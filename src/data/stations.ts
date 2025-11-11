@@ -1067,3 +1067,12 @@ export const stations: Station[] = [
   {posx: 447, posy: 583, size: 21, country: 'China', name: 'DANDONG (DDG)', type: 'VORTAC'},
   {posx: 81, posy: 1208, size: 21, country: 'China', name: 'WEIHAI (WEH)', type: 'VORTAC'},
 ]
+
+export const coordsByCountryType = stations.reduce((obj, coord) => {
+  const key = `${coord.country} - ${coord.type}s`;
+  if (!obj[key]) {
+    obj[key] = [];
+  }
+  obj[key].push(coord);
+  return obj;
+}, {} as Record<string, Station[]>);

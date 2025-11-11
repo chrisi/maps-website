@@ -3,37 +3,9 @@
 import {dropHandler, allowDrop} from "@/common/scripts/map_files.js";
 import {onMounted, ref} from "vue";
 import DetailsPopup from "@/components/details-popup.vue";
-import {stations} from "@/data/stations.ts";
+import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
-
-interface Tool {
-  name: string
-  caption: string
-  icon: string
-}
-
-const tools: Tool[] = [
-  {name: "move", caption: "move", icon: "icon_move1.png"},
-  {name: "zoom1", caption: "Zoom-Out", icon: "icon_zoom1.png"},
-  {name: "zoom2", caption: "Zoom-In", icon: "icon_zoom2.png"},
-  {name: "bullseye", caption: "Bullseye", icon: "icon_bullseye.png"},
-  {name: "compass", caption: "Compass", icon: "icon_compass.png"},
-  {name: "ruler", caption: "Ruler", icon: "icon_ruler.png"},
-  {name: "symbol", caption: "Symbol", icon: "icon_sword.png"},
-  {name: "pencil", caption: "Pencil", icon: "icon_pencil.png"},
-  {name: "text", caption: "Text", icon: "icon_text.png"},
-  {name: "eraser", caption: "Eraser", icon: "icon_eraser.png"},
-  {name: "settings", caption: "Settings", icon: "icon_menu.png"},
-]
-
-const coordsByCountryType = stations.reduce((obj, coord) => {
-  const key = `${coord.country} - ${coord.type}s`;
-  if (!obj[key]) {
-    obj[key] = [];
-  }
-  obj[key].push(coord);
-  return obj;
-}, {} as Record<string, Station[]>);
+import {coordsByCountryType, stations} from "@/data/stations.ts";
 
 const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
@@ -151,6 +123,10 @@ function locateAirbase(ap: string): void {
   }
 }
 
+const execTool = (tool: string) => {
+  console.log(tool);
+}
+
 </script>
 
 <template>
@@ -180,22 +156,7 @@ function locateAirbase(ap: string): void {
           </tr>
           </tbody>
         </table>
-        <table id="toolbar" class="pm0 tspc">
-          <tbody>
-          <tr>
-            <td>
-              <img src="/common/assets/icon_toolbar.png" class="toolBar" alt="">
-            </td>
-          </tr>
-          <tr v-for="tool in tools" v-bind:key="tool.name">
-            <td>
-              <img :src="'/common/assets/'+tool.icon"
-                   :alt="tool.caption" :id="tool.name"
-                   class="toolButton" onclick="button(event)">
-            </td>
-          </tr>
-          </tbody>
-        </table>
+        <map-toolbar @toolClick="execTool" class="tspc"/>
       </div>
     </div>
   </div>
@@ -221,7 +182,6 @@ function locateAirbase(ap: string): void {
 </template>
 
 <style scoped>
-
 .tspc {
   margin-top: 10px !important;
 }
@@ -234,19 +194,6 @@ function locateAirbase(ap: string): void {
 
 .pm0 td {
   padding: 0;
-}
-
-.toolBar {
-  width: 32px;
-  height: 8px;
-  display: block;
-}
-
-.toolButton {
-  width: 32px;
-  height: 32px;
-  display: block;
-  cursor: pointer;
 }
 
 #selectAirbase {
