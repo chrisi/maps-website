@@ -1,13 +1,14 @@
-export interface Coord {
+export interface Station {
   name: string,
   country: string,
   type: string
   posx: number,
   posy: number,
   size: number,
+  details?: Details,
 }
 
-export interface AirbaseData {
+export interface Details {
   name: string;
   lat: string;
   long: string;
@@ -19,10 +20,10 @@ export interface AirbaseData {
   gnd: string;
   twr: string;
   appdep: string;
-  charts: ChartData[];
+  charts?: Chart[];
 }
 
-export interface ChartData {
+export interface Chart {
   name: string;
   url: string;
   page: number;

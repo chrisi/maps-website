@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import type {Coord} from "@/model/Coord.ts";
-import {coords, exampleAp} from "@/data/airbases.ts";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files.js";
 import {onMounted, ref} from "vue";
 import DetailsPopup from "@/components/details-popup.vue";
+import {stations} from "@/data/stations.ts";
+import type {Station} from "@/model/Station.ts";
 
 interface Tool {
   name: string
@@ -26,18 +26,19 @@ const tools: Tool[] = [
   {name: "settings", caption: "Settings", icon: "icon_menu.png"},
 ]
 
-const coordsByCountryType = coords.reduce((obj, coord) => {
+const coordsByCountryType = stations.reduce((obj, coord) => {
   const key = `${coord.country} - ${coord.type}s`;
   if (!obj[key]) {
     obj[key] = [];
   }
   obj[key].push(coord);
   return obj;
-}, {} as Record<string, Coord[]>);
+}, {} as Record<string, Station[]>);
 
 const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
 const showModal = ref(false);
+const selectedStation = ref<Station | undefined>();
 
 interface Properties {
   zoom: number
@@ -134,14 +135,14 @@ function selectAirbase(event: Event): void {
 }
 
 function locateAirbase(ap: string): void {
-  console.log(ap);
-
-  const coord = coords.find(c => c.name === ap);
-  if (coord) {
+  const sta = stations.find(c => c.name === ap);
+  selectedStation.value = sta
+  if (sta) {
     const imageMap = document.getElementById("imgMap")!;
     const areas = [...imageMap.children] as HTMLAreaElement[];
     const area = areas.find(a => a.title === ap);
     if (area) {
+      //TODO: paint circle on map
       const coordArr = area.coords.split(',');
       console.log(coordArr);
       // const x = +coordArr[0];
@@ -154,7 +155,7 @@ function locateAirbase(ap: string): void {
 
 <template>
 
-  <details-popup :airbase="exampleAp" :visible="showModal" />
+  <details-popup :station="selectedStation" :visible="selectedStation!=null"/>
 
   <div id="container">
     <img id="map" width="3840" height="3840" :src="map" alt="">
@@ -201,14 +202,14 @@ function locateAirbase(ap: string): void {
 
   <map name="Map" id="imgMap" data-map-datum="38.5,127.18" data-map-version="2">
     <area
-      v-for="coord in coords"
-      :key="`${coord.country}-${coord.name}`"
+      v-for="sta in stations"
+      :key="`${sta.country}-${sta.name}`"
       shape="circle"
-      :coords="`${coord.posx},${coord.posy},${coord.size}`"
+      :coords="`${sta.posx},${sta.posy},${sta.size}`"
       href="javascript:void(0);"
-      :alt="coord.country"
-      :title="coord.name"
-      @click="locateAirbase(coord.name)"
+      :alt="sta.country"
+      :title="sta.name"
+      @click="locateAirbase(sta.name)"
     >
 
     <!-- Special Map areas and Coordinates based on 4096x4096-->

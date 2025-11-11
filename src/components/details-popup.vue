@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
-import type {AirbaseData, ChartData} from "@/model/Coord.ts";
+import type {Chart, Details, Station} from "@/model/Station.ts";
+import {ref, watch} from "vue";
 
 const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/";
 
 const props = defineProps({
-  airbase: {
-    type: Object as () => AirbaseData,
-    required: true
+  station: {
+    type: Object as () => Station | undefined
   },
   visible: {
     type: Boolean,
@@ -15,7 +15,19 @@ const props = defineProps({
   }
 })
 
-const createUrl = (chart: ChartData) => {
+const details = ref<Details>()
+
+watch(
+  () => props.station,
+  (newVal) => {
+    if (!newVal)
+      details.value = undefined
+    else
+      details.value = newVal.details
+  }
+)
+
+const createUrl = (chart: Chart) => {
   return `${baseUrl}/${chart.url}#page=${chart.page}#&view=Fit&toolbar=0`
 }
 
@@ -23,52 +35,52 @@ const createUrl = (chart: ChartData) => {
 
 <template>
   <div class="modal" v-if="props.visible">
-    <div class="modal-content">
-      <h4 class="title center">{{ props.airbase.name }}</h4>
+    <div class="modal-content" v-if="details">
+      <h4 class="title center">{{ details.name }}</h4>
       <hr style="margin: 0">
       <table class="table">
         <tbody>
         <tr>
-          <td colspan="2" class="data">{{ props.airbase.lat }}&nbsp;{{ props.airbase.long }}</td>
+          <td colspan="2" class="data">{{ details.lat }}&nbsp;{{ details.long }}</td>
         </tr>
         <tr>
           <td class="label">Elevation:</td>
-          <td class="data">{{ props.airbase.elev }}</td>
+          <td class="data">{{ details.elev }}</td>
         </tr>
         <tr>
           <td class="label">RWY:</td>
-          <td class="data">{{ props.airbase.rwy }}</td>
+          <td class="data">{{ details.rwy }}</td>
         </tr>
         <tr>
           <td class="label">TCN:</td>
-          <td class="data">{{ props.airbase.tcn }}</td>
+          <td class="data">{{ details.tcn }}</td>
         </tr>
         <tr>
           <td class="label">ATIS:</td>
-          <td class="data">{{ props.airbase.atis }}</td>
+          <td class="data">{{ details.atis }}</td>
         </tr>
-        <tr>
+        <tr v-if="details.ops">
           <td class="label">OPS:</td>
-          <td class="data">{{ props.airbase.ops }}</td>
+          <td class="data">{{ details.ops }}</td>
         </tr>
         <tr>
           <td class="label">GND:</td>
-          <td class="data">{{ props.airbase.gnd }}</td>
+          <td class="data">{{ details.gnd }}</td>
         </tr>
         <tr>
           <td class="label">TWR:</td>
-          <td class="data">{{ props.airbase.twr }}</td>
+          <td class="data">{{ details.twr }}</td>
         </tr>
         <tr>
           <td class="label">APP/DEP:</td>
-          <td class="data">{{ props.airbase.appdep }}</td>
+          <td class="data">{{ details.appdep }}</td>
         </tr>
         </tbody>
       </table>
       <h4 class="title" style="padding-top: 10px">Charts</h4>
       <hr style="margin: 0">
       <ul class="charts">
-        <li v-for="chart in props.airbase.charts" v-bind:key="chart.name">
+        <li v-for="chart in details.charts" v-bind:key="chart.name">
           <a :href="createUrl(chart)" target="_blank">{{ chart.name }}</a></li>
       </ul>
     </div>

@@ -1,12 +1,364 @@
-import type {AirbaseData, Coord} from "@/model/Coord.ts";
+import type {Station} from "@/model/Station.ts";
 
-export const coords: Coord[] = [
-  {posx: 958, posy: 1332, size: 8, country: 'South Korea', name: 'CHEONGJU', type: 'Airbase'},
-  {posx: 1158, posy: 1502, size: 8, country: 'South Korea', name: 'DAEGU', type: 'Airbase'},
-  {posx: 1198, posy: 1113, size: 6, country: 'South Korea', name: 'GANGNEUNG', type: 'Airbase'},
-  {posx: 1203, posy: 1652, size: 8, country: 'South Korea', name: 'GIMHAE', type: 'Airbase'},
-  {posx: 842, posy: 1158, size: 8, country: 'South Korea', name: 'GIMPO', type: 'Airbase'},
-  {posx: 810, posy: 1500, size: 8, country: 'South Korea', name: 'GUNSAN', type: 'Airbase'},
+export const stations: Station[] = [
+  {
+    posx: 958, posy: 1332, size: 8, country: 'South Korea', name: 'CHEONGJU', type: 'Airbase',
+    details: {
+      name: "CHEONGJU (RKTU)",
+      lat: "N36° 42.857'",
+      long: "E127° 29.493'",
+      elev: "176 ft",
+      rwy: "06L/24R - 06R/24L",
+      tcn: "27X",
+      atis: "128.85",
+      ops: "305.5",
+      gnd: "275.8",
+      twr: "250.2",
+      appdep: "292.9",
+      charts: [
+        {
+          name: "EOR-Procedure Chart",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_EOR.png",
+          page: 1
+        },
+        {
+          name: "VISUAL RWY 06/24",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - VISUAL.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 24R (111.7)",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
+          page: 21
+        },
+        {
+          name: "RNP RWY 06L",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
+          page: 1
+        },
+        {
+          name: "RNP RWY 24R",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
+          page: 17
+        },
+        {
+          name: "VOR RWY 06L",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
+          page: 15
+        },
+        {
+          name: "VOR RWY 24R",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
+          page: 31
+        },
+        {
+          name: "Standard Departures",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - SID.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
+  {
+    posx: 1158, posy: 1502, size: 8, country: 'South Korea', name: 'DAEGU', type: 'Airbase',
+    details: {
+      name: "DAEGU (RKTN)",
+      lat: "N35°53.672'",
+      long: "E129°39.557'",
+      elev: "120 ft",
+      rwy: "13R/31L - 13L/31R",
+      tcn: "125X",
+      atis: "127.65",
+      ops: "", // Not provided in the HTML
+      gnd: "275.8",
+      twr: "365.0",
+      appdep: "346.3",
+      charts: [
+        {
+          name: "Airport Diagram",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ADC.pdf",
+          page: 1
+        },
+        {
+          name: "EOR Procedure Chart",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_EOR.png",
+          page: 1
+        },
+        {
+          name: "ILS RWY 13L (111.9)",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 13R (108.7)",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 31L (108.7)",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 9
+        },
+        {
+          name: "RNP RWY 13L",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 7
+        },
+        {
+          name: "RNP RWY 13R",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 5
+        },
+        {
+          name: "RNP RWY 31L",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 13
+        },
+        {
+          name: "RNP RWY 31R",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 19
+        },
+        {
+          name: "TACAN 31L",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 15
+        },
+        {
+          name: "TACAN 31R",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
+          page: 21
+        },
+        {
+          name: "Standard Departures",
+          url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - SID.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
+  {
+    posx: 1198,
+    posy: 1113,
+    size: 6,
+    country: 'South Korea',
+    name: 'GANGNEUNG',
+    type: 'Airbase',
+    details: {
+      name: "GANGNEUNG (RKNN)",
+      lat: "N37°45.275'",
+      long: "E128°56.576'",
+      elev: "22 ft",
+      rwy: "08/26",
+      tcn: "56X",
+      atis: "132.05",
+      ops: "", // Not provided in the HTML
+      gnd: "275.8",
+      twr: "334.9",
+      appdep: "304.0",
+      charts: [
+        {
+          name: "Airport Diagram",
+          url: "01 South Korea/Gangneung/Gangneung_Airport.png",
+          page: 1
+        },
+        {
+          name: "EOR Procedure Chart",
+          url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN)_EOR.png",
+          page: 1
+        },
+        {
+          name: "ILS RWY 26 (111.5)",
+          url: "01 South Korea/Gangneung/Gangneung_ILS_26.png",
+          page: 1
+        },
+        {
+          name: "TACAN RWY 26",
+          url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - tacan_rwy_26.pdf",
+          page: 1
+        },
+        {
+          name: "Gangneung 1D Departure",
+          url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - 1d_dep.pdf",
+          page: 1
+        },
+        {
+          name: "Gangwon 3 Departure",
+          url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - 3_dep.pdf",
+          page: 1
+        },
+        {
+          name: "Pilit One Departure",
+          url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - pilit_dep.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
+  {
+    posx: 1203,
+    posy: 1652,
+    size: 8,
+    country: 'South Korea',
+    name: 'GIMHAE',
+    type: 'Airbase',
+    details: {
+      name: "GIMHAE (RKPK)",
+      lat: "N35°13.020'",
+      long: "E128°56.009'",
+      elev: "14 ft",
+      rwy: "18L/36R - 18R/36L",
+      tcn: "117X",
+      atis: "126.65",
+      ops: "", // Not provided in the HTML
+      gnd: "274.8",
+      twr: "233.3",
+      appdep: "225.1",
+      charts: [
+        {
+          name: "Airport Diagram",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - ADC.pdf",
+          page: 1
+        },
+        {
+          name: "Visual Approach",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - VISUAL.pdf",
+          page: 1
+        },
+        {
+          name: "RNP RWY 18L/R",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - ILS.pdf",
+          page: 29
+        },
+        {
+          name: "RNP RWY 36R",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - ILS.pdf",
+          page: 23
+        },
+        {
+          name: "ILS RWY 36R (109.5)",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - ILS.pdf",
+          page: 15
+        },
+        {
+          name: "Standard Departures",
+          url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - SID.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
+  {
+    posx: 842,
+    posy: 1158,
+    size: 8,
+    country: 'South Korea',
+    name: 'GIMPO',
+    type: 'Airbase',
+    details: {
+      name: "GIMPO (RKSS)",
+      lat: "N37°33.263'",
+      long: "E127°47.678'",
+      elev: "48 ft",
+      rwy: "14L/32R - 14R/32L",
+      tcn: "83X",
+      atis: "126.35",
+      ops: "", // Not provided in the HTML
+      gnd: "236.7",
+      twr: "240.9",
+      appdep: "363.8",
+      charts: [
+        {
+          name: "Airport Diagram",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ADC.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 14L (109.9)",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ILS.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 14R (108.7)",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ILS.pdf",
+          page: 7
+        },
+        {
+          name: "ILS RWY 32L (108.3)",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ILS.pdf",
+          page: 11
+        },
+        {
+          name: "ILS RWY 32R (110.7)",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ILS.pdf",
+          page: 17
+        },
+        {
+          name: "Standard Departures",
+          url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - SID.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
+  {
+    posx: 810,
+    posy: 1500,
+    size: 8,
+    country: 'South Korea',
+    name: 'GUNSAN',
+    type: 'Airbase',
+    details: {
+      name: "GUNSAN (RKJK)",
+      lat: "N35°54.297'",
+      long: "E126°37.064'",
+      elev: "22 ft",
+      rwy: "18/36",
+      tcn: "75X",
+      atis: "120.225",
+      ops: "", // Not provided in the HTML
+      gnd: "273.525",
+      twr: "292.3",
+      appdep: "292.65",
+      charts: [
+        {
+          name: "Airport Diagram",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ADC.pdf",
+          page: 1
+        },
+        {
+          name: "EOR Procedure Chart",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK)_EOR.png",
+          page: 1
+        },
+        {
+          name: "ILS RWY 18 (110.3)",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          page: 1
+        },
+        {
+          name: "ILS RWY 36 (110.3)",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          page: 3
+        },
+        {
+          name: "TACAN RWY 18 (112.8)",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          page: 5
+        },
+        {
+          name: "TACAN RWY 36 (112.8)",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          page: 7
+        },
+        {
+          name: "Standard Departures",
+          url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - SID.pdf",
+          page: 1
+        }
+      ]
+    }
+  },
   {posx: 841, posy: 1662, size: 8, country: 'South Korea', name: 'GWANGJU', type: 'Airbase'},
   {posx: 787, posy: 1173, size: 8, country: 'South Korea', name: 'INCHEON', type: 'Airbase'},
   {posx: 1023, posy: 1267, size: 8, country: 'South Korea', name: 'JUNGWON', type: 'Airbase'},
@@ -138,44 +490,3 @@ export const coords: Coord[] = [
   {posx: 447, posy: 583, size: 21, country: 'China', name: 'DANDONG (DDG)', type: 'VORTAC'},
   {posx: 81, posy: 1208, size: 21, country: 'China', name: 'WEIHAI (WEH)', type: 'VORTAC'},
 ]
-
-export const exampleAp: AirbaseData = {
-  name: "SACHEON (RKPS)",
-  lat: "N37°28.430'",
-  long: "E126°27.083'",
-  elev: "18 ft",
-  rwy: "03L/21R - 03R/21L",
-  tcn: "73X",
-  atis: "130.3",
-  ops: "318.1",
-  gnd: "275.8",
-  twr: "353.1",
-  appdep: "253.95",
-  charts: [
-    {
-      name: "ILS RWY 03R (111.5)",
-      url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - ilsdme_or_locdme_rwy_03r.pdf",
-      page: 1
-    },
-    {
-      name: "ILS RWY 21L (110.1)",
-      url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - ilsdme_or_locdme_rwy_21l.pdf",
-      page: 1
-    },
-    {
-      name: "HI-TACAN RWY 03L",
-      url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_tacan_rwy_03l.pdf",
-      page: 1
-    },
-    {
-      name: "HI-TACAN RWY 03R",
-      url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_tacan_rwy_03r.pdf",
-      page: 1
-    },
-    {
-      name: "HI-ILS RWY 03R",
-      url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_ils_or_locdme_rwy_3r.pdf",
-      page: 1
-    }
-  ]
-}
