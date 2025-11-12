@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
+<head>
     <meta charset="UTF-8">
     <link rel="icon" href="/maps-website/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Falcon BMS - Interactive Maps</title>
-    <script type="module" crossorigin src="/maps-website/assets/index-BW02CmrB.js"></script>
-    <link rel="stylesheet" crossorigin href="/maps-website/assets/index-DQZt5b1g.css">
-  </head>
-  <body style="padding: 0; margin: 0;">
-    <div id="app"></div>
-  </body>
+
+    <script>
+        (function () {
+            const PASSWORD = 'MapsDemo';
+            const AUTH_KEY = 'mapsAuthToken';
+
+            if (!sessionStorage.getItem(AUTH_KEY)) {
+                const password = prompt('Please enter password:');
+                if (password !== PASSWORD) {
+                    document.body.innerHTML = '<h1>Access Denied</h1>';
+                    throw new Error('Authentication failed');
+                }
+                sessionStorage.setItem(AUTH_KEY, 'authenticated');
+            }
+        })();
+    </script>
+
+  <script type="module" crossorigin src="/maps-website/assets/index-BW02CmrB.js"></script>
+  <link rel="stylesheet" crossorigin href="/maps-website/assets/index-DQZt5b1g.css">
+</head>
+<body style="padding: 0; margin: 0;">
+<div id="app"></div>
+</body>
 </html>
