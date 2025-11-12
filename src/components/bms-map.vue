@@ -9,7 +9,7 @@ import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
 
-const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
+const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
 const selectedStation = ref<Station | undefined>();
 
@@ -110,7 +110,7 @@ function selectAirbase(event: Event): void {
 }
 
 function locateAirbase(ap: string): void {
-  const imageMap = document.getElementById("imgMap")!;
+  const imageMap = document.getElementById("airbase_map")!;
   const areas = [...imageMap.children] as HTMLAreaElement[];
   const area = areas.find(a => a.title === ap);
   if (area) {
@@ -150,10 +150,18 @@ const execTool = (tool: string) => {
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
 
   <div ref="containerRef" id="container">
-    <img id="map" width="3840" height="3840" :src="map" alt="">
+    <img id="map" width="3840" height="3840" :src="mapUrl" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
       <canvas ref="annotationCanvasRef" id="annotation" width="3840" height="3840"></canvas>
-      <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#imgMap">
+      <map id="airbase_map" data-map-datum="38.5,127.18" data-map-version="2" name="airbase_map">
+        <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
+        <!-- Special Map areas and Coordinates based on 4096x4096-->
+        <!-- Map Legend Area -->
+        <area shape="rect" coords="0,1920,0,1920" alt="Legend">
+        <!-- Set Default Bullseye coordinates -->
+        <area shape="circle" coords="732,1049,1" alt="Bullseye">
+      </map>
+      <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#airbase_map">
       <div id="inputs">
         <table id="locate" class="pm0">
           <tbody>
@@ -175,15 +183,6 @@ const execTool = (tool: string) => {
       </div>
     </div>
   </div>
-
-  <map name="Map" id="imgMap" data-map-datum="38.5,127.18" data-map-version="2">
-    <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
-    <!-- Special Map areas and Coordinates based on 4096x4096-->
-    <!-- Map Legend Area -->
-    <area shape="rect" coords="0,1920,0,1920" alt="Legend">
-    <!-- Set Default Bullseye coordinates -->
-    <area shape="circle" coords="732,1049,1" alt="Bullseye">
-  </map>
 </template>
 
 <style scoped>
