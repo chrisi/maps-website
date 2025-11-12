@@ -35,8 +35,12 @@ const createUrl = (chart: Chart) => {
 }
 
 function openChart(chart: Chart) {
+  const w = chart.width || 610;
+  const h = chart.height || 835;
+  const x = (window.screen.width - w) / 2;
+  const y = (window.screen.height - h) / 2;
   const url = createUrl(chart)
-  const features = `width=${chart.width || 610},height=${chart.height || 835}`
+  const features = `width=${w},height=${h},left=${x},top=${y}`
   window.open(url, 'popup', features)
   return false
 }
