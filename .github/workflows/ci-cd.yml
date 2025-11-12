@@ -30,6 +30,6 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          npx gh-pages -d dist -u "github-actions-bot <github-actions[bot]@users.noreply.github.com>" -r https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git config --global user.email "mail@christiangebauer.de"
+          git config --global user.name "Christian Gebauer"
+          npx gh-pages -d dist -u "Christian Gebauer <mail@christiangebauer.de>" -r https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
