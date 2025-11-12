@@ -1,0 +1,29 @@
+name: Continuous CI/CD
+
+on:
+  push:
+    branches: [ "vue-port", "feature/*" ]
+  pull_request:
+    branches: [ "vue-port" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build the application
+        run: yarn build
+
+      - name: Deploy to GH pages
+        run: yarn deploy
