@@ -82,7 +82,7 @@ export const stations: Station[] = [
       rwy: "13R/31L - 13L/31R",
       tcn: "125X",
       atis: "127.65",
-      ops: "", // Not provided in the HTML
+      ops: "",
       gnd: "275.8",
       twr: "365.0",
       appdep: "346.3",

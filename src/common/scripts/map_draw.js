@@ -35,7 +35,7 @@ img_wx[3].src = '../common/assets/icon_wx4r.png';
 img_wx[4].src = '../common/assets/icon_wx4s.png';
 
 // Draw the highlight circle
-function drawHighlight(ctx,x,y,r) {
+export function drawHighlight(ctx,x,y,r) {
     ctx.beginPath();
     ctx.arc(x,y,r, 0, 2 * Math.PI, false);
     ctx.strokeStyle = '#ff0000';
@@ -535,7 +535,7 @@ function drawTemperatures(ctx) {
 // Callback for CONREC to draw contour segment
 var conrec_ctx;
 var level = -1;
-drawContours = function(x1,y1,x2,y2, l) {
+var drawContours = function(x1,y1,x2,y2, l) {
     conrec_ctx.beginPath();
     conrec_ctx.moveTo(y1 * 65,x1 * 65);
     conrec_ctx.lineTo(y2 * 65,x2 * 65);

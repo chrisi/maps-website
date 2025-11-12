@@ -1,8 +1,10 @@
 <script setup lang="ts">
 
-import {dropHandler, allowDrop} from "@/common/scripts/map_files.js";
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
+import {dropHandler, allowDrop} from "@/common/scripts/map_files";
+import {drawHighlight} from "@/common/scripts/map_draw";
 import DetailsPopup from "@/components/details-popup.vue";
+import AirbaseAreas from "@/components/airbase-areas.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -12,42 +14,54 @@ const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 const showModal = ref(false);
 const selectedStation = ref<Station | undefined>();
 
+const message = ref("");
+
+const containerRef = ref<HTMLDivElement | null>(null);
+const annotationCanvasRef = ref<HTMLCanvasElement | null>(null);
+
+let canvasContext: CanvasRenderingContext2D | null = null;
+
+const properties = reactive<Properties>({
+  zoom: 1
+});
+
 interface Properties {
   zoom: number
 }
 
-const properties: Properties = {
-  zoom: 1
-}
-
 onMounted(() => {
-  properties.zoom = 0.25;
-  storeMapCoordinates();
-  scaleMap(3840 / 4096);
-  scaleView(undefined);
+  initializeCanvas()
+  properties.zoom = 1
+  scaleView(undefined)
+  message.value = "Zoom Level: " + properties.zoom.toFixed(2);
 })
 
-let hotspots = [] as HTMLAreaElement[];
+function initializeCanvas() {
+  const canvas = annotationCanvasRef.value;
 
-function storeMapCoordinates() {
-  const imgMap = document.getElementById("imgMap")!;
-  hotspots = [];
-  for (const area of imgMap.children) hotspots.push(area as HTMLAreaElement);
-}
-
-function scaleMap(scale: number) {
-  const imageMap = document.getElementById("imgMap")!;
-  const areas = imageMap.children as unknown as HTMLAreaElement[];
-  let i = 0;
-  for (const area of areas) {
-    const coordArr = hotspots[i++]!.coords.split(',');
-    area.coords = coordArr.map(coord => Math.round(+coord * scale)).join(',');
-    // if (area.alt == "Legend") properties.legend = area.coords;
-    // if (area.alt == "Bullseye") bullseye.coords = area.coords;
+  if (!canvas) {
+    console.error("Canvas element not found");
+    return;
   }
+
+  canvasContext = canvas.getContext("2d", {willReadFrequently: true});
+
+  if (!canvasContext) {
+    console.error("Failed to get 2D context");
+    return;
+  }
+
+  canvasContext.globalAlpha = 1;
 }
 
-let last_zoom = 1;
+watch(
+  () => properties.zoom,
+  (newZoom) => {
+    message.value = "Zoom Level: " + newZoom.toFixed(2);
+  }
+);
+
+let last_zoom = 1
 
 function scaleView(event: MouseEvent | undefined) { // Add event parameter to capture mouse position
 
@@ -67,12 +81,6 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
   const doc_mouseX = scroll_element.scrollLeft + mouseX;
   const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-  // Setup the main canvas for the view
-  const canvas = document.getElementById("annotation")! as HTMLCanvasElement;
-  console.log(canvas);
-  const context = canvas.getContext("2d", {willReadFrequently: true})!;
-  context.globalAlpha = 1;
-
   // Update map dimensions
   const base_map = document.getElementById('map')!;
   base_map.style.width = dim_str;
@@ -81,15 +89,12 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
   const ovly_map = document.getElementById('airbases')!;
   ovly_map.style.width = dim_str;
   ovly_map.style.height = dim_str;
-  canvas.width = dimension;
-  canvas.height = dimension;
+  annotationCanvasRef.value!.width = dimension;
+  annotationCanvasRef.value!.height = dimension;
 
   // Scale bullseye coordinates
 // bullseye.x *= scale;
 // bullseye.y *= scale;
-
-  // Scale the airport coordinates on the image map
-  scaleMap(scale);
 
   // Calculate new scroll position to keep mouse point fixed
   const new_doc_mouseX = doc_mouseX * scale;
@@ -103,28 +108,42 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
 function selectAirbase(event: Event): void {
   const select = event.target as HTMLSelectElement;
   locateAirbase(select.value);
-  showModal.value = true;
 }
 
 function locateAirbase(ap: string): void {
-  const sta = stations.find(c => c.name === ap);
-  selectedStation.value = sta
-  if (sta) {
-    const imageMap = document.getElementById("imgMap")!;
-    const areas = [...imageMap.children] as HTMLAreaElement[];
-    const area = areas.find(a => a.title === ap);
-    if (area) {
-      //TODO: paint circle on map
-      const coordArr = area.coords.split(',');
-      console.log(coordArr);
-      // const x = +coordArr[0];
-      // const y = +coordArr[1];
-    }
+  const imageMap = document.getElementById("imgMap")!;
+  const areas = [...imageMap.children] as HTMLAreaElement[];
+  const area = areas.find(a => a.title === ap);
+  if (area) {
+    const coordArr = area.coords.split(',');
+    const x = +coordArr[0]!;
+    const y = +coordArr[1]!;
+    drawHighlight(canvasContext!, x, y, 17 * properties.zoom);
+    // Make the airbase the focus
+    window.scrollTo(x - window.innerWidth / 2, y - window.innerHeight / 2);
   }
+}
+
+function showStationDetails(station: Station) {
+  selectedStation.value = station;
+  showModal.value = true;
 }
 
 const execTool = (tool: string) => {
   console.log(tool);
+  switch (tool) {
+    case "move":
+      document.getElementById("cursor-val")!.innerText = "Drag the map to move it around.";
+      break;
+    case "zoom1":
+      properties.zoom /= 1.1;
+      scaleView(undefined)
+      break;
+    case "zoom2":
+      properties.zoom *= 1.1;
+      scaleView(undefined)
+      break;
+  }
 }
 
 </script>
@@ -133,17 +152,17 @@ const execTool = (tool: string) => {
 
   <details-popup :station="selectedStation" :visible="selectedStation!=null"/>
 
-  <div id="container">
+  <div ref="containerRef" id="container">
     <img id="map" width="3840" height="3840" :src="map" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
-      <canvas id="annotation" width="3840" height="3840"></canvas>
+      <canvas ref="annotationCanvasRef" id="annotation" width="3840" height="3840"></canvas>
       <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt=""
            usemap="#imgMap">
       <div id="inputs">
         <table id="locate" class="pm0">
           <tbody>
           <tr>
-            <td><label id="cursor-val">What goes here?</label></td>
+            <td><label id="cursor-val">{{ message }}</label></td>
           </tr>
           <tr>
             <td>
@@ -162,10 +181,7 @@ const execTool = (tool: string) => {
   </div>
 
   <map name="Map" id="imgMap" data-map-datum="38.5,127.18" data-map-version="2">
-    <area v-for="sta in stations" :key="sta.name" shape="circle" href="javascript:void(0);"
-          :coords="`${sta.posx},${sta.posy},${sta.size}`" :alt="sta.country" :title="sta.name"
-          @click="locateAirbase(sta.name)">
-
+    <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showStationDetails"/>
     <!-- Special Map areas and Coordinates based on 4096x4096-->
     <!-- Map Legend Area -->
     <area shape="rect" coords="0,1920,0,1920" alt="Legend">
@@ -190,15 +206,16 @@ const execTool = (tool: string) => {
 }
 
 #selectAirbase {
+  pointer-events: auto;
   font-size: medium;
   width: 280px;
 }
 
 #cursor-val {
   color: white;
-  font-size: small;
+  font-weight: bolder;
   font-family: monospace;
-  font-weight: bold;
+  display: inline-block;
 }
 
 #container {
@@ -219,6 +236,7 @@ const execTool = (tool: string) => {
 }
 
 #inputs {
+  pointer-events: none;
   position: fixed;
   left: 15px;
   top: 15px;
