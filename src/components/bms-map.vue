@@ -104,11 +104,6 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
   last_zoom = properties.zoom;
 }
 
-function handleMapBackgroundClick(event: MouseEvent): void {
-  console.log("Clicked empty map area at:", event.offsetX, event.offsetY);
-  selectedStation.value = undefined;
-}
-
 function selectAirbase(event: Event): void {
   const select = event.target as HTMLSelectElement;
   locateAirbase(select.value);
@@ -128,7 +123,7 @@ function locateAirbase(ap: string): void {
   }
 }
 
-function showStationDetails(station: Station) {
+function showPopup(station: Station) {
   selectedStation.value = station;
 }
 
@@ -152,15 +147,13 @@ const execTool = (tool: string) => {
 </script>
 
 <template>
-
   <details-popup :station="selectedStation" :visible="selectedStation!=null" @close="selectedStation=undefined"/>
 
   <div ref="containerRef" id="container">
-    <img id="map" width="3840" height="3840" :src="map" alt="" @click="handleMapBackgroundClick">
+    <img id="map" width="3840" height="3840" :src="map" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
       <canvas ref="annotationCanvasRef" id="annotation" width="3840" height="3840"></canvas>
-      <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt=""
-           usemap="#imgMap">
+      <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#imgMap">
       <div id="inputs">
         <table id="locate" class="pm0">
           <tbody>
@@ -184,7 +177,7 @@ const execTool = (tool: string) => {
   </div>
 
   <map name="Map" id="imgMap" data-map-datum="38.5,127.18" data-map-version="2">
-    <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showStationDetails"/>
+    <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
     <!-- Special Map areas and Coordinates based on 4096x4096-->
     <!-- Map Legend Area -->
     <area shape="rect" coords="0,1920,0,1920" alt="Legend">
