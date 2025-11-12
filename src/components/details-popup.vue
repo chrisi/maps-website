@@ -15,6 +15,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['close'])
+
 const data = ref<Details>()
 
 watch(
@@ -48,7 +50,7 @@ function openChart(chart: Chart) {
 </script>
 
 <template>
-  <div class="modal" v-if="props.visible">
+  <div class="modal-backdrop" v-if="props.visible" @click="emit('close')">
     <div class="modal-content" v-if="data">
       <h4 class="title center">{{ data.name }}</h4>
       <hr class="sep">
@@ -168,10 +170,12 @@ span:hover {
   font-family: monospace;
 }
 
-.modal {
+.modal-backdrop {
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  background-color: rgba(0, 0, 0, 0);
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(1, 1, 1, 0);
 }
 
 .modal-content {

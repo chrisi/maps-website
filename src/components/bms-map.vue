@@ -11,7 +11,6 @@ import {stationsByCountryType, stations} from "@/data/stations.ts";
 
 const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
-const showModal = ref(false);
 const selectedStation = ref<Station | undefined>();
 
 const message = ref("");
@@ -105,6 +104,11 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
   last_zoom = properties.zoom;
 }
 
+function handleMapBackgroundClick(event: MouseEvent): void {
+  console.log("Clicked empty map area at:", event.offsetX, event.offsetY);
+  selectedStation.value = undefined;
+}
+
 function selectAirbase(event: Event): void {
   const select = event.target as HTMLSelectElement;
   locateAirbase(select.value);
@@ -126,7 +130,6 @@ function locateAirbase(ap: string): void {
 
 function showStationDetails(station: Station) {
   selectedStation.value = station;
-  showModal.value = true;
 }
 
 const execTool = (tool: string) => {
@@ -150,10 +153,10 @@ const execTool = (tool: string) => {
 
 <template>
 
-  <details-popup :station="selectedStation" :visible="selectedStation!=null"/>
+  <details-popup :station="selectedStation" :visible="selectedStation!=null" @close="selectedStation=undefined"/>
 
   <div ref="containerRef" id="container">
-    <img id="map" width="3840" height="3840" :src="map" alt="">
+    <img id="map" width="3840" height="3840" :src="map" alt="" @click="handleMapBackgroundClick">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
       <canvas ref="annotationCanvasRef" id="annotation" width="3840" height="3840"></canvas>
       <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt=""
