@@ -5,7 +5,7 @@ import {onMounted, ref} from "vue";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
-import {coordsByCountryType, stations} from "@/data/stations.ts";
+import {stationsByCountryType, stations} from "@/data/stations.ts";
 
 const map = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
@@ -148,7 +148,7 @@ const execTool = (tool: string) => {
           <tr>
             <td>
               <select id="selectAirbase" @change="selectAirbase($event)" size="1">
-                <optgroup v-for="(v,k) in coordsByCountryType" v-bind:key="k" :label="k">
+                <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
                   <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
                 </optgroup>
               </select>
@@ -162,16 +162,9 @@ const execTool = (tool: string) => {
   </div>
 
   <map name="Map" id="imgMap" data-map-datum="38.5,127.18" data-map-version="2">
-    <area
-      v-for="sta in stations"
-      :key="`${sta.country}-${sta.name}`"
-      shape="circle"
-      :coords="`${sta.posx},${sta.posy},${sta.size}`"
-      href="javascript:void(0);"
-      :alt="sta.country"
-      :title="sta.name"
-      @click="locateAirbase(sta.name)"
-    >
+    <area v-for="sta in stations" :key="sta.name" shape="circle" href="javascript:void(0);"
+          :coords="`${sta.posx},${sta.posy},${sta.size}`" :alt="sta.country" :title="sta.name"
+          @click="locateAirbase(sta.name)">
 
     <!-- Special Map areas and Coordinates based on 4096x4096-->
     <!-- Map Legend Area -->

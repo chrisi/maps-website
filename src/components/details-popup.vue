@@ -28,7 +28,14 @@ watch(
 )
 
 const createUrl = (chart: Chart) => {
-  return `${baseUrl}/${chart.url}#page=${chart.page}#&view=Fit&toolbar=0`
+  return `${baseUrl}/${chart.url}#page=${chart.page || 1}#&view=Fit&toolbar=0`
+}
+
+function openChart(chart: Chart) {
+  const url = createUrl(chart)
+  const features = `width=${chart.width || 610},height=${chart.height || 835}`
+  window.open(url, 'popup', features)
+  return false
 }
 
 </script>
@@ -81,7 +88,8 @@ const createUrl = (chart: Chart) => {
       <hr style="margin: 0">
       <ul class="charts">
         <li v-for="chart in details.charts" v-bind:key="chart.name">
-          <a :href="createUrl(chart)" target="_blank">{{ chart.name }}</a></li>
+          <a :href="createUrl(chart)" @click.prevent="openChart(chart)">{{ chart.name }}</a>
+        </li>
       </ul>
     </div>
   </div>

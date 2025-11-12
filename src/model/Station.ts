@@ -26,5 +26,7 @@ export interface Details {
 export interface Chart {
   name: string;
   url: string;
-  page: number;
+  page?: number;
+  width?: number;
+  height?: number;
 }

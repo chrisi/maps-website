@@ -1068,11 +1068,11 @@ export const stations: Station[] = [
   {posx: 81, posy: 1208, size: 21, country: 'China', name: 'WEIHAI (WEH)', type: 'VORTAC'},
 ]
 
-export const coordsByCountryType = stations.reduce((obj, coord) => {
-  const key = `${coord.country} - ${coord.type}s`;
+export const stationsByCountryType = stations.reduce((obj, sta) => {
+  const key = `${sta.country} - ${sta.type}s`;
   if (!obj[key]) {
     obj[key] = [];
   }
-  obj[key].push(coord);
+  obj[key].push(sta);
   return obj;
 }, {} as Record<string, Station[]>);
