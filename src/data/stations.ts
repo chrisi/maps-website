@@ -450,12 +450,12 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Incheon Intl (RKSI)/Incheon Intl (RKSI) - ADC.pdf",
-          page: 1
+          width: 870,
+          height: 600
         },
         {
           name: "ILS RWY 15L (111.9)",
           url: "01 South Korea (ROK-US)/Incheon Intl (RKSI)/Incheon Intl (RKSI) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 15R (109.1)",
@@ -475,17 +475,14 @@ export const stations: Station[] = [
         {
           name: "Visual Approach",
           url: "01 South Korea (ROK-US)/Incheon Intl (RKSI)/Incheon Intl (RKSI) - VISUAL.pdf",
-          page: 1
         },
         {
           name: "Standard Arrivals",
           url: "01 South Korea (ROK-US)/Incheon Intl (RKSI)/Incheon Intl (RKSI) - STAR.pdf",
-          page: 1
         },
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Incheon Intl (RKSI)/Incheon Intl (RKSI) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -513,32 +510,32 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea/Jungwon/Jungwon_Airport.png",
-          page: 1
+          width: 551
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Jungwon AB (RKTI)/Jungwon AB (RKTI)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 36R (111.3)",
           url: "01 South Korea (ROK-US)/Jungwon AB (RKTI)/Jungwon AB (RKTI) - ilsdme_rwy_36r.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "TACAN RWY 36L",
           url: "01 South Korea (ROK-US)/Jungwon AB (RKTI)/Jungwon AB (RKTI) - tacan_rwy_36l.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "TACAN RWY 36R",
           url: "01 South Korea (ROK-US)/Jungwon AB (RKTI)/Jungwon AB (RKTI) - tacan_rwy_36r.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "Jungwon 2 Departure",
           url: "01 South Korea (ROK-US)/Jungwon AB (RKTI)/Jungwon AB (RKTI) - jungwon_dep.pdf",
-          page: 1
+          width: 551
         }
       ]
     }
@@ -574,12 +571,10 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Muan Intl (RKJB)/Muan Intl (RKJB) - ADC.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 01 (111.9)",
           url: "01 South Korea (ROK-US)/Muan Intl (RKJB)/Muan Intl (RKJB) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 19 (108.9)",
@@ -589,17 +584,14 @@ export const stations: Station[] = [
         {
           name: "Visual Approach",
           url: "01 South Korea (ROK-US)/Muan Intl (RKJB)/Muan Intl (RKJB) - VISUAL.pdf",
-          page: 1
         },
         {
           name: "Standard Arrivals",
           url: "01 South Korea (ROK-US)/Muan Intl (RKJB)/Muan Intl (RKJB) - STAR.pdf",
-          page: 1
         },
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Muan Intl (RKJB)/Muan Intl (RKJB) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -627,42 +619,42 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "https://cdn.falcon-bms.com/maps/01_KTO/charts/01 South Korea/Osan/Osan_Airport.png",
-          page: 1
+          width: 551
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 09L (111.3)",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - ils_or_locdme_rwy_09l.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 27R (111.3)",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - ils_or_locdme_rwy_27r.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "RNAV RWY 09L",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - rnav_gps_rwy_09l.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "RNAV RWY 27R",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - rnav_gps_rwy_27r.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "DRAGGIN 8 Departure",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - draggin_dep.pdf",
-          page: 1
+          width: 551
         },
         {
           name: "MUSTANG 4 Departure",
           url: "01 South Korea (ROK-US)/Osan AB (RKSO)/Osan AB (RKSO) - mustang_dep.pdf",
-          page: 1
+          width: 551
         }
       ]
     }
@@ -690,12 +682,12 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Pohang AB (RKTH)/Pohang AB (RKTH) - ADC.pdf",
-          page: 1
+          width: 860,
+          height: 600
         },
         {
           name: "ILS RWY 10 (110.9)",
           url: "01 South Korea (ROK-US)/Pohang AB (RKTH)/Pohang AB (RKTH) - ILS.pdf",
-          page: 1
         },
         {
           name: "TACAN RWY 10",
@@ -710,7 +702,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Pohang AB (RKTH)/Pohang AB (RKTH) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -738,22 +729,19 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea/Pyeongtaek/Pyeongtaek_Airport.png",
-          page: 1
+          width: 551,
         },
         {
           name: "ILS RWY 32 (108.75)",
           url: "01 South Korea (ROK-US)/Pyeongtaek AAF (RKSG)/Pyeongtaek AAF (RKSG) - ils_or_loc_rwy_32.pdf",
-          page: 1
         },
         {
           name: "DVOR RWY 32",
           url: "01 South Korea (ROK-US)/Pyeongtaek AAF (RKSG)/Pyeongtaek AAF (RKSG) - dvor_rwy_32.pdf",
-          page: 1
         },
         {
           name: "RNAV RWY 32",
           url: "01 South Korea (ROK-US)/Pyeongtaek AAF (RKSG)/Pyeongtaek AAF (RKSG) - rnav_gps_rwy_32.pdf",
-          page: 1
         }
       ]
     }
@@ -781,17 +769,15 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Sacheon AB (RKPS)/Sacheon AB (RKPS) - ADC.pdf",
-          page: 1
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Sacheon AB (RKPS)/Sacheon AB (RKPS)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 06L (111.5)",
           url: "01 South Korea (ROK-US)/Sacheon AB (RKPS)/Sacheon AB (RKPS) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 24R (108.1)",
@@ -811,12 +797,10 @@ export const stations: Station[] = [
         {
           name: "Standard Arrivals",
           url: "01 South Korea (ROK-US)/Sacheon AB (RKPS)/Sacheon AB (RKPS) - STAR.pdf",
-          page: 1
         },
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Sacheon AB (RKPS)/Sacheon AB (RKPS) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -844,37 +828,31 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea/Seosan/Seosan_Airport.png",
-          page: 1
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 03R (111.5)",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - ilsdme_or_locdme_rwy_03r.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 21L (110.1)",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - ilsdme_or_locdme_rwy_21l.pdf",
-          page: 1
         },
         {
           name: "HI-TACAN RWY 03L",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_tacan_rwy_03l.pdf",
-          page: 1
         },
         {
           name: "HI-TACAN RWY 03R",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_tacan_rwy_03r.pdf",
-          page: 1
         },
         {
           name: "HI-ILS RWY 03R",
           url: "01 South Korea (ROK-US)/Seosan AB (RKTP)/Seosan AB (RKTP) - hi_ils_or_locdme_rwy_3r.pdf",
-          page: 1
         }
       ]
     }
@@ -902,12 +880,10 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Seoul AB (RKSM)/Seoul AB (RKSM) - ADC.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 20 (110.9)",
           url: "01 South Korea (ROK-US)/Seoul AB (RKSM)/Seoul AB (RKSM) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 19 (108.95)",
@@ -927,7 +903,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Seoul AB (RKSM)/Seoul AB (RKSM) - SID.pdf",
-          page: 1
         }
       ]
     }
