@@ -11,7 +11,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "deploy": "npm run build && gh-pages -d dist",
+    "deploy": "yarn build && gh-pages -d dist",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache"
   },
