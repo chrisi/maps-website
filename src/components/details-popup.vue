@@ -98,7 +98,7 @@ function openChart(chart: Chart) {
       <hr class="sep">
       <ul class="charts">
         <li v-for="chart in data.charts" v-bind:key="chart.name">
-          <span @click="openChart(chart)">{{ chart.name }}</span>
+          <span @click.stop="openChart(chart)">{{ chart.name }}</span>
         </li>
       </ul>
     </div>

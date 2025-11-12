@@ -147,7 +147,7 @@ const execTool = (tool: string) => {
 </script>
 
 <template>
-  <details-popup :station="selectedStation" :visible="selectedStation!=null" @close="selectedStation=undefined"/>
+  <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
 
   <div ref="containerRef" id="container">
     <img id="map" width="3840" height="3840" :src="map" alt="">
