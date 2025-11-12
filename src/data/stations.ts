@@ -22,14 +22,19 @@ export const stations: Station[] = [
       appdep: "292.9",
       charts: [
         {
+          name: "Airport Diagram",
+          url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ADC.pdf",
+          width: 860,
+          height: 600
+        },
+        {
           name: "EOR-Procedure Chart",
           url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU)_EOR.png",
-          page: 1
+          width: 546
         },
         {
           name: "VISUAL RWY 06/24",
           url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - VISUAL.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 24R (111.7)",
@@ -39,7 +44,6 @@ export const stations: Station[] = [
         {
           name: "RNP RWY 06L",
           url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - ILS.pdf",
-          page: 1
         },
         {
           name: "RNP RWY 24R",
@@ -59,7 +63,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Cheongju Intl (RKTU)/Cheongju Intl (RKTU) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -87,22 +90,21 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ADC.pdf",
-          page: 1
+          width: 870,
+          height: 600
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN)_EOR.png",
-          page: 1
+          width: 546
         },
         {
           name: "ILS RWY 13L (111.9)",
           url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 13R (108.7)",
           url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 31L (108.7)",
@@ -142,7 +144,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Daegu AB (RKTN)/Daegu AB (RKTN) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -170,37 +171,33 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea/Gangneung/Gangneung_Airport.png",
-          page: 1
+          width: 551
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 26 (111.5)",
           url: "01 South Korea/Gangneung/Gangneung_ILS_26.png",
-          page: 1
+          width: 595
         },
         {
           name: "TACAN RWY 26",
           url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - tacan_rwy_26.pdf",
-          page: 1
         },
         {
           name: "Gangneung 1D Departure",
           url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - 1d_dep.pdf",
-          page: 1
         },
         {
           name: "Gangwon 3 Departure",
           url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - 3_dep.pdf",
-          page: 1
         },
         {
           name: "Pilit One Departure",
           url: "01 South Korea (ROK-US)/Gangneung AB (RKNN)/Gangneung AB (RKNN) - pilit_dep.pdf",
-          page: 1
         }
       ]
     }
@@ -228,12 +225,10 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - ADC.pdf",
-          page: 1
         },
         {
           name: "Visual Approach",
           url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - VISUAL.pdf",
-          page: 1
         },
         {
           name: "RNP RWY 18L/R",
@@ -253,7 +248,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Gimhae Intl (RKPK)/Gimhae Intl (RKPK) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -281,12 +275,12 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ADC.pdf",
-          page: 1
+          width: 870,
+          height: 600
         },
         {
           name: "ILS RWY 14L (109.9)",
           url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 14R (108.7)",
@@ -306,7 +300,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Gimpo Intl (RKSS)/Gimpo Intl (RKSS) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -334,17 +327,15 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ADC.pdf",
-          page: 1
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 18 (110.3)",
           url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
-          page: 1
         },
         {
           name: "ILS RWY 36 (110.3)",
@@ -364,7 +355,6 @@ export const stations: Station[] = [
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - SID.pdf",
-          page: 1
         }
       ]
     }
@@ -392,22 +382,19 @@ export const stations: Station[] = [
         {
           name: "Airport Diagram",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ) - ADC.pdf",
-          page: 1
         },
         {
           name: "Visual Approach",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ) - VISUAL.pdf",
-          page: 1
         },
         {
           name: "EOR Procedure Chart",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ)_EOR.png",
-          page: 1
+          width: 551
         },
         {
           name: "ILS RWY 04R (111.1)",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ) - ILS.pdf",
-          page: 1
         },
         {
           name: "RNP RWY 04L",
@@ -432,12 +419,10 @@ export const stations: Station[] = [
         {
           name: "Standard Arrivals",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ) - STAR.pdf",
-          page: 1
         },
         {
           name: "Standard Departures",
           url: "01 South Korea (ROK-US)/Gwangju AB (RKJJ)/Gwangju AB (RKJJ) - SID.pdf",
-          page: 1
         }
       ]
     }

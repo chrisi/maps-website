@@ -15,20 +15,23 @@ const props = defineProps({
   }
 })
 
-const details = ref<Details>()
+const data = ref<Details>()
 
 watch(
   () => props.station,
   (newVal) => {
     if (!newVal)
-      details.value = undefined
+      data.value = undefined
     else
-      details.value = newVal.details
+      data.value = newVal.details
   }
 )
 
 const createUrl = (chart: Chart) => {
-  return `${baseUrl}/${chart.url}#page=${chart.page || 1}#&view=Fit&toolbar=0`
+  if (chart.url.endsWith('.png'))
+    return `${baseUrl}/${chart.url}`
+  else
+    return `${baseUrl}/${chart.url}#page=${chart.page || 1}#&view=Fit&toolbar=0`
 }
 
 function openChart(chart: Chart) {
@@ -42,53 +45,54 @@ function openChart(chart: Chart) {
 
 <template>
   <div class="modal" v-if="props.visible">
-    <div class="modal-content" v-if="details">
-      <h4 class="title center">{{ details.name }}</h4>
-      <hr style="margin: 0">
-      <table class="table">
+    <div class="modal-content" v-if="data">
+      <h4 class="title center">{{ data.name }}</h4>
+      <hr class="sep">
+      <table class="table spc">
         <tbody>
         <tr>
-          <td colspan="2" class="data">{{ details.lat }}&nbsp;{{ details.long }}</td>
+          <td colspan="2" class="data" style="padding: 5px 0">{{ data.lat }}&nbsp;{{ data.long }}
+          </td>
         </tr>
         <tr>
           <td class="label">Elevation:</td>
-          <td class="data">{{ details.elev }}</td>
+          <td class="data">{{ data.elev }}</td>
         </tr>
         <tr>
           <td class="label">RWY:</td>
-          <td class="data">{{ details.rwy }}</td>
+          <td class="data">{{ data.rwy }}</td>
         </tr>
         <tr>
           <td class="label">TCN:</td>
-          <td class="data">{{ details.tcn }}</td>
+          <td class="data">{{ data.tcn }}</td>
         </tr>
         <tr>
           <td class="label">ATIS:</td>
-          <td class="data">{{ details.atis }}</td>
+          <td class="data">{{ data.atis }}</td>
         </tr>
-        <tr v-if="details.ops">
+        <tr v-if="data.ops">
           <td class="label">OPS:</td>
-          <td class="data">{{ details.ops }}</td>
+          <td class="data">{{ data.ops }}</td>
         </tr>
         <tr>
           <td class="label">GND:</td>
-          <td class="data">{{ details.gnd }}</td>
+          <td class="data">{{ data.gnd }}</td>
         </tr>
         <tr>
           <td class="label">TWR:</td>
-          <td class="data">{{ details.twr }}</td>
+          <td class="data">{{ data.twr }}</td>
         </tr>
         <tr>
           <td class="label">APP/DEP:</td>
-          <td class="data">{{ details.appdep }}</td>
+          <td class="data">{{ data.appdep }}</td>
         </tr>
         </tbody>
       </table>
       <h4 class="title" style="padding-top: 10px">Charts</h4>
-      <hr style="margin: 0">
+      <hr class="sep">
       <ul class="charts">
-        <li v-for="chart in details.charts" v-bind:key="chart.name">
-          <a :href="createUrl(chart)" @click.prevent="openChart(chart)">{{ chart.name }}</a>
+        <li v-for="chart in data.charts" v-bind:key="chart.name">
+          <span @click="openChart(chart)">{{ chart.name }}</span>
         </li>
       </ul>
     </div>
@@ -96,6 +100,29 @@ function openChart(chart: Chart) {
 </template>
 
 <style scoped>
+
+.spc {
+  padding: 5px 0;
+}
+
+.sep {
+  margin: 2px 0;
+}
+
+li {
+  padding: 1px;
+}
+
+span {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+}
+
+span:hover {
+  background-color: #ddd;
+  padding: 1px 2px;
+}
 
 .center {
   text-align: center;
