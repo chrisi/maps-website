@@ -28,11 +28,11 @@ img_wx.push(new Image());
 img_wx.push(new Image());
 
 // Weather Type Icon files
-img_wx[0].src = '../common/assets/icon_wx1.png';
-img_wx[1].src = '../common/assets/icon_wx2.png';
-img_wx[2].src = '../common/assets/icon_wx3.png';
-img_wx[3].src = '../common/assets/icon_wx4r.png';
-img_wx[4].src = '../common/assets/icon_wx4s.png';
+img_wx[0].src = 'common/assets/icon_wx1.png';
+img_wx[1].src = 'common/assets/icon_wx2.png';
+img_wx[2].src = 'common/assets/icon_wx3.png';
+img_wx[3].src = 'common/assets/icon_wx4r.png';
+img_wx[4].src = 'common/assets/icon_wx4s.png';
 
 // Draw the highlight circle
 export function drawHighlight(ctx,x,y,r) {

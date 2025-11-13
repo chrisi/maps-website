@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onMounted, reactive, ref, watch} from "vue";
+import {onBeforeUnmount, onMounted, reactive, ref, watch} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import DetailsPopup from "@/components/details-popup.vue";
@@ -16,16 +16,32 @@ const selectedStation = ref<Station | undefined>();
 const message = ref("");
 
 const containerRef = ref<HTMLDivElement | null>(null);
-const annotationCanvasRef = ref<HTMLCanvasElement | null>(null);
+const mapRef = ref<HTMLImageElement | null>(null);
+const airbasesRef = ref<HTMLImageElement | null>(null);
+const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
 
+enum Mode {
+  None = "none",
+  Move = "move",
+  Bullseye = "bullseye",
+  Compass = "compass",
+  Measure = "measure",
+  Draw = "draw",
+  Erase = "erase",
+  Write = "write",
+  Symbol = "symbol"
+}
+
 const properties = reactive<Properties>({
-  zoom: 1
+  zoom: 1,
+  mode: Mode.Move
 });
 
 interface Properties {
   zoom: number
+  mode: Mode
 }
 
 onMounted(() => {
@@ -33,24 +49,49 @@ onMounted(() => {
   properties.zoom = 1
   scaleView(undefined)
   message.value = "Zoom Level: " + properties.zoom.toFixed(2);
+  airbasesRef.value!.addEventListener('mousedown', pointer_start);
+  airbasesRef.value!.addEventListener('mousemove', pointer_drag);
+  airbasesRef.value!.addEventListener('mouseup', pointer_end);
+  // window.addEventListener("wheel", mouse_zoom, {passive: false});
 })
 
+onBeforeUnmount(() => {
+  airbasesRef.value!.removeEventListener('mousedown', pointer_start);
+  airbasesRef.value!.removeEventListener('mousemove', pointer_drag);
+  airbasesRef.value!.removeEventListener('mouseup', pointer_end);
+})
+
+let pointerPanStart = {x: 0, y: 0};
+let panOffset = {x: 0, y: 0};
+
+function pointer_start(e: MouseEvent) {
+  e.preventDefault()
+  const scroll_element = document.scrollingElement!;
+  pointerPanStart = {x: e.clientX, y: e.clientY};
+  panOffset = {x: scroll_element.scrollLeft, y: scroll_element.scrollTop};
+  properties.mode = Mode.Move;
+}
+
+function pointer_end(e: MouseEvent) {
+  e.preventDefault()
+  pointerPanStart = {x: 0, y: 0};
+  properties.mode = Mode.None;
+}
+
+function pointer_drag(e: MouseEvent) {
+  e.preventDefault()
+  switch (properties.mode) {
+    case Mode.Move:
+      const dx = pointerPanStart.x - e.clientX;
+      const dy = pointerPanStart.y - e.clientY;
+      window.scrollTo(panOffset.x + dx, panOffset.y + dy);
+      break;
+  }
+}
+
 function initializeCanvas() {
-  const canvas = annotationCanvasRef.value;
-
-  if (!canvas) {
-    console.error("Canvas element not found");
-    return;
-  }
-
-  canvasContext = canvas.getContext("2d", {willReadFrequently: true});
-
-  if (!canvasContext) {
-    console.error("Failed to get 2D context");
-    return;
-  }
-
-  canvasContext.globalAlpha = 1;
+  canvasContext = annotationRef.value!.getContext("2d", {willReadFrequently: true});
+  canvasContext!.globalAlpha = 1;
 }
 
 watch(
@@ -80,16 +121,14 @@ function scaleView(event: MouseEvent | undefined) { // Add event parameter to ca
   const doc_mouseX = scroll_element.scrollLeft + mouseX;
   const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-  // Update map dimensions
-  const base_map = document.getElementById('map')!;
-  base_map.style.width = dim_str;
-  base_map.style.height = dim_str;
+  airbasesRef.value!.style.width = dim_str;
+  airbasesRef.value!.style.height = dim_str;
 
-  const ovly_map = document.getElementById('airbases')!;
-  ovly_map.style.width = dim_str;
-  ovly_map.style.height = dim_str;
-  annotationCanvasRef.value!.width = dimension;
-  annotationCanvasRef.value!.height = dimension;
+  mapRef.value!.style.width = dim_str;
+  mapRef.value!.style.height = dim_str;
+
+  annotationRef.value!.width = dimension;
+  annotationRef.value!.height = dimension;
 
   // Scale bullseye coordinates
 // bullseye.x *= scale;
@@ -150,9 +189,9 @@ const execTool = (tool: string) => {
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
 
   <div ref="containerRef" id="container">
-    <img id="map" width="3840" height="3840" :src="mapUrl" alt="">
+    <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
-      <canvas ref="annotationCanvasRef" id="annotation" width="3840" height="3840"></canvas>
+      <canvas ref="annotationRef" id="annotation" width="3840" height="3840"></canvas>
       <map id="airbase_map" data-map-datum="38.5,127.18" data-map-version="2" name="airbase_map">
         <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
         <!-- Special Map areas and Coordinates based on 4096x4096-->
@@ -161,7 +200,7 @@ const execTool = (tool: string) => {
         <!-- Set Default Bullseye coordinates -->
         <area shape="circle" coords="732,1049,1" alt="Bullseye">
       </map>
-      <img id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#airbase_map">
+      <img ref="airbasesRef" id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#airbase_map">
       <div id="inputs">
         <table id="locate" class="pm0">
           <tbody>
@@ -170,7 +209,7 @@ const execTool = (tool: string) => {
           </tr>
           <tr>
             <td>
-              <select id="selectAirbase" @change="selectAirbase($event)" size="1">
+              <select id="selectAirbase" @change="selectAirbase($event)" size="1" style="display: block; margin: 0 auto;">
                 <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
                   <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
                 </optgroup>

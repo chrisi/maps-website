@@ -1,1 +1,1 @@
-export function scaleView(zoom: number, ev: MouseEvent = null): void;
+export function scaleView(zoom: number, ev: MouseEvent = null): void
