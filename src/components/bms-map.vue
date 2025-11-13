@@ -18,6 +18,7 @@ const message = ref("");
 const containerRef = ref<HTMLDivElement | null>(null);
 const mapRef = ref<HTMLImageElement | null>(null);
 const airbasesRef = ref<HTMLImageElement | null>(null);
+const airbaseMapRef = ref<HTMLMapElement | null>(null);
 const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
@@ -183,8 +184,7 @@ function selectAirbase(event: Event): void {
 }
 
 function locateAirbase(ap: string): void {
-  const imageMap = document.getElementById("airbase_map")!;
-  const areas = [...imageMap.children] as HTMLAreaElement[];
+  const areas = [...airbaseMapRef.value!.children] as HTMLAreaElement[];
   const area = areas.find(a => a.title === ap);
   if (area) {
     const coordArr = area.coords.split(',');
@@ -226,7 +226,7 @@ const execTool = (tool: string) => {
     <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
       <canvas ref="annotationRef" id="annotation" width="3840" height="3840"></canvas>
-      <map id="airbase_map" data-map-datum="38.5,127.18" data-map-version="2" name="airbase_map">
+      <map ref="airbaseMapRef" id="airbase_map" data-map-datum="38.5,127.18" data-map-version="2" name="airbase_map">
         <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
         <!-- Special Map areas and Coordinates based on 4096x4096-->
         <!-- Map Legend Area -->

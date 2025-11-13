@@ -102,6 +102,9 @@ function openChart(chart: Chart) {
         </li>
       </ul>
     </div>
+    <div class="modal-content" v-else>
+      <h4 class="title center">Data not jet migrated</h4>
+    </div>
   </div>
 </template>
 
