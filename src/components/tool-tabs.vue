@@ -56,7 +56,7 @@ onMounted(() => {
   border-bottom: none;
   /*outline: none; */
   cursor: pointer;
-  padding: 4px 4px;
+  padding: 4px 8px;
   transition: 0.3s;
   font-size: 17px;
 }

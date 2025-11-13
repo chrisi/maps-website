@@ -28,7 +28,7 @@ const emit = defineEmits(['close'])
           <tbody>
           <tr>
             <td><label for="alt-select">Wind Alt.</label></td>
-            <td><select name="altitudes" id="alt-select" onchange="selectAltitude(this);" style="width:110px">
+            <td><select name="altitudes" id="alt-select" onchange="selectAltitude(this);">
               <option value="0">0</option>
               <option value="1">3000</option>
               <option value="2">6000</option>
@@ -43,7 +43,7 @@ const emit = defineEmits(['close'])
           </tr>
           <tr>
             <td><label for="wx-select">Weather</label></td>
-            <td><select name="weather" id="wx-select" onchange="selectChart(this);" style="width:110px">
+            <td><select name="weather" id="wx-select" onchange="selectChart(this);">
               <option value="2">Temperature</option>
               <option value="1">Winds</option>
               <option value="3">Isobar</option>
@@ -53,7 +53,7 @@ const emit = defineEmits(['close'])
           </tr>
           <tr>
             <td><label for="flt-select">Map Filter</label></td>
-            <td><select name="filter" id="flt-select" onchange="selectFilter(this);" style="width:110px">
+            <td><select name="filter" id="flt-select" onchange="selectFilter(this);">
               <option value="0">Default</option>
               <option value="3">Dimmed</option>
               <option value="1">Grayscale</option>
@@ -85,27 +85,33 @@ const emit = defineEmits(['close'])
         <h4>Collaboration</h4>
         <hr>
         <input type="checkbox" id="imcs-secure" value="on" onchange="changedIMCS(this);">
-        <label for="imcs-secure">&nbsp;Secure Connection</label><br><br>
+        <label for="imcs-secure">Secure Connection</label>
+        <div style="padding: 4px;"></div>
         <table>
           <tbody>
           <tr>
-            <td align="right">Callsign</td>
-            <td><input type="text" id="imcs-callsign" name="callsign" onchange="changedIMCS(this);" style="width:130px"></td>
+            <td>Callsign</td>
+            <td><input type="text" id="imcs-callsign" name="callsign" onchange="changedIMCS(this);"></td>
           </tr>
           <tr>
-            <td align="right">Session</td>
-            <td><input type="text" id="imcs-session" name="session" onchange="changedIMCS(this);" style="width:130px"></td>
+            <td>Session</td>
+            <td><input type="text" id="imcs-session" name="session" onchange="changedIMCS(this);"></td>
           </tr>
           <tr>
-            <td align="right">Address</td>
-            <td><input type="text" id="imcs-host" name="host" value="collab.falcon-bms.com" onchange="changedIMCS(this);"
-                       style="width:130px"></td>
-          </tr>
-          <tr>
-            <td align="right" valign="top">Port</td>
+            <td>Address</td>
             <td>
-              <input type="text" id="imcs-port" name="port" value="443" onchange="changedIMCS(this);" style="width:50px"><br>
-              <button id="imcs-connection" style="float: right; width:50px" onclick="button(event)">&nbsp;Join&nbsp;</button>
+              <input type="text" id="imcs-host" name="host" value="collab.falcon-bms.com" onchange="changedIMCS(this);">
+            </td>
+          </tr>
+          <tr>
+            <td>Port</td>
+            <td>
+              <input type="text" id="imcs-port" name="port" value="443" onchange="changedIMCS(this);" style="width: 50px;"><br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <button id="imcs-connection" onclick="button(event)">&nbsp;Join&nbsp;</button>
             </td>
           </tr>
           </tbody>
@@ -116,16 +122,16 @@ const emit = defineEmits(['close'])
         <table>
           <tbody>
           <tr>
-            <td align="right">Date</td>
+            <td>Date</td>
             <td>
-              <select id="gfs-date" name="date" style="width:100px">
+              <select id="gfs-date" name="date" style="width:100%">
                 <option value="20230531">May 31, 2023</option>
               </select></td>
           </tr>
           <tr>
-            <td align="right">Cycle</td>
+            <td>Cycle</td>
             <td>
-              <select name="cycle" id="gfs-cycle" style="width:64px">
+              <select name="cycle" id="gfs-cycle" style="width:80px">
                 <option value="00">0000Z</option>
                 <option value="06">0600Z</option>
                 <option value="12">1200Z</option>
@@ -134,8 +140,8 @@ const emit = defineEmits(['close'])
             </td>
           </tr>
           <tr>
-            <td align="right" valign="top">Forecast</td>
-            <td><input type="number" id="gfs-off" name="offset" min="1" max="384" value="1" step="1" required style="width:60px"></td>
+            <td>Forecast</td>
+            <td><input type="number" id="gfs-off" name="offset" min="1" max="384" value="1" step="1" required style="width:80px"></td>
           </tr>
           <!-- <button id="gfs-fetch" style="float: right;" onclick="button(event)">&nbspFetch&nbsp</button></td></tr>-->
           </tbody>
@@ -150,6 +156,24 @@ const emit = defineEmits(['close'])
 </template>
 
 <style scoped>
+
+table {
+  width: 100%;
+}
+
+input[type="text"], select {
+  width: 130px;
+}
+
+tr td:nth-child(1) {
+  text-align: end;
+  width: 35%;
+}
+
+tr td:nth-child(2) {
+  width: 65%;
+}
+
 button {
   margin: 4px;
 }
