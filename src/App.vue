@@ -6,4 +6,10 @@ import BmsMap from "@/components/bms-map.vue";
   <bms-map/>
 </template>
 
-<style scoped></style>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 0;
+  margin: 0;
+}
+</style>

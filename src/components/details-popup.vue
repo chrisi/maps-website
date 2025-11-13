@@ -2,8 +2,9 @@
 
 import type {Chart, Details, Station} from "@/model/Station.ts";
 import {ref, watch} from "vue";
+import ToolWindow from "@/components/tool-window.vue";
 
-const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/";
+const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/"; // TODO: centralize this
 
 const props = defineProps({
   station: {
@@ -50,8 +51,8 @@ function openChart(chart: Chart) {
 </script>
 
 <template>
-  <div class="modal-backdrop" v-if="props.visible" @click="emit('close')">
-    <div class="modal-content" v-if="data">
+  <tool-window :visible="visible" @close="emit('close')">
+    <div v-if="data">
       <h4 class="title center">{{ data.name }}</h4>
       <hr class="sep">
       <table class="table spc">
@@ -102,10 +103,10 @@ function openChart(chart: Chart) {
         </li>
       </ul>
     </div>
-    <div class="modal-content" v-else>
-      <h4 class="title center">Data not jet migrated</h4>
+    <div v-else>
+      <h4 class="title center">Select a station to view details</h4>
     </div>
-  </div>
+  </tool-window>
 </template>
 
 <style scoped>
@@ -171,25 +172,6 @@ span:hover {
   font-size: medium;
   font-weight: bolder;
   font-family: monospace;
-}
-
-.modal-backdrop {
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(1, 1, 1, 0);
-}
-
-.modal-content {
-  position: fixed;
-  left: 55px;
-  top: 66px;
-  background-color: rgba(245, 245, 245, 1);
-  border: 1px solid black;
-  box-shadow: 5px 5px 5px #222;
-  padding: 8px;
-  width: 240px;
 }
 
 </style>
