@@ -34,6 +34,12 @@ enum Mode {
   Symbol = "symbol"
 }
 
+const limits = {
+  zoom_max: 2.5,
+  zoom_min: 0.5,
+  wheel_rate_hz: 20
+}
+
 const properties = reactive<Properties>({
   zoom: 1,
   mode: Mode.Move
@@ -49,16 +55,20 @@ onMounted(() => {
   properties.zoom = 1
   scaleView(undefined)
   message.value = "Zoom Level: " + properties.zoom.toFixed(2);
-  airbasesRef.value!.addEventListener('mousedown', pointer_start);
-  airbasesRef.value!.addEventListener('mousemove', pointer_drag);
-  airbasesRef.value!.addEventListener('mouseup', pointer_end);
-  // window.addEventListener("wheel", mouse_zoom, {passive: false});
+
+  const pane = airbasesRef.value!
+  pane.addEventListener('mousedown', pointer_start);
+  pane.addEventListener('mousemove', pointer_drag);
+  pane.addEventListener('mouseup', pointer_end);
+  pane.addEventListener("wheel", mouse_zoom, {passive: false});
 })
 
 onBeforeUnmount(() => {
-  airbasesRef.value!.removeEventListener('mousedown', pointer_start);
-  airbasesRef.value!.removeEventListener('mousemove', pointer_drag);
-  airbasesRef.value!.removeEventListener('mouseup', pointer_end);
+  const pane = airbasesRef.value!
+  pane.removeEventListener('mousedown', pointer_start);
+  pane.removeEventListener('mousemove', pointer_drag);
+  pane.removeEventListener('mouseup', pointer_end);
+  pane.removeEventListener("wheel", mouse_zoom);
 })
 
 let pointerPanStart = {x: 0, y: 0};
@@ -88,6 +98,30 @@ function pointer_drag(e: MouseEvent) {
       break;
   }
 }
+
+let wheel_enabled = true;
+
+// Allow zooming with the mouse but limit it to a set wheel rate
+// See Limiters (20 hz) and set discrete steps
+const mouse_zoom = function (e: WheelEvent) {
+  e.preventDefault();
+
+  // Normalize deltaY to a consistent step (e.g., 0.1 zoom per scroll)
+  const zoomStep = Math.sign(e.deltaY) * 0.1; // Adjust step size as needed
+  const newZoom = properties.zoom - zoomStep;
+
+  // Ensure zoom stays within limits and apply rounding to avoid floating-point drift
+  if (wheel_enabled && newZoom >= limits.zoom_min && newZoom <= limits.zoom_max) {
+    properties.zoom = Math.round(newZoom * 100) / 100; // Round to 2 decimal places
+    scaleView(undefined);
+    // saveSettings();
+    // refreshCanvas();
+    wheel_enabled = false;
+    setTimeout(function () {
+      wheel_enabled = true;
+    }, (1 / limits.wheel_rate_hz) * 1000);
+  }
+};
 
 function initializeCanvas() {
   canvasContext = annotationRef.value!.getContext("2d", {willReadFrequently: true});
