@@ -124,7 +124,7 @@ const emit = defineEmits(['close'])
           <tr>
             <td>Date</td>
             <td>
-              <select id="gfs-date" name="date" style="width:100%">
+              <select id="gfs-date" name="date">
                 <option value="20230531">May 31, 2023</option>
               </select></td>
           </tr>
@@ -161,7 +161,8 @@ table {
   width: 100%;
 }
 
-input[type="text"], select {
+input[type="text"], input[type="number"], select {
+  padding: 1px;
   width: 130px;
 }
 
