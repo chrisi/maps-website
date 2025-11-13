@@ -8,8 +8,6 @@ import AirbaseAreas from "@/components/airbase-areas.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
-import ToolWindow from "@/components/tool-window.vue";
-import ToolTabs from "@/components/tool-tabs.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 
 const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
@@ -218,18 +216,18 @@ const execTool = (tool: string) => {
       scaleView(undefined)
       break;
     case "settings":
-      showToolWindow.value = true;
+      showSettingsWindow.value = true;
       break;
   }
 }
 
-const showToolWindow = ref(false)
+const showSettingsWindow = ref(false)
 
 </script>
 
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
-  <settings-window :visible="showToolWindow" @close="showToolWindow=false" />
+  <settings-window :visible="showSettingsWindow" @close="showSettingsWindow=false" />
 
   <div ref="containerRef" id="container">
     <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">

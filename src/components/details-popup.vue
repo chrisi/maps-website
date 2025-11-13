@@ -104,7 +104,7 @@ function openChart(chart: Chart) {
       </ul>
     </div>
     <div v-else>
-      <h4 class="title center">Select a station to view details</h4>
+      <h4 class="title center">The data for Station {{ station?.name  }} is not jet migrated.</h4>
     </div>
   </tool-window>
 </template>
