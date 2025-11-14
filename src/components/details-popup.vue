@@ -2,7 +2,7 @@
 
 import type {Chart, Details, Station} from "@/model/Station.ts";
 import {ref, watch} from "vue";
-import ToolWindow from "@/components/tool-window.vue";
+import ToolWindow from "@/components/forms/tool-window.vue";
 
 const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/"; // TODO: centralize this
 

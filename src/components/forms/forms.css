@@ -1,0 +1,26 @@
+.row {
+  padding-inline: 2px;
+  padding-block: 2px;
+
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  width: 35%;
+  text-align: right;
+  padding-inline: 3px;
+}
+
+.control {
+  width: 65%;
+}
+
+button {
+  margin: 4px;
+}
+
+input, select {
+  padding: 1px;
+  width: 120px;
+}
