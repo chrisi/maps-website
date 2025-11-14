@@ -9,6 +9,7 @@ import MapToolbar from "@/components/map-toolbar.vue";
 import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
 import SettingsWindow from "@/components/settings-window.vue";
+import SymbolsWindow from "@/components/symbols-window.vue";
 
 const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
@@ -216,18 +217,20 @@ const execTool = (tool: string) => {
       scaleView(undefined)
       break;
     case "settings":
-      showSettingsWindow.value = true;
+    case "symbol":
+      activeWindow.value = tool
       break;
   }
 }
 
-const showSettingsWindow = ref(false)
+const activeWindow = ref('')
 
 </script>
 
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
-  <settings-window :visible="showSettingsWindow" @close="showSettingsWindow=false" />
+  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
+  <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
 
   <div ref="containerRef" id="container">
     <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">

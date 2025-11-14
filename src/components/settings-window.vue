@@ -4,7 +4,6 @@ import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolRow from "@/components/forms/tool-row.vue";
-import ToolInput from "@/components/forms/tool-input.vue";
 import ToolButton from "@/components/forms/tool-button.vue";
 import ToolTextfield from "@/components/forms/tool-textfield.vue";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
