@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
+import {onMounted, ref} from "vue";
 
 const props = withDefaults(defineProps<{
   id: string
@@ -7,6 +8,7 @@ const props = withDefaults(defineProps<{
   label: string
   options?: ValueCaptionPair[]
   modelValue?: string
+  unit?: string
   width?: string
 }>(), {
   width: '100%',
@@ -24,6 +26,15 @@ function onChange(event: Event) {
   emit('change', props.id, newValue)
   emit('update:modelValue', newValue)
 }
+
+const clazz = ref("control")
+
+onMounted(() => {
+  if (props.unit) {
+    clazz.value = "control-with-unit"
+  }
+})
+
 </script>
 
 <template>
@@ -31,7 +42,7 @@ function onChange(event: Event) {
     <div class="label">
       <label :for="id">{{ label }}</label>
     </div>
-    <div class="control">
+    <div :class="clazz">
       <!-- Vue.js style two-way value binding if modelValue is set -->
       <template v-if="modelValue">
         <select :id="id" :name="name" :style="{ width: width }" :value="modelValue" @change="onChange">
@@ -46,6 +57,9 @@ function onChange(event: Event) {
           <slot/>
         </select>
       </template>
+    </div>
+    <div v-if="unit" class="control-unit">
+      <span style="padding-left: 2px;">{{ unit }}</span>
     </div>
   </div>
 </template>

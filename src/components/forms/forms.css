@@ -16,6 +16,14 @@
   width: 65%;
 }
 
+.control-with-unit {
+  width: 53%;
+}
+
+.control-unit {
+  width: 12%;
+}
+
 button {
   margin: 4px;
 }
