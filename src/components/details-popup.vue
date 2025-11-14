@@ -3,6 +3,10 @@
 import type {Chart, Details, Station} from "@/model/Station.ts";
 import {ref, watch} from "vue";
 import ToolWindow from "@/components/forms/tool-window.vue";
+import ToolListitem from "@/components/forms/tool-listitem.vue";
+import ToolSpacer from "@/components/forms/tool-spacer.vue";
+import ToolSection from "@/components/forms/tool-section.vue";
+import ToolTitle from "@/components/forms/tool-title.vue";
 
 const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/"; // TODO: centralize this
 
@@ -53,50 +57,20 @@ function openChart(chart: Chart) {
 <template>
   <tool-window :visible="visible" @close="emit('close')">
     <div v-if="data">
-      <h4 class="title center">{{ data.name }}</h4>
-      <hr class="sep">
-      <table class="table spc">
-        <tbody>
-        <tr>
-          <td colspan="2" class="data" style="padding: 5px 0">{{ data.lat }}&nbsp;{{ data.long }}
-          </td>
-        </tr>
-        <tr>
-          <td class="label">Elevation:</td>
-          <td class="data">{{ data.elev }}</td>
-        </tr>
-        <tr>
-          <td class="label">RWY:</td>
-          <td class="data">{{ data.rwy }}</td>
-        </tr>
-        <tr>
-          <td class="label">TCN:</td>
-          <td class="data">{{ data.tcn }}</td>
-        </tr>
-        <tr>
-          <td class="label">ATIS:</td>
-          <td class="data">{{ data.atis }}</td>
-        </tr>
-        <tr v-if="data.ops">
-          <td class="label">OPS:</td>
-          <td class="data">{{ data.ops }}</td>
-        </tr>
-        <tr>
-          <td class="label">GND:</td>
-          <td class="data">{{ data.gnd }}</td>
-        </tr>
-        <tr>
-          <td class="label">TWR:</td>
-          <td class="data">{{ data.twr }}</td>
-        </tr>
-        <tr>
-          <td class="label">APP/DEP:</td>
-          <td class="data">{{ data.appdep }}</td>
-        </tr>
-        </tbody>
-      </table>
-      <h4 class="title" style="padding-top: 10px">Charts</h4>
-      <hr class="sep">
+      <tool-title :text="data.name"/>
+      <hr style="margin: 2px 0;">
+      <tool-spacer/>
+      <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>
+      <tool-spacer/>
+      <tool-listitem label="Elevation" :value="data.elev"/>
+      <tool-listitem label="RWY" :value="data.rwy"/>
+      <tool-listitem label="TCN" :value="data.tcn"/>
+      <tool-listitem label="ATIS" :value="data.atis"/>
+      <tool-listitem label="OPS" :value="data.ops"/>
+      <tool-listitem label="GND" :value="data.gnd"/>
+      <tool-listitem label="TWR" :value="data.twr"/>
+      <tool-listitem label="APP/DEP" :value="data.appdep"/>
+      <tool-section name="Charts"/>
       <ul class="charts">
         <li v-for="chart in data.charts" v-bind:key="chart.name">
           <span @click.stop="openChart(chart)">{{ chart.name }}</span>
@@ -104,21 +78,14 @@ function openChart(chart: Chart) {
       </ul>
     </div>
     <div v-else>
-      <h4 class="title center">The data for Station {{ station?.name  }} is not jet migrated.</h4>
+      <h4 style="text-align: center">The data for<br/>
+        {{ station?.type }} {{ station?.name }}<br/>
+        is not jet migrated.</h4>
     </div>
   </tool-window>
 </template>
 
 <style scoped>
-
-.spc {
-  padding: 5px 0;
-}
-
-.sep {
-  margin: 2px 0;
-}
-
 li {
   padding: 1px;
 }
@@ -134,36 +101,10 @@ span:hover {
   padding: 1px 2px;
 }
 
-.center {
-  text-align: center;
-}
-
-.title {
-  margin: 0;
-  font-family: sans-serif;
-  font-weight: bold;
-}
-
 .charts {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  font-size: medium;
-  font-family: monospace;
-}
-
-.table {
-  padding: 0;
-  margin: 0;
-  border-spacing: 0;
-}
-
-.table td {
-  padding: 0;
-}
-
-.label {
-  width: 90px;
   font-size: medium;
   font-family: monospace;
 }
