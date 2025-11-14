@@ -8,10 +8,13 @@ withDefaults(defineProps<{
   options?: ValueCaptionPair[]
   width?: string
 }>(), {
-  width: '100%'
+  width: '100%',
+  options: () => []
 })
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  (e: 'change', sender: string, value: string): void
+}>()
 </script>
 
 <template>
@@ -20,8 +23,9 @@ const emit = defineEmits(['change'])
       <label :for="id">{{ label }}</label>
     </div>
     <div class="control">
-      <select :id="id" :name="name" :style="{ width: width }">
-        <option v-if="options" v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>
+      <select :id="id" :name="name" :style="{ width: width }"
+              @change="event => emit('change', id, (event.target as HTMLInputElement).value)">
+        <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>
         <slot/>
       </select>
     </div>

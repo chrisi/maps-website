@@ -4,9 +4,12 @@ withDefaults(defineProps<{
   name: string
   label: string
   value?: string
+  min?: number
+  max?: number
+  step?: number
   width?: string
 }>(), {
-  width: '96%'
+  width: '96%',
 })
 
 const emit = defineEmits<{
@@ -22,7 +25,8 @@ const emit = defineEmits<{
       <label :for="id">{{ label }}</label>
     </div>
     <div class="control">
-      <input type="text" :id="id" :name="name" :style="{ width: width }" :value="value"
+      <input type="number" :id="id" :name="name" :style="{ width: width }" :value="value"
+             :min="min" :max="max" :step="step"
              @input="event => emit('change', id, (event.target as HTMLInputElement).value)"
              @blur="event => emit('blur', id, (event.target as HTMLInputElement).value)">
     </div>

@@ -6,14 +6,17 @@ defineProps<{
   checked?: boolean
 }>()
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  (e: 'change', sender: string, checked: boolean): void
+}>()
 
 </script>
 
 <template>
   <div class="row">
     <div class="control">
-      <input type="checkbox" :id="id" :name="name" :checked="checked" @change="emit('change')">
+      <input type="checkbox" :id="id" :name="name" :checked="checked"
+             @change="event => emit('change', id, (event.target as HTMLInputElement).checked)">
     </div>
     <div class="label">
       <label :for="id">{{ label }}</label>

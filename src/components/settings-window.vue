@@ -10,6 +10,8 @@ import ToolTextfield from "@/components/forms/tool-textfield.vue";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
+import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
+import ToolSpacer from "@/components/forms/tool-spacer.vue";
 
 defineProps({
   visible: {
@@ -20,25 +22,29 @@ defineProps({
 
 const emit = defineEmits(['close'])
 
-function btnClick(e: Event) {
-  console.log("clicked: " + (e.target as HTMLButtonElement).id)
+function btnClick(sender: string) {
+  console.log(`btnClick: ${sender}`)
 }
 
-function selectVisibility(e: Event) {
-  console.log("selectVisibility: " + (e.target as HTMLInputElement).id)
+function selectVisibility(sender: string, checked: boolean) {
+  console.log(`selectVisibility: ${sender} -> ${checked}`)
 }
 
-function selectUnit(e: Event) {
-  console.log("selectUnit: " + (e.target as HTMLInputElement).checked)
+function selectUnit(sender: string, checked: boolean) {
+  console.log(`selectUnit: ${sender} -> ${checked}`)
 }
 
-function changedIMCS(e: Event) {
-  console.log("changedIMCS: " + (e.target as HTMLInputElement).id)
+function changedIMCS(sender: string, value: boolean | string) {
+  console.log(`changedIMCS: ${sender} -> ${value}`)
 }
 
-function selectAltitude(e: Event) {
-  console.log("selectAltitude: " + (e.target as HTMLSelectElement).value)
+function selectAltitude(sender: string, value: string) {
+  console.log(`selectAltitude: ${sender} -> ${value}`)
 }
+
+const collabHost = "collab.falcon-bms.com" // TODO: move to settings
+const collabPort = "443" // TODO: move to settings, how does this work with 'secure connection'?
+const maxForecast = 384 // TODO: move to settings ?
 
 const alts: ValueCaptionPair[] = [
   {value: "0", caption: "0"},
@@ -83,23 +89,21 @@ const cycles: ValueCaptionPair[] = [
     <tool-tabs :tabs="['Settings','Connectivity']">
       <template #Settings>
         <tool-section name="Common"/>
-
         <tool-checkbox id="unit" name="imperial" label="Imperial Units" @change="selectUnit"/>
 
         <tool-section name="Chart"/>
-
         <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" @change="selectAltitude"/>
         <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" @change="selectAltitude"/>
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" @change="selectAltitude"/>
 
         <tool-section name="Visibility"/>
-
         <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" @change="selectVisibility"/>
         <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" @change="selectVisibility"/>
         <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" @change="selectVisibility"/>
         <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" @change="selectVisibility"/>
         <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" @change="selectVisibility"/>
 
+        <tool-spacer medium/>
         <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>
         <tool-button id="clear" icon="common/assets/icon_clear.png" @click="btnClick"/>
         <tool-button id="reset" icon="common/assets/icon_reset.png" @click="btnClick"/>
@@ -107,31 +111,28 @@ const cycles: ValueCaptionPair[] = [
 
       <template #Connectivity>
         <tool-section name="Collaboration"/>
-
         <tool-checkbox id="imcs-secure" name="imcs-secure" label="Secure Connection" @change="changedIMCS"/>
 
-        <div style="padding: 4px;"></div>
-
-        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" @change="changedIMCS"/>
-        <tool-textfield id="imcs-session" name="session" label="Session" @change="changedIMCS"/>
-        <tool-textfield id="imcs-host" name="host" label="Host" value="collab.falcon-bms.com" @change="changedIMCS"/>
-        <tool-textfield id="imcs-port" name="port" label="Port" @change="changedIMCS"/>
+        <tool-spacer/>
+        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" @blur="changedIMCS"/>
+        <tool-textfield id="imcs-session" name="session" label="Session" @blur="changedIMCS"/>
+        <tool-textfield id="imcs-host" name="host" label="Host" :value="collabHost" @blur="changedIMCS"/>
+        <tool-numberfield id="imcs-port" name="port" label="Port" :value="collabPort" @blur="changedIMCS" width="60px"/>
+        <tool-spacer/>
         <tool-row>
-          <div style="text-align: end; width: 100%; padding-top: 10px">
-            <button id="imcs-connection" @click="btnClick">&nbsp;Join&nbsp;</button>
+          <div style="text-align: end; width: 100%;">
+            <tool-button id="imcs-connection" text="Join" @click="btnClick"/>
           </div>
         </tool-row>
 
         <tool-section name="Global Forecast System"/>
-
         <tool-dropdown id="gfs-date" name="date" label="Date">
           <option value="20230531">May 31, 2023</option>
         </tool-dropdown>
         <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles"/>
-        <tool-input for="gfs-off" label="Forecast">
-          <input type="number" id="gfs-off" name="offset" min="1" max="384" value="1" step="1" required style="width:80px">
-        </tool-input>
+        <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" value="1" :step="1" width="60px"/>
 
+        <tool-spacer medium/>
         <tool-button id="download" icon="common/assets/icon_download.png" @click="btnClick"/>
         <tool-button id="export" icon="common/assets/icon_save.png" @click="btnClick"/>
         <!--<tool-button id="gfs-fetch" icon="common/assets/icon_fetch.png" @click="btnClick(event)"/>-->
