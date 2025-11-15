@@ -25,12 +25,26 @@ interface Steerpoint {
   lat: string;
   long: string;
   tos: string;
+  tas: string;
+  alt: string;
+  track: string;
+  formation: string;
+  enroute: string;
+  action: string;
+  duration: string;
 }
 
 const steer = reactive<Steerpoint>({
   lat: "N37°28.430'",
   long: "E126°27.083'",
-  tos: "12:00:00"
+  tos: "12:00:00",
+  tas: "330",
+  alt: "22000",
+  track: "110° 8.6NM",
+  formation: "3",
+  enroute: "0",
+  action: "10",
+  duration: "25"
 });
 
 interface Flight {
@@ -165,19 +179,19 @@ function btnClick(sender: string) {
         <tool-spacer/>
         <div class="coord">{{ steer.lat }}&nbsp;{{ steer.long }}</div>
         <tool-spacer/>
-        <tool-textfield id="tos-val" name="tos" label="TOS" :value="steer.tos" :regexp="timeRegex"/>
-        <tool-numberfield id="tas-val" name="tas" label="TAS" :min="150" :max="600" value="350" :step="1" unit="kts"/>
-        <tool-numberfield id="alt-val" name="alt" label="Alt" :min="0" :max="45000" value="24000" :step="1" unit="ft"/>
+        <tool-textfield id="tos-val" name="tos" label="TOS" v-model="steer.tos" :regexp="timeRegex"/>
+        <tool-numberfield id="tas-val" name="tas" label="TAS" v-model="steer.tas" :min="150" :max="600" value="350" :step="1" unit="kts"/>
+        <tool-numberfield id="alt-val" name="alt" label="Alt" v-model="steer.alt" :min="0" :max="45000" value="24000" :step="1" unit="ft"/>
         <tool-spacer medium/>
-        <tool-output id="trk-val" name="trk" label="Track" value="110° 8.0NM"/>
+        <tool-output id="trk-val" name="trk" label="Track" :value="steer.track"/>
         <tool-spacer medium/>
-        <tool-dropdown id="formation-select" name="formation" label="Formation" :options="formations"/>
-        <tool-dropdown id="enrout-select" name="enrout" label="Enroute">
+        <tool-dropdown id="formation-select" name="formation" label="Formation" :options="formations" v-model="steer.formation"/>
+        <tool-dropdown id="enrout-select" name="enrout" label="Enroute" v-model="steer.enroute">
           <option value="0">Nav</option>
           <option value="1">SEAD</option>
         </tool-dropdown>
-        <tool-dropdown id="action-select" name="action" label="Action" :options="actions"/>
-        <tool-textfield id="dur-val" name="dur" label="Duration" value="20" unit="min"/>
+        <tool-dropdown id="action-select" name="action" label="Action" :options="actions" v-model="steer.action"/>
+        <tool-textfield id="dur-val" name="dur" label="Duration" v-model="steer.duration" unit="min"/>
         <tool-spacer separator large/>
         <tool-output id="support1" label="AWACS" value="Lynx5"/>
         <tool-output id="support2" label="Tanker" value="Texaco"/>
@@ -221,7 +235,7 @@ function btnClick(sender: string) {
             </div>
           </div>
         </tool-input>
-        <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" value="7000" unit="lbs"/>
+        <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" v-model="pkg.fuel" unit="lbs"/>
         <tool-spacer medium/>
         <tool-button id="btn-flight" icon="common/assets/icon_table1.png" @click="btnClick"/>
         <tool-button id="btn-wx" icon="common/assets/icon_table.png" @click="btnClick"/>

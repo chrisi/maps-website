@@ -11,6 +11,7 @@ import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
+import {reactive, ref} from "vue";
 
 defineProps({
   visible: {
@@ -25,25 +26,61 @@ function btnClick(sender: string) {
   console.log(`btnClick: ${sender}`)
 }
 
-function selectVisibility(sender: string, checked: boolean) {
-  console.log(`selectVisibility: ${sender} -> ${checked}`)
+function changeChartConfig(sender: string, value: string) {
+  console.log(`changeChartConfig: ${sender} -> ${value}`)
 }
 
-function selectUnit(sender: string, checked: boolean) {
-  console.log(`selectUnit: ${sender} -> ${checked}`)
+const imperialUnits = ref(true)
+
+const windAltitudes = ref("4")
+const weather = ref("2")
+const mapFilter = ref("3")
+
+interface Visibility {
+  be: boolean;
+  ms: boolean;
+  wx: boolean;
+  wb: boolean;
+  xy: boolean;
 }
 
-function changedIMCS(sender: string, value: boolean | string) {
-  console.log(`changedIMCS: ${sender} -> ${value}`)
+const viz = reactive<Visibility>({
+  be: false,
+  ms: false,
+  wx: true,
+  wb: true,
+  xy: true
+})
+
+interface CollabConfig {
+  secure: boolean;
+  callsign: string;
+  session: string;
+  host: string;
+  port: string;
 }
 
-function selectAltitude(sender: string, value: string) {
-  console.log(`selectAltitude: ${sender} -> ${value}`)
+const collab = reactive<CollabConfig>({
+  secure: true,
+  callsign: "Joker",
+  session: "12:00:00",
+  host: "collab.falcon-bms.com",
+  port: "443"
+})
+
+interface GFSConfig {
+  date: string;
+  cycle: string;
+  forecast: number;
 }
 
-const collabHost = "collab.falcon-bms.com" // TODO: move to settings
-const collabPort = "443" // TODO: move to settings, how does this work with 'secure connection'?
 const maxForecast = 384 // TODO: move to settings ?
+
+const gfs = reactive<GFSConfig>({
+  date: "20230531",
+  cycle: "06",
+  forecast: 42
+})
 
 const alts: ValueCaptionPair[] = [
   {value: "0", caption: "0"},
@@ -91,19 +128,20 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
     <tool-tabs :tabs="['Settings','Connectivity']">
       <template #Settings>
         <tool-section name="Common"/>
-        <tool-checkbox id="unit" name="imperial" label="Imperial Units" @change="selectUnit"/>
+        <tool-checkbox id="unit" name="imperial" label="Imperial Units" v-model="imperialUnits"/>
 
         <tool-section name="Chart"/>
-        <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" @change="selectAltitude"/>
-        <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" @change="selectAltitude"/>
-        <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" @change="selectAltitude"/>
+        <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" v-model="windAltitudes"
+                       @change="changeChartConfig"/>
+        <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" v-model="weather" @change="changeChartConfig"/>
+        <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
-        <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" @change="selectVisibility"/>
-        <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" @change="selectVisibility"/>
-        <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" @change="selectVisibility"/>
-        <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" @change="selectVisibility"/>
-        <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" @change="selectVisibility"/>
+        <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" v-model="viz.be"/>
+        <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" v-model="viz.ms"/>
+        <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" v-model="viz.wx"/>
+        <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" v-model="viz.wb"/>
+        <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" v-model="viz.xy"/>
 
         <tool-spacer medium/>
         <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>
@@ -113,13 +151,13 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 
       <template #Connectivity>
         <tool-section name="Collaboration"/>
-        <tool-checkbox id="imcs-secure" name="imcs-secure" label="Secure Connection" @change="changedIMCS"/>
+        <tool-checkbox id="imcs-secure" name="imcs-secure" label="Secure Connection" v-model="collab.secure"/>
 
         <tool-spacer/>
-        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" @blur="changedIMCS"/>
-        <tool-textfield id="imcs-session" name="session" label="Session" @blur="changedIMCS" :regexp="timeRegex"/>
-        <tool-textfield id="imcs-host" name="host" label="Host" :value="collabHost" @blur="changedIMCS"/>
-        <tool-numberfield id="imcs-port" name="port" label="Port" :value="collabPort" @blur="changedIMCS" width="60px"/>
+        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" v-model="collab.callsign"/>
+        <tool-textfield id="imcs-session" name="session" label="Session" v-model="collab.session" :regexp="timeRegex"/>
+        <tool-textfield id="imcs-host" name="host" label="Host" v-model="collab.host"/>
+        <tool-numberfield id="imcs-port" name="port" label="Port" v-model="collab.port" width="60px"/>
         <tool-spacer/>
         <tool-row>
           <div style="text-align: end; width: 100%;">
@@ -128,11 +166,11 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         </tool-row>
 
         <tool-section name="Global Forecast System"/>
-        <tool-dropdown id="gfs-date" name="date" label="Date">
+        <tool-dropdown id="gfs-date" name="date" label="Date" v-model="gfs.date">
           <option value="20230531">May 31, 2023</option>
         </tool-dropdown>
-        <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles"/>
-        <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" value="1" :step="1" width="60px"/>
+        <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles" v-model="gfs.cycle"/>
+        <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" v-model="gfs.forecast" width="60px"/>
 
         <tool-spacer medium/>
         <tool-button id="download" icon="common/assets/icon_download.png" @click="btnClick"/>
