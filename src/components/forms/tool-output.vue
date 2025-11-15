@@ -5,11 +5,13 @@ const props = withDefaults(defineProps<{
   id: string
   name?: string
   label: string
-  value: string
+  value: string | number
   unit?: string
   width?: string
+  variant?: string
 }>(), {
-  width: '96%'
+  width: '96%',
+  variant: 'a'
 })
 
 const clazz = ref("control")
@@ -24,14 +26,16 @@ onMounted(() => {
 
 <template>
   <div class="row">
-    <div class="label">
+    <div :class="`label-${variant}`">
       <label :for="id" ref="labelRef">{{ label }}</label>
     </div>
-    <div :class="clazz">
-      <div class="output" :style="{ width: width }">{{ value }}</div>
-    </div>
-    <div v-if="unit" class="control-unit">
-      <span style="padding-left: 2px;">{{ unit }}</span>
+    <div :class="`control-${variant}`">
+      <div :class="`control-value${unit ? '-with-unit' : ''}`">
+        <div class="output" :style="{ width: width }">{{ value }}</div>
+      </div>
+      <div v-if="unit" class="control-unit">
+        <span style="padding-left: 2px;">{{ unit }}</span>
+      </div>
     </div>
   </div>
 </template>

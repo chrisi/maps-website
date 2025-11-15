@@ -6,22 +6,38 @@
   align-items: center;
 }
 
-.label {
+.label-b {
+  width: 60%;
+  text-align: right;
+  padding-inline: 3px;
+}
+
+.control-b {
+  display: flex;
+  width: 40%;
+}
+
+.label-a {
   width: 35%;
   text-align: right;
   padding-inline: 3px;
 }
 
-.control {
+.control-a {
+  display: flex;
   width: 65%;
 }
 
-.control-with-unit {
-  width: 53%;
+.control-value {
+  width: 100%;
+}
+
+.control-value-with-unit {
+  width: 80%;
 }
 
 .control-unit {
-  width: 12%;
+  width: 20%;
 }
 
 button {
@@ -30,5 +46,4 @@ button {
 
 input, select {
   padding: 1px;
-  width: 120px;
 }

@@ -9,6 +9,7 @@ import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolTextfield from "@/components/forms/tool-textfield.vue";
 import ToolOutput from "@/components/forms/tool-output.vue";
+import ToolSection from "@/components/forms/tool-section.vue";
 
 defineProps({
   visible: {
@@ -27,6 +28,22 @@ const steer = reactive<Steerpoint>({
   lat: "N37°28.430'",
   long: "E126°27.083'",
   tos: "12:00:00"
+});
+
+interface Flight {
+  dist: number;
+  duration: number;
+  fuel: number;
+  bingo: number;
+  playtime: number;
+}
+
+const flight = reactive<Flight>({
+  dist: 432.6,
+  duration: 2.5,
+  fuel: 7500,
+  bingo: 3500,
+  playtime: 125,
 });
 
 const formations = reactive<ValueCaptionPair[]>([
@@ -122,6 +139,13 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
       <template #Radio>
       </template>
       <template #Mission>
+        <tool-section name="Flight 1"/>
+        <tool-output variant="b" id="flt-dist" label="Total Dist" :value="flight.dist" unit="nm"/>
+        <tool-output variant="b" id="flt-time" label="Flt Duration" :value="flight.duration" unit="hrs"/>
+        <tool-output variant="b" id="flt-fuel" label="Estimated Fuel" :value="flight.fuel" unit="lbs"/>
+        <tool-output variant="b" id="flt-bingo" label="Bingo" :value="flight.bingo" unit="lbs"/>
+        <tool-output variant="b" id="flt-play" label="Playtime" :value="flight.playtime" unit="lbs"/>
+        <tool-section name="Package 1"/>
       </template>
     </tool-tabs>
   </tool-window>

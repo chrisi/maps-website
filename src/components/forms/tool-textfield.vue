@@ -9,8 +9,10 @@ const props = withDefaults(defineProps<{
   unit?: string
   width?: string
   regexp?: RegExp
+  variant?: string
 }>(), {
-  width: '96%'
+  width: '96%',
+  variant: 'a'
 })
 
 const emit = defineEmits<{
@@ -53,14 +55,16 @@ const handleBlur = (event: FocusEvent) => {
 
 <template>
   <div class="row">
-    <div class="label">
+    <div :class="`label-${variant}`">
       <label :for="id" ref="labelRef" :title="hint">{{ label }}</label>
     </div>
-    <div :class="clazz">
-      <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" :value="value" @blur="handleBlur">
-    </div>
-    <div v-if="unit" class="control-unit">
-      <span style="padding-left: 2px;">{{ unit }}</span>
+    <div :class="`control-${variant}`">
+      <div :class="`control-value${unit ? '-with-unit' : ''}`">
+        <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" :value="value" @blur="handleBlur">
+      </div>
+      <div v-if="unit" class="control-unit">
+        <span style="padding-left: 2px;">{{ unit }}</span>
+      </div>
     </div>
   </div>
 </template>

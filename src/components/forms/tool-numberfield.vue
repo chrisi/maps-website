@@ -5,14 +5,16 @@ const props = withDefaults(defineProps<{
   id: string
   name?: string
   label: string
-  value?: string
+  value?: string | number
   unit?: string
   min?: number
   max?: number
   step?: number
   width?: string
+  variant?: string
 }>(), {
   width: '96%',
+  variant: 'a'
 })
 
 const emit = defineEmits<{
@@ -32,17 +34,19 @@ onMounted(() => {
 
 <template>
   <div class="row">
-    <div class="label">
+    <div :class="`label-${variant}`">
       <label :for="id">{{ label }}</label>
     </div>
-    <div :class="clazz">
+    <div :class="`control-${variant}`">
+      <div :class="`control-value${unit ? '-with-unit' : ''}`">
       <input type="number" :id="id" :name="name" :style="{ width: width }" :value="value"
              :min="min" :max="max" :step="step"
              @input="event => emit('change', id, (event.target as HTMLInputElement).value)"
              @blur="event => emit('blur', id, (event.target as HTMLInputElement).value)">
-    </div>
-    <div v-if="unit" class="control-unit">
-      <span style="padding-left: 2px;">{{ unit }}</span>
+      </div>
+      <div class="control-unit" v-if="unit">
+        <span style="padding-left: 2px;">{{ unit }}</span>
+      </div>
     </div>
   </div>
 </template>
