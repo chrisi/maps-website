@@ -18,12 +18,11 @@ const emit = defineEmits<{
       <input type="checkbox" :id="id" :name="name" :checked="checked"
              @change="event => emit('change', id, (event.target as HTMLInputElement).checked)">
     </div>
-    <div class="label">
+    <div>
       <label :for="id">{{ label }}</label>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .row {
@@ -38,5 +37,4 @@ const emit = defineEmits<{
   display: inline-flex;
   padding-right: 4px;
 }
-
 </style>

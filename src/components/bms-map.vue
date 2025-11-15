@@ -3,11 +3,11 @@
 import {onBeforeUnmount, onMounted, reactive, ref, watch} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import DetailsPopup from "@/components/details-popup.vue";
-import AirbaseAreas from "@/components/airbase-areas.vue";
-import MapToolbar from "@/components/map-toolbar.vue";
-import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
+import type {Station} from "@/model/Station.ts";
+import DetailsPopup from "@/components/details-popup.vue";
+import MapToolbar from "@/components/map-toolbar.vue";
+import AirbaseAreas from "@/components/airbase-areas.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";

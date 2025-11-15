@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {type CSSProperties, onMounted, ref} from "vue";
 
 const props = withDefaults(defineProps<{
   id: string
@@ -33,7 +33,7 @@ onMounted(() => {
     </div>
     <div :class="`control-${variant}`">
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
-        <div class="output" :style="{ width: width, textAlign: align }">{{ value }}</div>
+        <div class="output" :style="{ width: width, textAlign: align } as CSSProperties">{{ value }}</div>
       </div>
       <div v-if="unit" class="control-unit">
         <span style="padding-left: 2px;">{{ unit }}</span>

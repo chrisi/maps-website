@@ -10,6 +10,9 @@ import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolTextfield from "@/components/forms/tool-textfield.vue";
 import ToolOutput from "@/components/forms/tool-output.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
+import ToolInput from "@/components/forms/tool-input.vue";
+import PureDropdown from "@/components/forms/pure-dropdown.vue";
+import ToolButton from "@/components/forms/tool-button.vue";
 
 defineProps({
   visible: {
@@ -92,10 +95,54 @@ const actions = reactive<ValueCaptionPair[]>([
   {value: "26", caption: "Jamming"},
 ])
 
+const flights = reactive<ValueCaptionPair[]>([
+  {value: "0", caption: "Beast1"},
+  {value: "1", caption: "Jaguar5"},
+  {value: "2", caption: "Eagle7"},
+  {value: "3", caption: "Cyborg2"},
+])
+
+const chxs = reactive<ValueCaptionPair[]>([
+  {value: "11", caption: "11/74"},
+  {value: "12", caption: "12/75"},
+  {value: "13", caption: "13/76"},
+  {value: "14", caption: "14/77"},
+  {value: "15", caption: "15/78"},
+  {value: "16", caption: "16/79"},
+  {value: "17", caption: "17/80"},
+  {value: "18", caption: "18/81"},
+  {value: "19", caption: "19/82"},
+  {value: "20", caption: "20/83"},
+  {value: "21", caption: "21/84"},
+  {value: "22", caption: "22/85"},
+  {value: "23", caption: "23/86"},
+  {value: "24", caption: "24/87"},
+])
+
+interface Package {
+  flight: string;
+  seat: string;
+  chx: string;
+  band: string;
+  fuel: number;
+}
+
+const pkg = reactive<Package>({
+  flight: flights[0]!.value,
+  seat: "1",
+  chx: chxs[0]!.value,
+  band: "1",
+  fuel: 7000,
+});
+
 const emit = defineEmits(['close'])
 
 // 24h time format: HH:MM:SS
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
+
+function btnClick(sender: string) {
+  console.log(`btnClick: ${sender}`)
+}
 
 </script>
 
@@ -146,6 +193,38 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-output variant="b" id="flt-bingo" align="right" label="Bingo" :value="flight.bingo" unit="lbs"/>
         <tool-output variant="b" id="flt-play" align="right" label="Playtime" :value="flight.playtime" unit="min"/>
         <tool-section name="Package 1"/>
+        <tool-input variant="c" label="Flight" for="pkg-flight">
+          <div style="display: flex; width: 100%; gap: 4px;">
+            <div style="flex: 9">
+              <pure-dropdown id="pkg-flight" name="flight" :options="flights" v-model="pkg.flight"/>
+            </div>
+            <div style="flex: 3">
+              <pure-dropdown id="pkg-seat" name="seat" v-model="pkg.seat">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </pure-dropdown>
+            </div>
+          </div>
+        </tool-input>
+        <tool-input variant="c" label="Chx" for="pkg-flight">
+          <div style="display: flex; width: 100%; gap: 4px;">
+            <div style="flex: 9">
+              <pure-dropdown id="pkg-chx" name="chx" :options="chxs" v-model="pkg.chx"/>
+            </div>
+            <div style="flex: 3">
+              <pure-dropdown id="pkg-band" name="band" v-model="pkg.band">
+                <option value="1">Y</option>
+                <option value="-1">X</option>
+              </pure-dropdown>
+            </div>
+          </div>
+        </tool-input>
+        <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" value="7000" unit="lbs"/>
+        <tool-spacer medium/>
+        <tool-button id="btn-flight" icon="common/assets/icon_table1.png" @click="btnClick"/>
+        <tool-button id="btn-wx" icon="common/assets/icon_table.png" @click="btnClick"/>
       </template>
     </tool-tabs>
   </tool-window>

@@ -1,16 +1,19 @@
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   for: string
   label: string
-}>()
+  variant?: string
+}>(), {
+  variant: 'a'
+})
 </script>
 
 <template>
   <div class="row">
-    <div class="label">
+    <div :class="`label-${variant}`">
       <label :for="props.for">{{ label }}</label>
     </div>
-    <div class="control">
+    <div :class="`control-${variant}`">
       <slot/>
     </div>
   </div>
