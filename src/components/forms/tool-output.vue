@@ -9,9 +9,11 @@ const props = withDefaults(defineProps<{
   unit?: string
   width?: string
   variant?: string
+  align?: string
 }>(), {
   width: '96%',
-  variant: 'a'
+  variant: 'a',
+  align: 'left'
 })
 
 const clazz = ref("control")
@@ -31,7 +33,7 @@ onMounted(() => {
     </div>
     <div :class="`control-${variant}`">
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
-        <div class="output" :style="{ width: width }">{{ value }}</div>
+        <div class="output" :style="{ width: width, textAlign: align }">{{ value }}</div>
       </div>
       <div v-if="unit" class="control-unit">
         <span style="padding-left: 2px;">{{ unit }}</span>
@@ -44,7 +46,7 @@ onMounted(() => {
 
 <style scoped>
 .output {
-  padding-inline: 10px;
+  padding-inline: 4px;
   font-weight: bold;
 }
 </style>

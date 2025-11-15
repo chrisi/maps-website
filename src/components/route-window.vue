@@ -140,11 +140,11 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
       </template>
       <template #Mission>
         <tool-section name="Flight 1"/>
-        <tool-output variant="b" id="flt-dist" label="Total Dist" :value="flight.dist" unit="nm"/>
-        <tool-output variant="b" id="flt-time" label="Flt Duration" :value="flight.duration" unit="hrs"/>
-        <tool-output variant="b" id="flt-fuel" label="Estimated Fuel" :value="flight.fuel" unit="lbs"/>
-        <tool-output variant="b" id="flt-bingo" label="Bingo" :value="flight.bingo" unit="lbs"/>
-        <tool-output variant="b" id="flt-play" label="Playtime" :value="flight.playtime" unit="lbs"/>
+        <tool-output variant="b" id="flt-dist" align="right" label="Total Distance" :value="flight.dist" unit="nm"/>
+        <tool-output variant="b" id="flt-time" align="right" label="Flight Duration" :value="flight.duration" unit="hrs"/>
+        <tool-output variant="b" id="flt-fuel" align="right" label="Estimated Fuel" :value="flight.fuel" unit="lbs"/>
+        <tool-output variant="b" id="flt-bingo" align="right" label="Bingo" :value="flight.bingo" unit="lbs"/>
+        <tool-output variant="b" id="flt-play" align="right" label="Playtime" :value="flight.playtime" unit="min"/>
         <tool-section name="Package 1"/>
       </template>
     </tool-tabs>

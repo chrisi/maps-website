@@ -7,14 +7,14 @@
 }
 
 .label-b {
-  width: 60%;
+  width: 55%;
   text-align: right;
   padding-inline: 3px;
 }
 
 .control-b {
   display: flex;
-  width: 40%;
+  width: 45%;
 }
 
 .label-a {
@@ -33,11 +33,13 @@
 }
 
 .control-value-with-unit {
-  width: 80%;
+  width: 75%;
 }
 
 .control-unit {
-  width: 20%;
+  align-self: center;
+  padding-inline: 3px;
+  width: 25%;
 }
 
 button {
