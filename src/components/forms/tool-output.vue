@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {type CSSProperties, onMounted, ref} from "vue";
+import {type CSSProperties} from "vue";
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   id: string
   name?: string
   label: string
@@ -15,15 +15,6 @@ const props = withDefaults(defineProps<{
   variant: 'a',
   align: 'left'
 })
-
-const clazz = ref("control")
-
-onMounted(() => {
-  if (props.unit) {
-    clazz.value = "control-with-unit"
-  }
-})
-
 </script>
 
 <template>

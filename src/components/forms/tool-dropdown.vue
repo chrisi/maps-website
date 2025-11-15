@@ -5,8 +5,8 @@ const props = withDefaults(defineProps<{
   id: string
   name?: string
   label: string
-  options?: ValueCaptionPair[]
   modelValue?: string
+  options?: ValueCaptionPair[]
   unit?: string
   width?: string
   variant?: string
@@ -43,7 +43,7 @@ function onChange(event: Event) {
             <slot/>
           </select>
         </template>
-        <!-- classic one-way binding if modelValue is not set, selected value can only be aquired via @change -->
+        <!-- classic one-way binding if modelValue is not set, selected value can be aquired through @change -->
         <template v-else>
           <select :id="id" :name="name" :style="{ width: width }" @change="onChange">
             <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>

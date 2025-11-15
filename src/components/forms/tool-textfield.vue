@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {nextTick, onMounted, ref} from "vue";
+import {nextTick, ref} from "vue";
 
 const props = withDefaults(defineProps<{
   id: string
   name?: string
   label: string
-  value?: string
+  modelValue?: string
   unit?: string
   width?: string
   regexp?: RegExp
@@ -16,22 +16,15 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  (e: 'change', sender: string, value: string): void,
   (e: 'blur', sender: string, value: string): void
+  (e: 'update:modelValue', value: string): void
 }>()
 
 const hint = ref("")
-const clazz = ref("control")
 const inputRef = ref<HTMLInputElement | null>(null)
 const labelRef = ref<HTMLLabelElement | null>(null)
 
-onMounted(() => {
-  if (props.unit) {
-    clazz.value = "control-with-unit"
-  }
-})
-
-const handleBlur = (event: FocusEvent) => {
+const onBlur = (event: FocusEvent) => {
   const target = event.target as HTMLInputElement | null
   const value = target?.value ?? ""
   emit('blur', props.id, value)
@@ -50,7 +43,6 @@ const handleBlur = (event: FocusEvent) => {
     }
   }
 }
-
 </script>
 
 <template>
@@ -60,7 +52,8 @@ const handleBlur = (event: FocusEvent) => {
     </div>
     <div :class="`control-${variant}`">
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
-        <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" :value="value" @blur="handleBlur">
+        <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" :value="modelValue"
+               @input="event => emit('update:modelValue', (event.target as HTMLInputElement).value)" @blur="onBlur">
       </div>
       <div v-if="unit" class="control-unit">
         <span style="padding-left: 2px;">{{ unit }}</span>
