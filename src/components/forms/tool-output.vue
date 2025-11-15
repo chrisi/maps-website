@@ -5,20 +5,12 @@ const props = withDefaults(defineProps<{
   id: string
   name?: string
   label: string
-  value?: string
+  value: string
   unit?: string
-  min?: number
-  max?: number
-  step?: number
   width?: string
 }>(), {
-  width: '96%',
+  width: '96%'
 })
-
-const emit = defineEmits<{
-  (e: 'change', sender: string, value: string): void,
-  (e: 'blur', sender: string, value: string): void
-}>()
 
 const clazz = ref("control")
 
@@ -33,13 +25,10 @@ onMounted(() => {
 <template>
   <div class="row">
     <div class="label">
-      <label :for="id">{{ label }}</label>
+      <label :for="id" ref="labelRef">{{ label }}</label>
     </div>
     <div :class="clazz">
-      <input type="number" :id="id" :name="name" :style="{ width: width }" :value="value"
-             :min="min" :max="max" :step="step"
-             @input="event => emit('change', id, (event.target as HTMLInputElement).value)"
-             @blur="event => emit('blur', id, (event.target as HTMLInputElement).value)">
+      <div class="output" :style="{ width: width }">{{ value }}</div>
     </div>
     <div v-if="unit" class="control-unit">
       <span style="padding-left: 2px;">{{ unit }}</span>
@@ -48,3 +37,10 @@ onMounted(() => {
 </template>
 
 <style scoped src="@/components/forms/forms.css"/>
+
+<style scoped>
+.output {
+  padding-inline: 10px;
+  font-weight: bold;
+}
+</style>

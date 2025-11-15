@@ -3,7 +3,7 @@ import {nextTick, onMounted, ref} from "vue";
 
 const props = withDefaults(defineProps<{
   id: string
-  name: string
+  name?: string
   label: string
   value?: string
   unit?: string

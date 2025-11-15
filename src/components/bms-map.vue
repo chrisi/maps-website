@@ -10,6 +10,7 @@ import type {Station} from "@/model/Station.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
 import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
+import RouteWindow from "@/components/route-window.vue";
 
 const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
@@ -217,7 +218,9 @@ const execTool = (tool: string) => {
       scaleView(undefined)
       break;
     case "settings":
+    case "route":
     case "symbol":
+    case "whiteboard":
       activeWindow.value = tool
       break;
   }
@@ -231,6 +234,7 @@ const activeWindow = ref('')
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
+  <route-window :visible="activeWindow=='route'" @close="activeWindow=''"/>
 
   <div ref="containerRef" id="container">
     <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">

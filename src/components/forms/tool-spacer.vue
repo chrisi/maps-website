@@ -5,6 +5,7 @@ const props = withDefaults(defineProps<{
   size?: number
   medium?: boolean
   large?: boolean
+  separator?: boolean
 }>(), {
   size: 4
 })
@@ -21,8 +22,15 @@ onMounted(() => {
   }
 })
 </script>
+
 <template>
-  <div :style="{paddingBlock: actualSize}"></div>
+  <div :style="{paddingBlock: actualSize}">
+    <hr v-if="separator"/>
+  </div>
 </template>
 
-
+<style scoped>
+hr {
+  margin: 0 0;
+}
+</style>

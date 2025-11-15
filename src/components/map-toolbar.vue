@@ -27,7 +27,10 @@ const tools = ref<Tool[]>([
     name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
     desc: "Set the bullseye point on the map."
   },
-  {name: "compass", caption: "Compass", activeIcon: "icon_compass.png"},
+  {
+    name: "route", caption: "Route", activeIcon: "icon_compass.png",
+    desc: "Draw the mission route on the map."
+  },
   {
     name: "ruler", caption: "Ruler", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
     desc: "Measure distances on the map."

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   id: string
-  name: string
+  name?: string
   label: string
   checked?: boolean
 }>()

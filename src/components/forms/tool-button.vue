@@ -12,10 +12,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <template v-if="icon || !text">
+  <template v-if="icon && !text">
     <button><img :id="id" :src="icon" width="32" height="32" :alt="id" @click="emit('click',id)"></button>
   </template>
-  <template v-if="text || !icon">
+  <template v-if="text && !icon">
     <button :id="id" @click="emit('click',id)">{{ text }}</button>
   </template>
 </template>
