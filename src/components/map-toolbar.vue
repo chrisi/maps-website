@@ -40,7 +40,7 @@ const tools = ref<Tool[]>([
     desc: "Draw symbols on the map."
   },
   {
-    name: "pencil", caption: "Pencil", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
+    name: "whiteboard", caption: "Whiteboard", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
     desc: "Draw lines on the map."
   },
   {

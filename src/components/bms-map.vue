@@ -11,6 +11,7 @@ import AirbaseAreas from "@/components/airbase-areas.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
+import WhiteboardWindow from "@/components/whiteboard-window.vue";
 
 const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
@@ -235,6 +236,7 @@ const activeWindow = ref('')
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" @close="activeWindow=''"/>
+  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
 
   <div ref="containerRef" id="container">
     <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">

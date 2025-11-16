@@ -12,7 +12,10 @@ withDefaults(defineProps<{
   variant?: string
 }>(), {
   width: '96%',
-  variant: 'a'
+  variant: 'a',
+  min: 0,
+  max: 100,
+  step: 1
 })
 
 const emit = defineEmits<{

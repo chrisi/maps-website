@@ -6,6 +6,17 @@
   align-items: center;
 }
 
+.label-d {
+  width: 25%;
+  text-align: right;
+  padding-inline: 3px;
+}
+
+.control-d {
+  display: flex;
+  width: 75%;
+}
+
 .label-c {
   width: 30%;
   text-align: right;

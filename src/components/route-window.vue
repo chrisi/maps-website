@@ -63,7 +63,7 @@ const flight = reactive<Flight>({
   playtime: 125,
 });
 
-const formations = reactive<ValueCaptionPair[]>([
+const formations: ValueCaptionPair[] = ([
   {value: "0", caption: "Arrowhead"},
   {value: "1", caption: "Box"},
   {value: "2", caption: "Figthing Wing"},
@@ -79,7 +79,7 @@ const formations = reactive<ValueCaptionPair[]>([
   {value: "12", caption: "Wedge"},
 ]);
 
-const actions = reactive<ValueCaptionPair[]>([
+const actions: ValueCaptionPair[] = ([
   {value: "0", caption: "Nav"},
   {value: "1", caption: "Takeoff"},
   {value: "2", caption: "Push"},
@@ -109,14 +109,14 @@ const actions = reactive<ValueCaptionPair[]>([
   {value: "26", caption: "Jamming"},
 ])
 
-const flights = reactive<ValueCaptionPair[]>([
+const flights: ValueCaptionPair[] = ([
   {value: "0", caption: "Beast1"},
   {value: "1", caption: "Jaguar5"},
   {value: "2", caption: "Eagle7"},
   {value: "3", caption: "Cyborg2"},
 ])
 
-const chxs = reactive<ValueCaptionPair[]>([
+const chxs: ValueCaptionPair[] = ([
   {value: "11", caption: "11/74"},
   {value: "12", caption: "12/75"},
   {value: "13", caption: "13/76"},
