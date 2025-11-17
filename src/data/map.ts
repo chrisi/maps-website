@@ -9,6 +9,6 @@ export const maps: Theater[] = [
     resolution: 874.890625, // feet/pixels
     // offset: 3840, // pixels
     mapUrl: "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg",
-    airbasesUrl: "/resources/map_airbases.png"
+    airbasesUrl: "resources/map_airbases.png"
   }
 ]

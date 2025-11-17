@@ -1,11 +1,12 @@
 import {Mode} from "@/model/mode.ts";
 import {properties} from "@/scripts/properties.ts";
-import {useStateStore} from "@/stores/state.ts";
+import {useSettingsStore, useStateStore} from "@/stores/state.ts";
 
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
 import {pinia} from "@/pinia.ts";
 
 const state = useStateStore(pinia)
+const settings = useSettingsStore(pinia)
 
 type PointerPane = {
   addEventListener: (
@@ -88,6 +89,8 @@ const mouseDownHandler = function (e: MouseEvent) {
 
 const mouseMoveHandler = function (e: MouseEvent) {
   e.preventDefault()
+  if (settings.viz.xy)
+    showPointerCoord(e.pageX, e.pageY)
   switch (state.mode) {
     case Mode.Move:
       if (!properties.mouseDown) break;
@@ -107,6 +110,15 @@ const mouseUpHandler = function (e: MouseEvent) {
       properties.mouseDown = false;
       break;
   }
+}
+
+const showPointerCoord = function (posX: number, posY: number) {
+  const scalar = 4096 / state.annotationRef!.height;
+  const mapX = (posX * scalar) >> 0;
+  const mapY = (posY * scalar) >> 0;
+  const coord = canvasPos2LatLong({x: mapX, y: mapY});
+  const strCrd = strLatLong(coord);
+  state.message = `${strCrd.lat},${strCrd.long} | X:${mapX},Y:${mapY}`;
 }
 
 let last_zoom = 1
@@ -153,11 +165,11 @@ export function scaleView(event: MouseEvent | undefined) { // Add event paramete
   last_zoom = properties.zoom;
 }
 
-export function latLongString(crd: Coord): CoordStr {
+export function strLatLong(crd: Coord): CoordStr {
   const degLat = crd.lat;
-  const lat = (degLat < 0) ? "S" : "N" + degreesString(degLat);
+  const lat = (degLat < 0 ? "S" : "N") + degreesString(degLat);
   const degLong = crd.long;
-  const long = (degLong < 0) ? "W" : "E" + degreesString(degLong);
+  const long = (degLong < 0 ? "W" : "E") + degreesString(degLong);
   return {lat, long}
 }
 
@@ -210,7 +222,8 @@ function offsetToLatLon(lat0: number, lon0: number, xOffsetFt: number, yOffsetFt
 }
 
 function degreesString(degrees: number): string {
-  const deg = (degrees >> 0).toFixed(0);
-  const min = ((degrees - degrees) * 60).toFixed(3);
-  return (deg + "\xb0" + min + "'");
+  const degInt = degrees >> 0;
+  const min = ((degrees - degInt) * 60).toFixed(3);
+  const deg = degInt.toFixed(0);
+  return deg + "\xb0" + min + "'";
 }

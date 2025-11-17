@@ -4,7 +4,7 @@ import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "v
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {activatePointerEvents, deactivatePointerEvents, scaleView} from "@/scripts/pointer.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import {useStateStore} from "@/stores/state.ts";
+import {useSettingsStore, useStateStore} from "@/stores/state.ts";
 import {properties} from "@/scripts/properties.ts";
 import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -28,6 +28,7 @@ const annotationRef = ref<HTMLCanvasElement | null>(null);
 let canvasContext: CanvasRenderingContext2D | null = null;
 
 const state = useStateStore()
+const settings = useSettingsStore()
 
 onBeforeMount(() => {
   state.map = maps[0];
@@ -54,13 +55,8 @@ function initializeCanvas() {
   state.cnvCtx = canvasContext
 }
 
-const message = computed(() => {
-    return `Zoom: ${properties.zoom.toFixed(2)}`
-  }
-)
-
 const debugMessage = computed(() => {
-    return `Mode: ${state.mode}, MouseDown: ${properties.mouseDown}`
+    return `Mode: ${state.mode}, MouseDown: ${properties.mouseDown}, Zoom: ${properties.zoom.toFixed(2)}`
   }
 )
 
@@ -134,25 +130,17 @@ const activeWindow = ref('')
       <img ref="airbasesRef" id="airbases" :width="state.map.pixels" :height="state.map.pixels" :src="state.map.airbasesUrl"
            alt="" usemap="#airbase_map">
       <div id="inputs">
-        <table id="locate" class="pm0">
-          <tbody>
-          <tr>
-            <td><label id="cursor-val">{{ message }}</label></td>
-          </tr>
-          <tr>
-            <td>
-              <select id="selectAirbase" @change="selectAirbase($event)" class="suspend-prevent">
-                <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
-                  <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
-                </optgroup>
-              </select>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+        <div id="locate">
+          <select id="selectAirbase" @change="selectAirbase($event)" class="suspend-prevent">
+            <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
+              <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
+            </optgroup>
+          </select>
+        </div>
         <map-toolbar @toolClick="execTool" class="tspc" v-model="state.mode"/>
       </div>
-      <div id="debug">{{ debugMessage }}</div>
+      <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ state.message }}</div>
+      <div id="debug" class="message">{{ debugMessage }}</div>
     </div>
   </div>
 </template>
@@ -162,27 +150,10 @@ const activeWindow = ref('')
   margin-top: 10px !important;
 }
 
-.pm0 {
-  padding: 0;
-  margin: 0;
-  border-spacing: 0;
-}
-
-.pm0 td {
-  padding: 0;
-}
-
 #selectAirbase {
   pointer-events: auto;
   font-size: medium;
   width: 280px;
-}
-
-#cursor-val {
-  color: white;
-  font-weight: bolder;
-  font-family: monospace;
-  display: inline-block;
 }
 
 #container {
@@ -206,7 +177,24 @@ const activeWindow = ref('')
   pointer-events: none;
   position: fixed;
   left: 15px;
-  top: 15px;
+  top: 45px;
+}
+
+.message {
+  pointer-events: none;
+  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: black;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#cursor-val {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 15px;
 }
 
 #debug {
@@ -214,11 +202,5 @@ const activeWindow = ref('')
   bottom: 0;
   left: 0;
   margin: 15px;
-  pointer-events: none;
-  font-family: monospace;
-  background-color: rgba(255, 255, 255, 0.5);
-  color: black;
-  padding: 4px 8px;
-  border-radius: 4px;
 }
 </style>

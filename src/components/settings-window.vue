@@ -12,6 +12,9 @@ import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {reactive, ref} from "vue";
+import {useSettingsStore} from "@/stores/state.ts";
+
+const settings = useSettingsStore();
 
 defineProps({
   visible: {
@@ -35,22 +38,6 @@ const imperialUnits = ref(true)
 const windAltitudes = ref("4")
 const weather = ref("2")
 const mapFilter = ref("3")
-
-interface Visibility {
-  be: boolean;
-  ms: boolean;
-  wx: boolean;
-  wb: boolean;
-  xy: boolean;
-}
-
-const viz = reactive<Visibility>({
-  be: false,
-  ms: false,
-  wx: true,
-  wb: true,
-  xy: true
-})
 
 interface CollabConfig {
   secure: boolean;
@@ -137,11 +124,11 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
-        <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" v-model="viz.be"/>
-        <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" v-model="viz.ms"/>
-        <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" v-model="viz.wx"/>
-        <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" v-model="viz.wb"/>
-        <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" v-model="viz.xy"/>
+        <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" v-model="settings.viz.be"/>
+        <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" v-model="settings.viz.ms"/>
+        <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" v-model="settings.viz.wx"/>
+        <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" v-model="settings.viz.wb"/>
+        <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" v-model="settings.viz.xy"/>
 
         <tool-spacer medium/>
         <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>

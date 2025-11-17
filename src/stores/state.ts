@@ -1,8 +1,9 @@
-import {ref} from 'vue'
+import {reactive, ref} from 'vue'
 import {defineStore} from 'pinia'
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point} from "@/model/base.ts";
+import type {Visibility} from "@/model/settings.ts";
 
 export const useStateStore = defineStore('state', () => {
   const mapRef = ref<HTMLImageElement | null>(null);
@@ -10,11 +11,24 @@ export const useStateStore = defineStore('state', () => {
   const annotationRef = ref<HTMLCanvasElement | null>(null);
   const cnvCtx = ref<CanvasRenderingContext2D | null>(null);
 
+  const message = ref('')
+
   const mode = ref<Mode>(Mode.None)
   const map = ref<Theater>()!;
 
   const pos = ref<Point>({x: 0, y: 0})
   const coord = ref<Coord>({lat: 0, long: 0})
 
-  return {mapRef, airbasesRef, annotationRef, cnvCtx, mode, map, pos, coord}
+  return {mapRef, airbasesRef, annotationRef, cnvCtx, message, mode, map, pos, coord}
+})
+
+export const useSettingsStore = defineStore('settings', () => {
+  const viz = reactive<Visibility>({
+    be: false,
+    ms: false,
+    wx: true,
+    wb: true,
+    xy: true
+  })
+  return {viz}
 })

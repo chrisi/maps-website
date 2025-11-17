@@ -33,7 +33,7 @@ const emit = defineEmits(['close'])
 .modal-content {
   position: fixed;
   left: 55px;
-  top: 66px;
+  top: 77px;
   background-color: rgba(245, 245, 245, 1);
   border: 1px solid black;
   box-shadow: 5px 5px 5px #222;
