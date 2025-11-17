@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onBeforeUnmount, onMounted, reactive, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, reactive, ref} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -12,12 +12,11 @@ import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
+import {Mode} from "@/model/Mode.ts";
 
 const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
 const selectedStation = ref<Station | undefined>();
-
-const message = ref("");
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const mapRef = ref<HTMLImageElement | null>(null);
@@ -27,18 +26,6 @@ const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
 
-enum Mode {
-  None = "none",
-  Move = "move",
-  Bullseye = "bullseye",
-  Compass = "compass",
-  Measure = "measure",
-  Draw = "draw",
-  Erase = "erase",
-  Write = "write",
-  Symbol = "symbol"
-}
-
 const limits = {
   zoom_max: 2.5,
   zoom_min: 0.5,
@@ -47,19 +34,20 @@ const limits = {
 
 const properties = reactive<Properties>({
   zoom: 1,
-  mode: Mode.Move
+  mode: Mode.None,
+  mouseDown: false
 });
 
 interface Properties {
   zoom: number
   mode: Mode
+  mouseDown: boolean
 }
 
 onMounted(() => {
   initializeCanvas()
   properties.zoom = 1
   scaleView(undefined)
-  message.value = "Zoom Level: " + properties.zoom.toFixed(2);
 
   const pane = airbasesRef.value!
   pane.addEventListener('mousedown', pointer_start);
@@ -77,29 +65,38 @@ onBeforeUnmount(() => {
 })
 
 let pointerPanStart = {x: 0, y: 0};
-let panOffset = {x: 0, y: 0};
 
 function pointer_start(e: MouseEvent) {
   e.preventDefault()
-  const scroll_element = document.scrollingElement!;
-  pointerPanStart = {x: e.clientX, y: e.clientY};
-  panOffset = {x: scroll_element.scrollLeft, y: scroll_element.scrollTop};
-  properties.mode = Mode.Move;
-}
-
-function pointer_end(e: MouseEvent) {
-  e.preventDefault()
-  pointerPanStart = {x: 0, y: 0};
-  properties.mode = Mode.None;
+  switch (properties.mode) {
+    case Mode.Move:
+      if (properties.mouseDown) break;
+      const ofs = document.scrollingElement!;
+      pointerPanStart = {x: e.clientX + ofs.scrollLeft, y: e.clientY + ofs.scrollTop};
+      properties.mouseDown = true;
+      break;
+  }
 }
 
 function pointer_drag(e: MouseEvent) {
   e.preventDefault()
   switch (properties.mode) {
     case Mode.Move:
+      if (!properties.mouseDown) break;
       const dx = pointerPanStart.x - e.clientX;
       const dy = pointerPanStart.y - e.clientY;
-      window.scrollTo(panOffset.x + dx, panOffset.y + dy);
+      window.scrollTo(dx, dy);
+      break;
+  }
+}
+
+function pointer_end(e: MouseEvent) {
+  e.preventDefault()
+  switch (properties.mode) {
+    case Mode.Move:
+      if (!properties.mouseDown) break;
+      pointerPanStart = {x: 0, y: 0};
+      properties.mouseDown = false;
       break;
   }
 }
@@ -133,12 +130,16 @@ function initializeCanvas() {
   canvasContext!.globalAlpha = 1;
 }
 
-watch(
-  () => properties.zoom,
-  (newZoom) => {
-    message.value = "Zoom Level: " + newZoom.toFixed(2);
+const message = computed(() => {
+    return `Zoom: ${properties.zoom.toFixed(2)}`
   }
-);
+)
+
+const debugMessage = computed(() => {
+    return `Mode: ${properties.mode}, MouseDown: ${properties.mouseDown}`
+  }
+)
+
 
 let last_zoom = 1
 
@@ -208,7 +209,6 @@ const execTool = (tool: string) => {
   console.log(tool);
   switch (tool) {
     case "move":
-      document.getElementById("cursor-val")!.innerText = "Drag the map to move it around.";
       break;
     case "zoom1":
       properties.zoom /= 1.1;
@@ -268,8 +268,9 @@ const activeWindow = ref('')
           </tr>
           </tbody>
         </table>
-        <map-toolbar @toolClick="execTool" class="tspc"/>
+        <map-toolbar @toolClick="execTool" class="tspc" v-model="properties.mode"/>
       </div>
+      <div id="debug">{{ debugMessage }}</div>
     </div>
   </div>
 </template>
@@ -324,5 +325,18 @@ const activeWindow = ref('')
   position: fixed;
   left: 15px;
   top: 15px;
+}
+
+#debug {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 15px;
+  pointer-events: none;
+  font-family: monospace;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: black;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 </style>

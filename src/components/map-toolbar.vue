@@ -1,6 +1,16 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
+import {ref, watch} from "vue";
+import type {Mode} from "@/model/Mode.ts";
+
+const props = defineProps<{
+  modelValue: Mode
+}>()
+
+const emit = defineEmits<{
+  (e: 'toolClick', value: string): void
+  (e: 'update:modelValue', value: string): void
+}>()
 
 interface Tool {
   name: string
@@ -10,7 +20,7 @@ interface Tool {
   icons?: string[]
 }
 
-const tools = ref<Tool[]>([
+const tools: Tool[] = ([
   {
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
     desc: "Move the map view around the map."
@@ -57,12 +67,25 @@ const tools = ref<Tool[]>([
   },
 ])
 
-const emit = defineEmits(['toolClick'])
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    resetTools()
+    activateTool(newVal)
+  }
+);
 
 const resetTools = () => {
-  tools.value.filter(tool => tool.icons).forEach(tool => {
+  tools.filter(tool => tool.icons).forEach(tool => {
     tool.activeIcon = tool.icons![0]!
   })
+}
+
+const activateTool = (name: string) => {
+  const tool = tools.find(tool => tool.name == name)
+  if (tool) {
+    tool.activeIcon = tool.icons![1]!
+  }
 }
 
 const clickTool = (tool: Tool) => {
@@ -70,6 +93,7 @@ const clickTool = (tool: Tool) => {
   if (tool.icons) {
     tool.activeIcon = tool.icons[1]!
   }
+  emit('update:modelValue', tool.name)
   emit('toolClick', tool.name)
 }
 
