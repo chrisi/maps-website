@@ -1,7 +1,6 @@
 import {Mode} from "@/model/mode.ts";
 import {properties} from "@/scripts/properties.ts";
 import {useStateStore} from "@/stores/state.ts";
-import type {StoreDefinition} from "pinia";
 
 type PointerPane = {
   addEventListener: (
@@ -33,8 +32,15 @@ export function deactivatePointerEvent(target?: HTMLElement) {
 
 let pointerPanStart = {x: 0, y: 0};
 
-function pointer_start(e: MouseEvent) {
+//filter out events from certain elements (TODO: optimize event handling)
+function peventDefaultFiltered(e: Event) {
+  const elem = e.target as HTMLElement;
+  if (elem.classList.contains("suspend-prevent")) return;
   e.preventDefault()
+}
+
+function pointer_start(e: MouseEvent) {
+  peventDefaultFiltered(e)
   switch (properties.mode) {
     case Mode.Move:
       if (properties.mouseDown) break;

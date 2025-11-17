@@ -137,7 +137,7 @@ const activeWindow = ref('')
           </tr>
           <tr>
             <td>
-              <select id="selectAirbase" @change="selectAirbase($event)" size="1" style="display: block; margin: 0 auto;">
+              <select id="selectAirbase" @change="selectAirbase($event)" class="suspend-prevent">
                 <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
                   <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
                 </optgroup>
