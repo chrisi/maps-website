@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import type {Station} from "@/model/Station.ts";
+import type {Station} from "@/model/station.ts";
 
 const dataScale = 0.5 // TODO: centralize
 

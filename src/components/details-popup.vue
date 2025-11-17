@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-import type {Chart, Details, Station} from "@/model/Station.ts";
 import {ref, watch} from "vue";
+import type {Chart, Details, Station} from "@/model/station.ts";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolListitem from "@/components/forms/tool-listitem.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
