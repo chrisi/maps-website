@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref, watch} from "vue";
+import {watch} from "vue";
 import type {Mode} from "@/model/Mode.ts";
 
 const props = defineProps<{
@@ -83,7 +83,7 @@ const resetTools = () => {
 
 const activateTool = (name: string) => {
   const tool = tools.find(tool => tool.name == name)
-  if (tool) {
+  if (tool && tool.icons) {
     tool.activeIcon = tool.icons![1]!
   }
 }
@@ -93,8 +93,16 @@ const clickTool = (tool: Tool) => {
   if (tool.icons) {
     tool.activeIcon = tool.icons[1]!
   }
-  emit('update:modelValue', tool.name)
-  emit('toolClick', tool.name)
+  if (!tool.icons) {
+    // if no icons are defined, the tool is state-less
+    // emit a simple the toolClick event with no mode switching
+    emit('toolClick', tool.name)
+    return
+  } else {
+    // if icons are defined, the tool is a toggle button with an active state (mode)
+    // switch the global mode using two-way data binding
+    emit('update:modelValue', tool.name)
+  }
 }
 
 </script>

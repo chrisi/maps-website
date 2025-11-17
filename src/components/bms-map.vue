@@ -47,6 +47,7 @@ interface Properties {
 onMounted(() => {
   initializeCanvas()
   properties.zoom = 1
+  properties.mode = Mode.Move
   scaleView(undefined)
 
   const pane = airbasesRef.value!
@@ -139,7 +140,6 @@ const debugMessage = computed(() => {
     return `Mode: ${properties.mode}, MouseDown: ${properties.mouseDown}`
   }
 )
-
 
 let last_zoom = 1
 
