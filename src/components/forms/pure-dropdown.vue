@@ -26,7 +26,7 @@ function onChange(event: Event) {
 </script>
 
 <template>
-  <select :id="id" :name="name" :style="{ width: width }" :value="modelValue" @change="onChange">
+  <select :id="id" :name="name" :style="{ width: width }" class="suspend-prevent" :value="modelValue" @change="onChange">
     <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>
     <slot/>
   </select>

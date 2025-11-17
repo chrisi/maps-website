@@ -35,9 +35,9 @@ onMounted(() => {
   state.mapRef = mapRef.value!
   state.airbasesRef = airbasesRef.value!
   state.annotationRef = annotationRef.value!
-  initializeCanvas()
   properties.zoom = 1
   properties.mode = Mode.Move
+  initializeCanvas()
   scaleView(undefined)
   activatePointerEvent()
 })

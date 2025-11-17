@@ -31,8 +31,8 @@ const emit = defineEmits<{
     </div>
     <div :class="`control-${variant}`">
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
-        <input type="number" :id="id" :name="name" :style="{ width: width }" :value="modelValue"
-               :min="min" :max="max" :step="step"
+        <input type="number" :id="id" :name="name" :style="{ width: width }" class="suspend-prevent"
+               :value="modelValue" :min="min" :max="max" :step="step"
                @input="event => emit('update:modelValue', (event.target as HTMLInputElement).value)"
                @blur="event => emit('blur', id, (event.target as HTMLInputElement).value)">
       </div>

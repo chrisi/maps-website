@@ -52,7 +52,7 @@ const onBlur = (event: FocusEvent) => {
     </div>
     <div :class="`control-${variant}`">
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
-        <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" :value="modelValue"
+        <input type="text" ref="inputRef" :id="id" :name="name" :style="{ width: width }" class="suspend-prevent" :value="modelValue"
                @input="event => emit('update:modelValue', (event.target as HTMLInputElement).value)" @blur="onBlur">
       </div>
       <div v-if="unit" class="control-unit">

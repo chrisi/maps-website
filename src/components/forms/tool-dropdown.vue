@@ -38,14 +38,14 @@ function onChange(event: Event) {
       <div :class="`control-value${unit ? '-with-unit' : ''}`">
         <!-- Vue.js style two-way value binding if modelValue is set -->
         <template v-if="modelValue">
-          <select :id="id" :name="name" :style="{ width: width }" :value="modelValue" @change="onChange">
+          <select :id="id" :name="name" :style="{ width: width }" :value="modelValue" @change="onChange" class="suspend-prevent">
             <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>
             <slot/>
           </select>
         </template>
         <!-- classic one-way binding if modelValue is not set, selected value can be aquired through @change -->
         <template v-else>
-          <select :id="id" :name="name" :style="{ width: width }" @change="onChange">
+          <select :id="id" :name="name" :style="{ width: width }" @change="onChange" class="suspend-prevent">
             <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.caption }}</option>
             <slot/>
           </select>
