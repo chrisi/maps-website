@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
-import {activatePointerEvent, deactivatePointerEvent, scaleView} from "@/scripts/pointer.ts";
+import {activatePointerEvents, deactivatePointerEvents, scaleView} from "@/scripts/pointer.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import {useStateStore} from "@/stores/state.ts";
 import {properties} from "@/scripts/properties.ts";
+import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
-import {Mode} from "@/model/mode.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import AirbaseAreas from "@/components/airbase-areas.vue";
@@ -16,8 +16,6 @@ import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
-
-const mapUrl = "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
 
 const selectedStation = ref<Station | undefined>();
 
@@ -31,24 +29,29 @@ let canvasContext: CanvasRenderingContext2D | null = null;
 
 const state = useStateStore()
 
+onBeforeMount(() => {
+  state.map = maps[0];
+})
+
 onMounted(() => {
   state.mapRef = mapRef.value!
   state.airbasesRef = airbasesRef.value!
   state.annotationRef = annotationRef.value!
-  properties.zoom = 1
-  properties.mode = Mode.Move
   initializeCanvas()
   scaleView(undefined)
-  activatePointerEvent()
+  activatePointerEvents()
 })
 
 onBeforeUnmount(() => {
-  deactivatePointerEvent()
+  deactivatePointerEvents()
 })
 
 function initializeCanvas() {
-  canvasContext = annotationRef.value!.getContext("2d", {willReadFrequently: true});
-  canvasContext!.globalAlpha = 1;
+  if (!annotationRef.value) return;
+  canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
+  if (!canvasContext) return;
+  canvasContext.globalAlpha = 1;
+  state.cnvCtx = canvasContext
 }
 
 const message = computed(() => {
@@ -57,7 +60,7 @@ const message = computed(() => {
 )
 
 const debugMessage = computed(() => {
-    return `Mode: ${properties.mode}, MouseDown: ${properties.mouseDown}`
+    return `Mode: ${state.mode}, MouseDown: ${properties.mouseDown}`
   }
 )
 
@@ -116,11 +119,11 @@ const activeWindow = ref('')
   <route-window :visible="activeWindow=='route'" @close="activeWindow=''"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
 
-  <div ref="containerRef" id="container">
-    <img ref="mapRef" id="map" width="3840" height="3840" :src="mapUrl" alt="">
+  <div ref="containerRef" id="container" v-if="state.map">
+    <img ref="mapRef" id="map" :width="state.map.pixels" :height="state.map.pixels" :src="state.map.mapUrl" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
-      <canvas ref="annotationRef" id="annotation" width="3840" height="3840"></canvas>
-      <map ref="airbaseMapRef" id="airbase_map" data-map-datum="38.5,127.18" data-map-version="2" name="airbase_map">
+      <canvas ref="annotationRef" id="annotation" :width="state.map.pixels" :height="state.map.pixels"></canvas>
+      <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">
         <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
         <!-- Special Map areas and Coordinates based on 4096x4096-->
         <!-- Map Legend Area -->
@@ -128,7 +131,8 @@ const activeWindow = ref('')
         <!-- Set Default Bullseye coordinates -->
         <area shape="circle" coords="732,1049,1" alt="Bullseye">
       </map>
-      <img ref="airbasesRef" id="airbases" width="3840" height="3840" src="/resources/map_airbases.png" alt="" usemap="#airbase_map">
+      <img ref="airbasesRef" id="airbases" :width="state.map.pixels" :height="state.map.pixels" :src="state.map.airbasesUrl"
+           alt="" usemap="#airbase_map">
       <div id="inputs">
         <table id="locate" class="pm0">
           <tbody>
@@ -146,7 +150,7 @@ const activeWindow = ref('')
           </tr>
           </tbody>
         </table>
-        <map-toolbar @toolClick="execTool" class="tspc" v-model="properties.mode"/>
+        <map-toolbar @toolClick="execTool" class="tspc" v-model="state.mode"/>
       </div>
       <div id="debug">{{ debugMessage }}</div>
     </div>
