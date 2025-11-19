@@ -1,10 +1,9 @@
 import {Mode} from "@/model/mode.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
-import {pinia} from "@/plugins/pinia.ts";
-import {useStateStore} from "@/stores/state.ts";
 import {properties} from "@/scripts/properties.ts";
-
-const state = useStateStore(pinia)
+import {useContextStore} from "@/stores/context.ts";
+import {useGlobalStore} from "@/stores/global.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 
 type PointerPane = {
   addEventListener: (
@@ -79,7 +78,8 @@ const wheelHandler = function (e: WheelEvent) {
 
 const mouseDownHandler = function (e: MouseEvent) {
   peventDefaultFiltered(e)
-  switch (state.mode) {
+  const global = useGlobalStore()
+  switch (global.mode) {
     case Mode.Move:
       if (properties.mouseDown) break;
       const ofs = document.scrollingElement!;
@@ -91,8 +91,11 @@ const mouseDownHandler = function (e: MouseEvent) {
 
 const mouseMoveHandler = function (e: MouseEvent) {
   e.preventDefault()
+  const settings = useSettingsStore()
+  if (settings.viz.xy)
     showPointerCoord(e.pageX, e.pageY)
-  switch (state.mode) {
+  const global = useGlobalStore()
+  switch (global.mode) {
     case Mode.Move:
       if (!properties.mouseDown) break;
       const dx = pointerPanStart.x - e.clientX;
@@ -104,7 +107,8 @@ const mouseMoveHandler = function (e: MouseEvent) {
 
 const mouseUpHandler = function (e: MouseEvent) {
   e.preventDefault()
-  switch (state.mode) {
+  const global = useGlobalStore()
+  switch (global.mode) {
     case Mode.Move:
       if (!properties.mouseDown) break;
       pointerPanStart = {x: 0, y: 0};
@@ -114,20 +118,24 @@ const mouseUpHandler = function (e: MouseEvent) {
 }
 
 const showPointerCoord = function (posX: number, posY: number) {
+  const ctx = useContextStore()
+  const global = useGlobalStore()
   //TODO: how does this work?? 4096 is the orig size of the annotation canvas but the setup is scaled down to 3840.
-  const scalar = 4096 / state.annotationRef!.height;
+  const scalar = 4096 / ctx.annotationRef!.height;
   const mapX = (posX * scalar) >> 0;
   const mapY = (posY * scalar) >> 0;
   const coord = canvasPos2LatLong({x: mapX, y: mapY});
   const strCrd = strLatLong(coord);
-  state.message = `${strCrd.lat},${strCrd.long} | X:${mapX},Y:${mapY}`;
+  global.message = `${strCrd.lat},${strCrd.long} | X:${mapX},Y:${mapY}`;
 }
 
 let last_zoom = 1
 
 export function scaleView(mousePos: Point | undefined) { // Add event parameter to capture mouse position
+  const ctx = useContextStore()
+  const global = useGlobalStore()
 
-  const dimension = state.map!.pixels * properties.zoom;
+  const dimension = global.map!.pixels * properties.zoom;
   const dim_str = dimension.toString() + "px";
   const scale = properties.zoom / last_zoom;
 
@@ -143,14 +151,14 @@ export function scaleView(mousePos: Point | undefined) { // Add event parameter 
   const doc_mouseX = scroll_element.scrollLeft + mouseX;
   const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-  state.airbasesRef!.style.width = dim_str;
-  state.airbasesRef!.style.height = dim_str;
+  ctx.airbasesRef!.style.width = dim_str;
+  ctx.airbasesRef!.style.height = dim_str;
 
-  state.mapRef!.style.width = dim_str;
-  state.mapRef!.style.height = dim_str;
+  ctx.mapRef!.style.width = dim_str;
+  ctx.mapRef!.style.height = dim_str;
 
-  state.annotationRef!.width = dimension;
-  state.annotationRef!.height = dimension;
+  ctx.annotationRef!.width = dimension;
+  ctx.annotationRef!.height = dimension;
 
   // Scale bullseye coordinates
 // bullseye.x *= scale;
@@ -165,7 +173,7 @@ export function scaleView(mousePos: Point | undefined) { // Add event parameter 
   last_zoom = properties.zoom;
 }
 
-export function strLatLong(crd: Coord): CoordStr {
+function strLatLong(crd: Coord): CoordStr {
   const degLat = crd.lat;
   const lat = (degLat < 0 ? "S" : "N") + degreesString(degLat);
   const degLong = crd.long;
@@ -173,8 +181,9 @@ export function strLatLong(crd: Coord): CoordStr {
   return {lat, long}
 }
 
-export function canvasPos2LatLong(point: Point): Coord {
-  const map = state.map!
+function canvasPos2LatLong(point: Point): Coord {
+  const global = useGlobalStore()
+  const map = global.map!
   const dx = point.x * map.resolution;
   const dy = (map.pixels - point.y) * map.resolution;
   return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});

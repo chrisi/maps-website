@@ -1,11 +1,8 @@
 import {createPinia, type PiniaPluginContext} from 'pinia';
 
-// enable static access to the singleton pinia instance
-// useful for plain / non-vue code need to access the store
-console.log('creating pinia')
 export const pinia = createPinia();
 
-export function persistPlugin({store}: PiniaPluginContext) {
+export function persistPlugin({store, options}: PiniaPluginContext) {
   const stored = localStorage.getItem(store.$id)
 
   if (stored) {
@@ -13,10 +10,11 @@ export function persistPlugin({store}: PiniaPluginContext) {
   }
 
   store.$subscribe((_, state) => {
+    if (options.persist === false)
+      return
     console.log(`storing locally '${store.$id}': `, state)
     localStorage.setItem(store.$id, JSON.stringify(state))
   })
 }
 
-console.log("registering localstore-plugin to pinia")
 pinia.use(persistPlugin)

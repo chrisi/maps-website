@@ -2,10 +2,10 @@
 
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
-import {activatePointerEvents, deactivatePointerEvents, scaleView, zoom} from "@/scripts/pointer.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
+import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {useStateStore} from "@/stores/state.ts";
+import {useContextStore} from "@/stores/context.ts";
 import {properties} from "@/scripts/properties.ts";
 import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -28,18 +28,21 @@ const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
 
-const state = useStateStore()
+const ctx = useContextStore()
+const global = useGlobalStore()
 const settings = useSettingsStore()
 
+import {activatePointerEvents, deactivatePointerEvents, scaleView, zoom} from "@/scripts/pointer.ts";
+
 onBeforeMount(() => {
-  state.map = maps[0];
+  global.map = maps[0];
 })
 
 onMounted(() => {
   console.log("mount map")
-  state.mapRef = mapRef.value!
-  state.airbasesRef = airbasesRef.value!
-  state.annotationRef = annotationRef.value!
+  ctx.mapRef = mapRef.value!
+  ctx.airbasesRef = airbasesRef.value!
+  ctx.annotationRef = annotationRef.value!
   initializeCanvas()
   scaleView(undefined)
   activatePointerEvents()
@@ -55,11 +58,11 @@ function initializeCanvas() {
   canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
   if (!canvasContext) return;
   canvasContext.globalAlpha = 1;
-  state.cnvCtx = canvasContext
+  ctx.cnvCtx = canvasContext
 }
 
 const debugMessage = computed(() => {
-    return `Mode: ${state.mode}, MouseDown: ${properties.mouseDown}, Zoom: ${properties.zoom.toFixed(2)}`
+    return `Mode: ${global.mode}, MouseDown: ${properties.mouseDown}, Zoom: ${properties.zoom.toFixed(2)}`
   }
 )
 
@@ -86,15 +89,13 @@ function showPopup(station: Station) {
 }
 
 const execTool = (tool: string) => {
-  console.log(tool);
+  console.log(`activated tool '${tool}'`);
   switch (tool) {
     case "move":
       break;
     case "zoom1":
       zoom(1)
       scaleView(undefined)
-      const sett = useSettingsStore()
-      sett.viz.xy = false
       break;
     case "zoom2":
       zoom(-1)
@@ -120,10 +121,10 @@ const activeWindow = ref('')
   <route-window :visible="activeWindow=='route'" @close="activeWindow=''"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
 
-  <div ref="containerRef" id="container" v-if="state.map">
-    <img ref="mapRef" id="map" :width="state.map.pixels" :height="state.map.pixels" :src="state.map.mapUrl" alt="">
+  <div ref="containerRef" id="container" v-if="global.map">
+    <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.mapUrl" alt="">
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
-      <canvas ref="annotationRef" id="annotation" :width="state.map.pixels" :height="state.map.pixels"></canvas>
+      <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
       <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">
         <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
         <!-- Special Map areas and Coordinates based on 4096x4096-->
@@ -132,7 +133,7 @@ const activeWindow = ref('')
         <!-- Set Default Bullseye coordinates -->
         <area shape="circle" coords="732,1049,1" alt="Bullseye">
       </map>
-      <img ref="airbasesRef" id="airbases" :width="state.map.pixels" :height="state.map.pixels" :src="state.map.airbasesUrl"
+      <img ref="airbasesRef" id="airbases" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.airbasesUrl"
            alt="" usemap="#airbase_map">
       <div id="inputs">
         <div id="locate">
@@ -142,9 +143,9 @@ const activeWindow = ref('')
             </optgroup>
           </select>
         </div>
-        <map-toolbar @toolClick="execTool" class="tspc" v-model="state.mode"/>
+        <map-toolbar @toolClick="execTool" class="tspc" v-model="global.mode"/>
       </div>
-      <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ state.message }}</div>
+      <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}</div>
       <div id="debug" class="message">{{ debugMessage }}</div>
     </div>
   </div>
