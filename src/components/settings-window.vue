@@ -12,7 +12,7 @@ import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {reactive, ref} from "vue";
-import {useSettingsStore} from "@/stores/state.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 
 const settings = useSettingsStore();
 
@@ -129,6 +129,8 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" v-model="settings.viz.wx"/>
         <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" v-model="settings.viz.wb"/>
         <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" v-model="settings.viz.xy"/>
+
+        <input id="wx" type="checkbox" v-model="settings.viz.wx"/>
 
         <tool-spacer medium/>
         <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>

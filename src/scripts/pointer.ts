@@ -1,12 +1,10 @@
 import {Mode} from "@/model/mode.ts";
-import {properties} from "@/scripts/properties.ts";
-import {useSettingsStore, useStateStore} from "@/stores/state.ts";
-
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
-import {pinia} from "@/pinia.ts";
+import {pinia} from "@/plugins/pinia.ts";
+import {useStateStore} from "@/stores/state.ts";
+import {properties} from "@/scripts/properties.ts";
 
 const state = useStateStore(pinia)
-const settings = useSettingsStore(pinia)
 
 type PointerPane = {
   addEventListener: (
@@ -53,19 +51,23 @@ const limits = {
 
 let wheel_enabled = true;
 
+export const zoom = (dir: number) => {
+  if (Math.sign(dir) > 0)
+    properties.zoom = properties.zoom / properties.zoomSpeed;
+  else
+    properties.zoom = properties.zoom * properties.zoomSpeed;
+  if (properties.zoom < limits.zoom_min) properties.zoom = limits.zoom_min;
+  if (properties.zoom > limits.zoom_max) properties.zoom = limits.zoom_max;
+}
+
 // Allow zooming with the mouse but limit it to a set wheel rate
 // See Limiters (20 hz) and set discrete steps
 const wheelHandler = function (e: WheelEvent) {
   e.preventDefault();
-
-  // Normalize deltaY to a consistent step (e.g., 0.1 zoom per scroll)
-  const zoomStep = Math.sign(e.deltaY) * 0.1; // Adjust step size as needed
-  const newZoom = properties.zoom - zoomStep;
-
   // Ensure zoom stays within limits and apply rounding to avoid floating-point drift
-  if (wheel_enabled && newZoom >= limits.zoom_min && newZoom <= limits.zoom_max) {
-    properties.zoom = Math.round(newZoom * 100) / 100; // Round to 2 decimal places
-    scaleView(undefined);
+  if (wheel_enabled) {
+    zoom(e.deltaY);
+    scaleView({x: e.clientX, y: e.clientY});
     // saveSettings();
     // refreshCanvas();
     wheel_enabled = false;
@@ -89,7 +91,6 @@ const mouseDownHandler = function (e: MouseEvent) {
 
 const mouseMoveHandler = function (e: MouseEvent) {
   e.preventDefault()
-  if (settings.viz.xy)
     showPointerCoord(e.pageX, e.pageY)
   switch (state.mode) {
     case Mode.Move:
@@ -113,6 +114,7 @@ const mouseUpHandler = function (e: MouseEvent) {
 }
 
 const showPointerCoord = function (posX: number, posY: number) {
+  //TODO: how does this work?? 4096 is the orig size of the annotation canvas but the setup is scaled down to 3840.
   const scalar = 4096 / state.annotationRef!.height;
   const mapX = (posX * scalar) >> 0;
   const mapY = (posY * scalar) >> 0;
@@ -123,11 +125,9 @@ const showPointerCoord = function (posX: number, posY: number) {
 
 let last_zoom = 1
 
-export function scaleView(event: MouseEvent | undefined) { // Add event parameter to capture mouse position
+export function scaleView(mousePos: Point | undefined) { // Add event parameter to capture mouse position
 
-  const state = useStateStore()
-
-  const dimension = 3840 * properties.zoom;
+  const dimension = state.map!.pixels * properties.zoom;
   const dim_str = dimension.toString() + "px";
   const scale = properties.zoom / last_zoom;
 
@@ -136,8 +136,8 @@ export function scaleView(event: MouseEvent | undefined) { // Add event paramete
   const client_height = scroll_element.clientHeight;
 
   // Get mouse position relative to the viewport
-  const mouseX = event ? event.clientX : client_width / 2; // Fallback to center if no event
-  const mouseY = event ? event.clientY : client_height / 2;
+  const mouseX = mousePos ? mousePos.x : client_width / 2; // Fallback to center if no event
+  const mouseY = mousePos ? mousePos.y : client_height / 2;
 
   // Calculate mouse position relative to the document before scaling
   const doc_mouseX = scroll_element.scrollLeft + mouseX;

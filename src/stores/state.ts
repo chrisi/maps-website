@@ -1,9 +1,8 @@
-import {reactive, ref} from 'vue'
+import {ref} from 'vue'
 import {defineStore} from 'pinia'
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point} from "@/model/base.ts";
-import type {Visibility} from "@/model/settings.ts";
 
 export const useStateStore = defineStore('state', () => {
   const mapRef = ref<HTMLImageElement | null>(null);
@@ -20,15 +19,6 @@ export const useStateStore = defineStore('state', () => {
   const coord = ref<Coord>({lat: 0, long: 0})
 
   return {mapRef, airbasesRef, annotationRef, cnvCtx, message, mode, map, pos, coord}
-})
-
-export const useSettingsStore = defineStore('settings', () => {
-  const viz = reactive<Visibility>({
-    be: false,
-    ms: false,
-    wx: true,
-    wb: true,
-    xy: true
-  })
-  return {viz}
+}, {
+  persist: false
 })

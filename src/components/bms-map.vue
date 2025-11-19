@@ -1,10 +1,11 @@
 <script setup lang="ts">
 
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
-import {activatePointerEvents, deactivatePointerEvents, scaleView} from "@/scripts/pointer.ts";
+import {activatePointerEvents, deactivatePointerEvents, scaleView, zoom} from "@/scripts/pointer.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import {useSettingsStore, useStateStore} from "@/stores/state.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
+import {useStateStore} from "@/stores/state.ts";
 import {properties} from "@/scripts/properties.ts";
 import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -35,6 +36,7 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
+  console.log("mount map")
   state.mapRef = mapRef.value!
   state.airbasesRef = airbasesRef.value!
   state.annotationRef = annotationRef.value!
@@ -48,6 +50,7 @@ onBeforeUnmount(() => {
 })
 
 function initializeCanvas() {
+  console.log("initialize canvas")
   if (!annotationRef.value) return;
   canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
   if (!canvasContext) return;
@@ -88,11 +91,13 @@ const execTool = (tool: string) => {
     case "move":
       break;
     case "zoom1":
-      properties.zoom /= 1.1;
+      zoom(1)
       scaleView(undefined)
+      const sett = useSettingsStore()
+      sett.viz.xy = false
       break;
     case "zoom2":
-      properties.zoom *= 1.1;
+      zoom(-1)
       scaleView(undefined)
       break;
     case "settings":

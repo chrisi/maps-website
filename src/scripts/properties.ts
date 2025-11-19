@@ -1,6 +1,6 @@
 import {reactive} from "vue";
 
-interface Properties {
+export interface Properties {
   zoom: number
   zoomSpeed: number
   mouseDown: boolean

@@ -9,7 +9,11 @@ export default defineConfig({
   base: process.env.GITHUB_ACTIONS ? '/maps-website/' : '/',
   plugins: [
     vue(),
-    vueDevTools(),
+    vueDevTools(
+      {
+        launchEditor: 'webstorm',
+      }
+    ),
   ],
   resolve: {
     alias: {
