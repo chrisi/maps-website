@@ -5,7 +5,6 @@ import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {useContextStore} from "@/stores/context.ts";
 import {properties} from "@/scripts/properties.ts";
 import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
@@ -19,10 +18,11 @@ import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
 import {OverlayManager} from "@/scripts/overlayManager.ts";
+import type {OverlayContext} from "@/scripts/overlayContext.ts";
 
 const selectedStation = ref<Station | undefined>();
 
-const containerRef = ref<HTMLDivElement | null>(null);
+//const containerRef = ref<HTMLDivElement | null>(null);
 const mapRef = ref<HTMLImageElement | null>(null);
 const airbasesRef = ref<HTMLImageElement | null>(null);
 const airbaseMapRef = ref<HTMLMapElement | null>(null);
@@ -30,12 +30,10 @@ const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
 
-const ctx = useContextStore()
 const global = useGlobalStore()
 const settings = useSettingsStore()
 
 const ovlMgr = new OverlayManager();
-const zoomPanOvl = new ZoomPanOverlay();
 
 onBeforeMount(() => {
   global.map = maps[0];
@@ -43,12 +41,18 @@ onBeforeMount(() => {
 
 onMounted(() => {
   console.log("mounting map")
-  ctx.mapRef = mapRef.value!
-  ctx.airbasesRef = airbasesRef.value!
-  ctx.annotationRef = annotationRef.value!
-  initializeCanvas()
+  const cnv = initializeCanvas();
+
+  const ctx: OverlayContext = {
+    map: mapRef.value!,
+    airbases: airbasesRef.value!,
+    airbaseMap: airbaseMapRef.value!,
+    ...cnv
+  }
+
+  const zoomPanOvl = new ZoomPanOverlay(ctx);
+
   ovlMgr.registerOverlay(zoomPanOvl)
-  ovlMgr.init()
   ovlMgr.activatePointerEvents()
   zoomPanOvl.scaleView(undefined)
 })
@@ -57,13 +61,13 @@ onBeforeUnmount(() => {
   ovlMgr.deactivatePointerEvents()
 })
 
-function initializeCanvas() {
+function initializeCanvas(): { canvas: HTMLCanvasElement, context: CanvasRenderingContext2D } {
   console.log("initializing canvas")
-  if (!annotationRef.value) return;
+  if (!annotationRef.value) throw new Error("Canvas element not found");
   canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
-  if (!canvasContext) return;
+  if (!canvasContext) throw new Error("Failed to get the 2D context");
   canvasContext.globalAlpha = 1;
-  ctx.cnvCtx = canvasContext
+  return {canvas: annotationRef.value!, context: canvasContext}
 }
 
 const debugMessage = computed(() => {
@@ -94,17 +98,18 @@ function showPopup(station: Station) {
 }
 
 const execTool = (tool: string) => {
+  const ovl = ovlMgr.getOverlay(ZoomPanOverlay)!
   console.log(`activated tool '${tool}'`);
   switch (tool) {
     case "move":
       break;
     case "zoom1":
-      zoomPanOvl.zoom(1)
-      zoomPanOvl.scaleView(undefined)
+      ovl.zoom(1)
+      ovl.scaleView(undefined)
       break;
     case "zoom2":
-      zoomPanOvl.zoom(-1)
-      zoomPanOvl.scaleView(undefined)
+      ovl.zoom(-1)
+      ovl.scaleView(undefined)
       break;
     case "settings":
     case "route":

@@ -1,10 +1,10 @@
 import {Mode} from "@/model/mode.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
+import {useGlobalStore} from "@/stores/global.ts";
 import {properties} from "@/scripts/properties.ts";
 import type {Overlay} from "@/scripts/overlay.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
-import {useContextStore} from "@/stores/context.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
-import {useGlobalStore} from "@/stores/global.ts";
+import type {OverlayContext} from "@/scripts/overlayContext.ts";
 
 export class ZoomPanOverlay implements Overlay {
 
@@ -18,12 +18,15 @@ export class ZoomPanOverlay implements Overlay {
   private wheel_enabled = true;
   private last_zoom = 1
 
-  private ctx = useContextStore()
+  private ctx: OverlayContext
+
   private global = useGlobalStore()
+
   private settings = useSettingsStore()
 
-  public init = () => {
+  constructor(ctx: OverlayContext) {
     console.log("initializing zoom-pan overlay")
+    this.ctx = ctx;
   }
 
   public zoom = (dir: number) => {
@@ -53,14 +56,14 @@ export class ZoomPanOverlay implements Overlay {
     const doc_mouseX = scroll_element.scrollLeft + mouseX;
     const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-    this.ctx.airbasesRef!.style.width = dim_str;
-    this.ctx.airbasesRef!.style.height = dim_str;
+    this.ctx.airbases.style.width = dim_str;
+    this.ctx.airbases.style.height = dim_str;
 
-    this.ctx.mapRef!.style.width = dim_str;
-    this.ctx.mapRef!.style.height = dim_str;
+    this.ctx.map.style.width = dim_str;
+    this.ctx.map.style.height = dim_str;
 
-    this.ctx.annotationRef!.width = dimension;
-    this.ctx.annotationRef!.height = dimension;
+    this.ctx.canvas.width = dimension;
+    this.ctx.canvas.height = dimension;
 
     // Scale bullseye coordinates
 // bullseye.x *= scale;
@@ -125,7 +128,7 @@ export class ZoomPanOverlay implements Overlay {
 
   private showPointerCoord = (posX: number, posY: number) => {
     //TODO: how does this work?? 4096 is the orig size of the annotation canvas but the setup is scaled down to 3840.
-    const scalar = 4096 / this.ctx.annotationRef!.height;
+    const scalar = 4096 / this.ctx.canvas.height;
     const mapX = (posX * scalar) >> 0;
     const mapY = (posY * scalar) >> 0;
     const coord = this.canvasPos2LatLong({x: mapX, y: mapY});

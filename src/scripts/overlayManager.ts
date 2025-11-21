@@ -8,6 +8,11 @@ export class OverlayManager {
     this.overlays.push(overlay)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public getOverlay = <T extends Overlay>(clazz: new (...args: any[]) => T): T | undefined => {
+    return this.overlays.find(overlay => overlay instanceof clazz) as T | undefined
+  }
+
   public activatePointerEvents = (): void => {
     const pane = window
     pane.addEventListener('mousedown', this.mouseDownHandler as EventListener);
@@ -22,10 +27,6 @@ export class OverlayManager {
     pane.removeEventListener('mousemove', this.mouseMoveHandler as EventListener);
     pane.removeEventListener('mouseup', this.mouseUpHandler as EventListener);
     pane.removeEventListener('wheel', this.wheelHandler as EventListener);
-  }
-
-  public init = (): void => {
-    this.overlays.forEach(o => o.init());
   }
 
   private peventDefaultFiltered = (e: Event) => {
