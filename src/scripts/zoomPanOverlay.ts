@@ -2,11 +2,11 @@ import {Mode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {properties} from "@/scripts/properties.ts";
-import type {Overlay} from "@/scripts/overlay.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
-import type {OverlayContext} from "@/scripts/overlayContext.ts";
+import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
+import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 
-export class ZoomPanOverlay implements Overlay {
+export class ZoomPanOverlay extends BaseOverlay {
 
   private static limits = {
     zoom_max: 2.5,
@@ -19,14 +19,17 @@ export class ZoomPanOverlay implements Overlay {
   private last_zoom = 1
 
   private ctx: OverlayContext
+  private ovlManager: OverlayManager
 
   private global = useGlobalStore()
 
   private settings = useSettingsStore()
 
-  constructor(ctx: OverlayContext) {
+  constructor(ctx: OverlayContext, ovlManager: OverlayManager) {
     console.log("initializing zoom-pan overlay")
+    super();
     this.ctx = ctx;
+    this.ovlManager = ovlManager;
   }
 
   public zoom = (dir: number) => {
@@ -76,9 +79,11 @@ export class ZoomPanOverlay implements Overlay {
     scroll_element.scrollTop = new_doc_mouseY - mouseY;
 
     this.last_zoom = properties.zoom;
+
+    this.ovlManager.redraw(scale);
   }
 
-  public mouseDownHandler = (e: MouseEvent) => {
+  public onMouseDown = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Move:
         if (properties.mouseDown) break;
@@ -89,7 +94,7 @@ export class ZoomPanOverlay implements Overlay {
     }
   }
 
-  public mouseMoveHandler = (e: MouseEvent) => {
+  public onMouseMove = (e: MouseEvent) => {
     if (this.settings.viz.xy)
       this.showPointerCoord(e.pageX, e.pageY)
     switch (this.global.mode) {
@@ -102,7 +107,7 @@ export class ZoomPanOverlay implements Overlay {
     }
   }
 
-  public mouseUpHandler = () => {
+  public onMouseUp = () => {
     switch (this.global.mode) {
       case Mode.Move:
         if (!properties.mouseDown) break;
@@ -112,7 +117,7 @@ export class ZoomPanOverlay implements Overlay {
     }
   }
 
-  public wheelHandler = (e: WheelEvent) => {
+  public onWheel = (e: WheelEvent) => {
     // Ensure zoom stays within limits and apply rounding to avoid floating-point drift
     if (this.wheel_enabled) {
       this.zoom(e.deltaY);

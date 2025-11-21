@@ -2,7 +2,6 @@
 
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
-import {drawHighlight} from "@/common/scripts/map_draw";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {properties} from "@/scripts/properties.ts";
@@ -16,9 +15,9 @@ import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
+import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
 import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
-import {OverlayManager} from "@/scripts/overlayManager.ts";
-import type {OverlayContext} from "@/scripts/overlayContext.ts";
+import {LocateOverlay} from "@/scripts/locateOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 
@@ -50,9 +49,10 @@ onMounted(() => {
     ...cnv
   }
 
-  const zoomPanOvl = new ZoomPanOverlay(ctx);
+  const zoomPanOvl = new ZoomPanOverlay(ctx, ovlMgr)
 
   ovlMgr.registerOverlay(zoomPanOvl)
+  ovlMgr.registerOverlay(new LocateOverlay(ctx))
   ovlMgr.activatePointerEvents()
   zoomPanOvl.scaleView(undefined)
 })
@@ -81,16 +81,8 @@ function selectAirbase(event: Event): void {
 }
 
 function locateAirbase(ap: string): void {
-  const areas = [...airbaseMapRef.value!.children] as HTMLAreaElement[];
-  const area = areas.find(a => a.title === ap);
-  if (area) {
-    const coordArr = area.coords.split(',');
-    const x = +coordArr[0]!;
-    const y = +coordArr[1]!;
-    drawHighlight(canvasContext!, x, y, 17 * properties.zoom);
-    // Make the airbase the focus
-    window.scrollTo(x - window.innerWidth / 2, y - window.innerHeight / 2);
-  }
+  const ovl = ovlMgr.getOverlay(LocateOverlay)!
+  ovl.locateAirbase(ap)
 }
 
 function showPopup(station: Station) {
