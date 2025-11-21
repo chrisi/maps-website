@@ -1,22 +1,19 @@
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
-import {properties} from "@/scripts/properties.ts";
-import type {Point} from "@/model/base.ts";
 import type {OverlayContext} from "@/scripts/overlay.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {watch} from "vue";
 import {Mode} from "@/model/mode.ts";
+import type {Point} from "@/model/base.ts";
 
 export class BullseyeOverlay extends BaseOverlay {
 
   private ovlCtx: OverlayContext
 
-  private location: Point | undefined
-
   private global = useGlobalStore();
   private settings = useSettingsStore();
 
-  private mouseDown = false;
+  private location: Point = {x: 0, y: 0}
 
   constructor(ovlCtx: OverlayContext) {
     console.log("initializing bullseye overlay")
@@ -25,9 +22,12 @@ export class BullseyeOverlay extends BaseOverlay {
     watch(() => this.settings.viz.be, () => {
       this.ovlCtx.redraw(1, true)
     })
+    // copy only the values, not the reactive object
+    this.location.x = this.settings.bullseyePos.x;
+    this.location.y = this.settings.bullseyePos.y;
   }
 
-  onRedraw(scale: number) {
+  public onRedraw = (scale: number) => {
     if (!this.location) return;
     this.location.x *= scale;
     this.location.y *= scale;
@@ -37,8 +37,8 @@ export class BullseyeOverlay extends BaseOverlay {
   public onMouseUp = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Bullseye:
-        this.setBullseye(e.pageX, e.pageY);
-        this.mouseDown = false //TODO: make global fremove from properties, put into state
+        this.settings.bullseyePos = {x: e.pageX, y: e.pageY};
+        this.ovlCtx.redraw(1, true)
         break;
     }
   }
@@ -46,22 +46,13 @@ export class BullseyeOverlay extends BaseOverlay {
   public onMouseMove = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Bullseye:
-        if (this.mouseDown)
-          this.setBullseye(e.pageX, e.pageY);
+        if (this.ovlCtx.isMouseDown) {
+          this.location.x = e.pageX;
+          this.location.y = e.pageY;
+          this.ovlCtx.redraw(1, true)
+        }
         break;
     }
-  }
-
-  public onMouseDown = () => {
-    switch (this.global.mode) {
-      case Mode.Bullseye:
-        this.mouseDown = true;
-    }
-  }
-
-  public setBullseye = (x: number, y: number) => {
-    this.location = {x: x, y: y};
-    this.ovlCtx.redraw(1, true)
   }
 
   private drawBullseye = () => {
@@ -80,13 +71,13 @@ export class BullseyeOverlay extends BaseOverlay {
     // Draw Radial Circles
     for (let i = 0; i < 6; i++) {
       ctx.beginPath();
-      radius += (30 * properties.zoom) * 6076.12 / this.global.map!.resolution;
+      radius += (30 * this.global.zoom.factor) * 6076.12 / this.global.map!.resolution;
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
 
     // Draw Degree Lines
-    radius += 30 * properties.zoom;
+    radius += 30 * this.global.zoom.factor;
     let rad = 0;
     for (let i = 0; i < 12; i++) {
       ctx.beginPath();

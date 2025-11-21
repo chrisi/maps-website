@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
-import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {properties} from "@/scripts/properties.ts";
 import {maps} from "@/data/map.ts";
 import {stationsByCountryType, stations} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
@@ -21,8 +20,8 @@ import {LocateOverlay} from "@/scripts/locateOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
+const dropdownName = ref("");
 
-//const containerRef = ref<HTMLDivElement | null>(null);
 const mapRef = ref<HTMLImageElement | null>(null);
 const airbasesRef = ref<HTMLImageElement | null>(null);
 const airbaseMapRef = ref<HTMLMapElement | null>(null);
@@ -49,6 +48,7 @@ onMounted(() => {
     airbaseMap: airbaseMapRef.value!,
     ...cnv,
     redraw: ovlMgr.redraw,
+    isMouseDown: false
   }
   ovlMgr.init(ctx)
 
@@ -74,20 +74,20 @@ function initializeCanvas(): { canvas: HTMLCanvasElement, context: CanvasRenderi
   return {canvas: annotationRef.value!, context: canvasContext}
 }
 
+watch(dropdownName, (newValue) => {
+  const ovl = ovlMgr.getOverlay(LocateOverlay)!
+  if (newValue == "") {
+    ovl.clearLocation()
+  } else {
+    console.log(`locating airbase '${newValue}'`)
+    ovl.locateAirbase(newValue)
+  }
+})
+
 const debugMessage = computed(() => {
-    return `Mode: ${global.mode}, MouseDown: ${properties.mouseDown}, Zoom: ${properties.zoom.toFixed(2)}`
+    return `Mode: ${global.mode}, Zoom: ${global.zoom.factor.toFixed(2)}`
   }
 )
-
-function selectAirbase(event: Event): void {
-  const select = event.target as HTMLSelectElement;
-  locateAirbase(select.value);
-}
-
-function locateAirbase(ap: string): void {
-  const ovl = ovlMgr.getOverlay(LocateOverlay)!
-  ovl.locateAirbase(ap)
-}
 
 function showPopup(station: Station) {
   selectedStation.value = station;
@@ -132,7 +132,7 @@ const activeWindow = ref('')
     <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
       <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
       <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">
-        <airbase-areas :zoom="properties.zoom" :stations="stations" @mapClick="showPopup"/>
+        <airbase-areas :zoom="global.zoom.factor" :stations="stations" @mapClick="showPopup"/>
         <!-- Special Map areas and Coordinates based on 4096x4096-->
         <!-- Map Legend Area -->
         <area shape="rect" coords="0,1920,0,1920" alt="Legend">
@@ -143,11 +143,13 @@ const activeWindow = ref('')
            alt="" usemap="#airbase_map">
       <div id="inputs">
         <div id="locate">
-          <select id="selectAirbase" @change="selectAirbase($event)" class="suspend-prevent">
+          <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">
+            <option value=""></option>
             <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
               <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
             </optgroup>
           </select>
+          <button @click="dropdownName = ''" class="suspend-prevent" style="pointer-events: auto;">Clear</button>
         </div>
         <map-toolbar @toolClick="execTool" class="tspc" v-model="global.mode"/>
       </div>
@@ -160,6 +162,12 @@ const activeWindow = ref('')
 <style scoped>
 .tspc {
   margin-top: 10px !important;
+}
+
+#locate {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 #selectAirbase {

@@ -1,8 +1,8 @@
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import {properties} from "@/scripts/properties.ts";
 import type {Point} from "@/model/base.ts";
 import type {OverlayContext} from "@/scripts/overlay.ts";
+import {useGlobalStore} from "@/stores/global.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
@@ -12,13 +12,20 @@ export class LocateOverlay extends BaseOverlay {
 
   private highlightSize = 17;
 
+  private global = useGlobalStore();
+
   constructor(ctx: OverlayContext) {
     console.log("initializing localte overlay")
     super();
     this.ctx = ctx;
   }
 
-  public locateAirbase(ap: string): void {
+  public clearLocation = () => {
+    this.location = undefined;
+    this.ctx.redraw(1, true);
+  }
+
+  public locateAirbase = (ap: string): void => {
     const areas = [...this.ctx.airbaseMap.children] as HTMLAreaElement[];
     const area = areas.find(a => a.title === ap);
     if (area) {
@@ -34,7 +41,7 @@ export class LocateOverlay extends BaseOverlay {
     }
   }
 
-  onRedraw(scale: number) {
+  public onRedraw = (scale: number) => {
     this.drawLocation(scale);
   }
 
@@ -43,7 +50,7 @@ export class LocateOverlay extends BaseOverlay {
     this.location.x *= scale;
     this.location.y *= scale;
 
-    drawHighlight(this.ctx.context, this.location.x, this.location.y, this.highlightSize * properties.zoom);
+    drawHighlight(this.ctx.context, this.location.x, this.location.y, this.highlightSize * this.global.zoom.factor);
   }
 
 }

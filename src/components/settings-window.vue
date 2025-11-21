@@ -124,11 +124,11 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
-        <tool-checkbox id="bullseye_hide" name="hide_be" label="Hide Bullseye" v-model="settings.viz.be"/>
-        <tool-checkbox id="mission_hide" name="hide_ms" label="Hide Mission" v-model="settings.viz.ms"/>
-        <tool-checkbox id="weather_hide" name="hide_wx" label="Hide Weather" v-model="settings.viz.wx"/>
-        <tool-checkbox id="whitebrd_hide" name="hide_wb" label="Hide Whiteboard" v-model="settings.viz.wb"/>
-        <tool-checkbox id="coordinates_hide" name="hide_xy" label="Hide Coordinates" v-model="settings.viz.xy"/>
+        <tool-checkbox id="bullseye_show" label="Show Bullseye" v-model="settings.viz.be"/>
+        <tool-checkbox id="mission_show" label="Show Mission" v-model="settings.viz.ms"/>
+        <tool-checkbox id="weather_show" label="Show Weather" v-model="settings.viz.wx"/>
+        <tool-checkbox id="whitebrd_show" label="Show Whiteboard" v-model="settings.viz.wb"/>
+        <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
 
         <tool-spacer medium/>
         <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>

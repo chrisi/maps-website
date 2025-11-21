@@ -1,18 +1,11 @@
 import {Mode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
-import {properties} from "@/scripts/properties.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
 import {type OverlayContext} from "@/scripts/overlay.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 
 export class ZoomPanOverlay extends BaseOverlay {
-
-  private static limits = {
-    zoom_max: 2.5,
-    zoom_min: 0.5,
-    wheel_rate_hz: 20
-  }
 
   private pointerPanStart = {x: 0, y: 0};
   private wheel_enabled = true;
@@ -32,18 +25,20 @@ export class ZoomPanOverlay extends BaseOverlay {
 
   public zoom = (dir: number) => {
     if (Math.sign(dir) > 0)
-      properties.zoom = properties.zoom / properties.zoomSpeed;
+      this.global.zoom.factor /= this.global.zoom.speed;
     else
-      properties.zoom = properties.zoom * properties.zoomSpeed;
-    if (properties.zoom < ZoomPanOverlay.limits.zoom_min) properties.zoom = ZoomPanOverlay.limits.zoom_min;
-    if (properties.zoom > ZoomPanOverlay.limits.zoom_max) properties.zoom = ZoomPanOverlay.limits.zoom_max;
+      this.global.zoom.factor *= this.global.zoom.speed;
+    if (this.global.zoom.factor < this.global.zoom.min)
+      this.global.zoom.factor = this.global.zoom.min;
+    if (this.global.zoom.factor > this.global.zoom.max)
+      this.global.zoom.factor = this.global.zoom.max;
   }
 
   public scaleView(mousePos: Point | undefined) { // Add event parameter to capture mouse position
 
-    const dimension = this.global.map!.pixels * properties.zoom;
+    const dimension = this.global.map!.pixels * this.global.zoom.factor;
     const dim_str = dimension.toString() + "px";
-    const scale = properties.zoom / this.last_zoom;
+    const scale = this.global.zoom.factor / this.last_zoom;
 
     const scroll_element = document.scrollingElement!;
     const client_width = scroll_element.clientWidth;
@@ -72,7 +67,7 @@ export class ZoomPanOverlay extends BaseOverlay {
     scroll_element.scrollLeft = new_doc_mouseX - mouseX;
     scroll_element.scrollTop = new_doc_mouseY - mouseY;
 
-    this.last_zoom = properties.zoom;
+    this.last_zoom = this.global.zoom.factor;
 
     this.ctx.redraw(scale);
   }
@@ -80,10 +75,8 @@ export class ZoomPanOverlay extends BaseOverlay {
   public onMouseDown = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Move:
-        if (properties.mouseDown) break;
         const ofs = document.scrollingElement!;
         this.pointerPanStart = {x: e.clientX + ofs.scrollLeft, y: e.clientY + ofs.scrollTop};
-        properties.mouseDown = true;
         break;
     }
   }
@@ -93,7 +86,7 @@ export class ZoomPanOverlay extends BaseOverlay {
       this.showPointerCoord(e.pageX, e.pageY)
     switch (this.global.mode) {
       case Mode.Move:
-        if (!properties.mouseDown) break;
+        if (!this.ctx.isMouseDown) break;
         const dx = this.pointerPanStart.x - e.clientX;
         const dy = this.pointerPanStart.y - e.clientY;
         window.scrollTo(dx, dy);
@@ -104,9 +97,7 @@ export class ZoomPanOverlay extends BaseOverlay {
   public onMouseUp = () => {
     switch (this.global.mode) {
       case Mode.Move:
-        if (!properties.mouseDown) break;
         this.pointerPanStart = {x: 0, y: 0};
-        properties.mouseDown = false;
         break;
     }
   }
@@ -121,7 +112,7 @@ export class ZoomPanOverlay extends BaseOverlay {
       this.wheel_enabled = false;
       setTimeout(() => {
         this.wheel_enabled = true;
-      }, (1 / ZoomPanOverlay.limits.wheel_rate_hz) * 1000);
+      }, (1 / this.global.zoom.wheelRate) * 1000);
     }
   }
 

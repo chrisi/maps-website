@@ -11,7 +11,6 @@ export interface Overlay {
 }
 
 export interface OverlayContext {
-  // container: HTMLDivElement,
   map: HTMLImageElement,
   airbases: HTMLImageElement,
   airbaseMap: HTMLMapElement,
@@ -19,6 +18,8 @@ export interface OverlayContext {
   context: CanvasRenderingContext2D,
 
   redraw(scale: number, clean?: boolean): void
+
+  isMouseDown: boolean
 }
 
 export class OverlayManager {
@@ -74,6 +75,7 @@ export class OverlayManager {
   private mouseDownHandler = (e: MouseEvent) => {
     this.peventDefaultFiltered(e)
     for (const overlay of this.overlays) {
+      this.ovlCtx!.isMouseDown = true
       overlay.onMouseDown(e)
     }
   }
@@ -88,6 +90,7 @@ export class OverlayManager {
   private mouseUpHandler = (e: MouseEvent) => {
     e.preventDefault()
     for (const overlay of this.overlays) {
+      this.ovlCtx!.isMouseDown = false
       overlay.onMouseUp(e)
     }
   }

@@ -1,8 +1,8 @@
-import {ref} from 'vue'
+import {reactive, ref} from 'vue'
 import {defineStore} from 'pinia'
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
-import type {Coord, Point} from "@/model/base.ts";
+import type {Coord, Point, Zoom} from "@/model/base.ts";
 
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')
@@ -13,7 +13,15 @@ export const useGlobalStore = defineStore('global', () => {
   const pos = ref<Point>({x: 0, y: 0})
   const coord = ref<Coord>({lat: 0, long: 0})
 
-  return {message, mode, map, pos, coord}
+  const zoom = reactive<Zoom>({
+    factor: 1,
+    min: 0.5,
+    max: 2.5,
+    speed: 1.1,
+    wheelRate: 20
+  })
+
+  return {message, mode, map, pos, coord, zoom}
 }, {
   persist: false
 })
