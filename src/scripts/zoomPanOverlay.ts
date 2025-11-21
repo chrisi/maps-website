@@ -3,7 +3,7 @@ import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {properties} from "@/scripts/properties.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
-import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
+import {type OverlayContext} from "@/scripts/overlay.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 
 export class ZoomPanOverlay extends BaseOverlay {
@@ -19,17 +19,15 @@ export class ZoomPanOverlay extends BaseOverlay {
   private last_zoom = 1
 
   private ctx: OverlayContext
-  private ovlManager: OverlayManager
 
   private global = useGlobalStore()
 
   private settings = useSettingsStore()
 
-  constructor(ctx: OverlayContext, ovlManager: OverlayManager) {
+  constructor(ctx: OverlayContext) {
     console.log("initializing zoom-pan overlay")
     super();
     this.ctx = ctx;
-    this.ovlManager = ovlManager;
   }
 
   public zoom = (dir: number) => {
@@ -68,10 +66,6 @@ export class ZoomPanOverlay extends BaseOverlay {
     this.ctx.canvas.width = dimension;
     this.ctx.canvas.height = dimension;
 
-    // Scale bullseye coordinates
-// bullseye.x *= scale;
-// bullseye.y *= scale;
-
     // Calculate new scroll position to keep mouse point fixed
     const new_doc_mouseX = doc_mouseX * scale;
     const new_doc_mouseY = doc_mouseY * scale;
@@ -80,7 +74,7 @@ export class ZoomPanOverlay extends BaseOverlay {
 
     this.last_zoom = properties.zoom;
 
-    this.ovlManager.redraw(scale);
+    this.ctx.redraw(scale);
   }
 
   public onMouseDown = (e: MouseEvent) => {

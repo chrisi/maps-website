@@ -17,17 +17,28 @@ export interface OverlayContext {
   airbaseMap: HTMLMapElement,
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
+
+  redraw(scale: number, clean?: boolean): void
 }
 
 export class OverlayManager {
 
   private overlays: Overlay[] = []
+  private ovlCtx?: OverlayContext
+
+  public init = (overlayContext: OverlayContext) => {
+    overlayContext.redraw = this.redraw
+    this.ovlCtx = overlayContext
+  }
 
   public registerOverlay = (overlay: Overlay) => {
     this.overlays.push(overlay)
   }
 
-  public redraw = (scale: number): void => {
+  public redraw = (scale: number, clean: boolean = false): void => {
+    if (clean) {
+      this.ovlCtx!.context.clearRect(0, 0, this.ovlCtx!.canvas.width, this.ovlCtx!.canvas.height);
+    }
     for (const overlay of this.overlays) {
       overlay.onRedraw(scale)
     }

@@ -18,6 +18,7 @@ import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
 import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
 import {LocateOverlay} from "@/scripts/locateOverlay.ts";
+import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 
@@ -46,13 +47,16 @@ onMounted(() => {
     map: mapRef.value!,
     airbases: airbasesRef.value!,
     airbaseMap: airbaseMapRef.value!,
-    ...cnv
+    ...cnv,
+    redraw: ovlMgr.redraw,
   }
+  ovlMgr.init(ctx)
 
-  const zoomPanOvl = new ZoomPanOverlay(ctx, ovlMgr)
+  const zoomPanOvl = new ZoomPanOverlay(ctx)
 
   ovlMgr.registerOverlay(zoomPanOvl)
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
+  ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
   ovlMgr.activatePointerEvents()
   zoomPanOvl.scaleView(undefined)
 })
@@ -63,9 +67,9 @@ onBeforeUnmount(() => {
 
 function initializeCanvas(): { canvas: HTMLCanvasElement, context: CanvasRenderingContext2D } {
   console.log("initializing canvas")
-  if (!annotationRef.value) throw new Error("Canvas element not found");
+  if (!annotationRef.value) throw new Error("canvas element not found");
   canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
-  if (!canvasContext) throw new Error("Failed to get the 2D context");
+  if (!canvasContext) throw new Error("failed to get the 2D context");
   canvasContext.globalAlpha = 1;
   return {canvas: annotationRef.value!, context: canvasContext}
 }

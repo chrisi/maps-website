@@ -100,7 +100,7 @@ const clickTool = (tool: Tool) => {
     emit('update:modelValue', tool.name)
   }
 }
-
+//TODO: emit mouseup on toolbar enter
 </script>
 
 <template>
@@ -114,7 +114,7 @@ const clickTool = (tool: Tool) => {
     <tr v-for="tool in tools" v-bind:key="tool.name">
       <td>
         <img :src="'common/assets/'+tool.activeIcon" :id="tool.name" :alt="tool.caption" :title="tool.desc"
-             class="toolButton" @click="clickTool(tool)">
+             class="toolButton" @click.stop="clickTool(tool)" @mousedown.stop @mouseup.stop @mousemove.stop>
       </td>
     </tr>
     </tbody>
