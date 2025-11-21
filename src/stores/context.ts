@@ -7,4 +7,6 @@ export const useContextStore = defineStore('context', () => {
   const annotationRef = ref<HTMLCanvasElement | null>(null);
   const cnvCtx = ref<CanvasRenderingContext2D | null>(null);
   return {mapRef, airbasesRef, annotationRef, cnvCtx}
+}, {
+  persist: false
 })

@@ -17,6 +17,8 @@ import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
+import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
+import {OverlayManager} from "@/scripts/overlayManager.ts";
 
 const selectedStation = ref<Station | undefined>();
 
@@ -32,28 +34,31 @@ const ctx = useContextStore()
 const global = useGlobalStore()
 const settings = useSettingsStore()
 
-import {activatePointerEvents, deactivatePointerEvents, scaleView, zoom} from "@/scripts/pointer.ts";
+const ovlMgr = new OverlayManager();
+const zoomPanOvl = new ZoomPanOverlay();
 
 onBeforeMount(() => {
   global.map = maps[0];
 })
 
 onMounted(() => {
-  console.log("mount map")
+  console.log("mounting map")
   ctx.mapRef = mapRef.value!
   ctx.airbasesRef = airbasesRef.value!
   ctx.annotationRef = annotationRef.value!
   initializeCanvas()
-  scaleView(undefined)
-  activatePointerEvents()
+  ovlMgr.registerOverlay(zoomPanOvl)
+  ovlMgr.init()
+  ovlMgr.activatePointerEvents()
+  zoomPanOvl.scaleView(undefined)
 })
 
 onBeforeUnmount(() => {
-  deactivatePointerEvents()
+  ovlMgr.deactivatePointerEvents()
 })
 
 function initializeCanvas() {
-  console.log("initialize canvas")
+  console.log("initializing canvas")
   if (!annotationRef.value) return;
   canvasContext = annotationRef.value.getContext("2d", {willReadFrequently: true});
   if (!canvasContext) return;
@@ -94,12 +99,12 @@ const execTool = (tool: string) => {
     case "move":
       break;
     case "zoom1":
-      zoom(1)
-      scaleView(undefined)
+      zoomPanOvl.zoom(1)
+      zoomPanOvl.scaleView(undefined)
       break;
     case "zoom2":
-      zoom(-1)
-      scaleView(undefined)
+      zoomPanOvl.zoom(-1)
+      zoomPanOvl.scaleView(undefined)
       break;
     case "settings":
     case "route":
