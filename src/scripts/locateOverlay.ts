@@ -27,7 +27,8 @@ export class LocateOverlay extends BaseOverlay {
       const y = +coordArr[1]!;
 
       this.location = {x, y}
-      this.drawLocation(1);
+
+      this.ctx.redraw(1, true);
 
       window.scrollTo(x - window.innerWidth / 2, y - window.innerHeight / 2);
     }
