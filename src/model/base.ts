@@ -3,6 +3,11 @@ export interface Point {
   y: number;
 }
 
+export interface Vector {
+  mag: number;
+  dir: number;
+}
+
 export interface Coord {
   lat: number;
   long: number;

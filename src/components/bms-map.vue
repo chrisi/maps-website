@@ -18,6 +18,7 @@ import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
 import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
 import {LocateOverlay} from "@/scripts/locateOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
+import {MeassureOverlay} from "@/scripts/meassureOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -57,6 +58,7 @@ onMounted(() => {
   ovlMgr.registerOverlay(zoomPanOvl)
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
   ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
+  ovlMgr.registerOverlay(new MeassureOverlay(ctx))
   ovlMgr.activatePointerEvents()
   zoomPanOvl.scaleView(undefined)
 })

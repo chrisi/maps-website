@@ -42,7 +42,7 @@ const tools: Tool[] = ([
     desc: "Draw the mission route on the map."
   },
   {
-    name: "ruler", caption: "Ruler", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
+    name: "measure", caption: "Measure", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
     desc: "Measure distances on the map."
   },
   {

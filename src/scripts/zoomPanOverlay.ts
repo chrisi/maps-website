@@ -4,6 +4,7 @@ import {useGlobalStore} from "@/stores/global.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
 import {type OverlayContext} from "@/scripts/overlay.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
+import {map2LatLong} from "@/scripts/math.ts";
 
 export class ZoomPanOverlay extends BaseOverlay {
 
@@ -145,47 +146,6 @@ export class ZoomPanOverlay extends BaseOverlay {
     const map = this.global.map!
     const dx = point.x * map.resolution;
     const dy = (map.pixels - point.y) * map.resolution;
-    return this.map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
-  }
-
-  private map2LatLong = (datum: Coord, loc: Point): Coord => {
-    const KM_TO_FT = 3280.8399;
-    const x = loc.x - 512 * KM_TO_FT;
-    const y = loc.y - 512 * KM_TO_FT;
-    const result = this.offsetToLatLon(datum.lat, datum.long, x, y);
-    return {lat: result.lat, long: result.long};
-  }
-
-  private offsetToLatLon = (lat0: number, lon0: number, xOffsetFt: number, yOffsetFt: number): Coord => {
-    // Constants
-    const R = 6378137; // Earth radius in meters
-    const deg2rad = Math.PI / 180; // Degrees to radians conversion
-    const ftToM = 0.3048; // Feet to meters conversion
-    const metersPerDegreeLat = 111120; // Approximate meters per degree of latitude
-
-    // Convert offsets from feet to meters with latitude correction
-    const xM = xOffsetFt * ftToM;
-    const yM = yOffsetFt * ftToM * 1.065; // Empirical correction for 0.910716° latitude error
-
-    // Estimate target latitude for longitude correction
-    const deltaLat = yM / metersPerDegreeLat; // Approximate latitude change in degrees
-    const latEst = lat0 + deltaLat; // Estimated target latitude
-    const scale = (1 / Math.cos(latEst * deg2rad)) * 1.002; // Longitude scale with correction for 0.710367° error
-
-    const xMCorrected = xM * scale;
-
-    // Convert origin (lat0, lon0) to Web Mercator coordinates
-    const x0 = R * lon0 * deg2rad;
-    const y0 = R * Math.log(Math.tan(Math.PI / 4 + lat0 * deg2rad / 2));
-
-    // Apply corrected offsets
-    const x = x0 + xMCorrected;
-    const y = y0 + yM;
-
-    // Convert back to latitude and longitude
-    const long = x / (R * deg2rad);
-    const lat = (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) / deg2rad;
-
-    return {lat, long};
+    return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
   }
 }

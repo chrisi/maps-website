@@ -1,0 +1,95 @@
+import {BaseOverlay} from "@/scripts/baseOverlay.ts";
+import type {Point} from "@/model/base.ts";
+import type {OverlayContext} from "@/scripts/overlay.ts";
+import {useGlobalStore} from "@/stores/global.ts";
+import {Mode} from "@/model/mode.ts";
+import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
+
+export class MeassureOverlay extends BaseOverlay {
+
+  private ovlCtx: OverlayContext
+
+  private from: Point | undefined
+  private to: Point | undefined
+
+  private global = useGlobalStore();
+
+  constructor(ctx: OverlayContext) {
+    console.log("initializing localte overlay")
+    super();
+    this.ovlCtx = ctx;
+  }
+
+  public onRedraw = (scale: number) => {
+    if (!this.from) return;
+    if (!this.to) return;
+    this.from.x *= scale;
+    this.from.y *= scale;
+    this.to.x *= scale;
+    this.to.y *= scale;
+    this.drawRuler(this.from, this.to);
+  }
+
+  public onMouseDown(e: MouseEvent) {
+    switch (this.global.mode) {
+      case Mode.Measure:
+        this.from = {x: e.pageX, y: e.pageY};
+        this.ovlCtx.redraw(1, true)
+        break;
+    }
+  }
+
+  public onMouseUp = () => {
+    switch (this.global.mode) {
+      case Mode.Measure:
+        this.to = undefined;
+        this.from = undefined;
+        this.ovlCtx.redraw(1, true)
+        break;
+    }
+  }
+
+  public onMouseMove = (e: MouseEvent) => {
+    switch (this.global.mode) {
+      case Mode.Measure:
+        if (this.ovlCtx.isMouseDown) {
+          this.to = {x: e.pageX, y: e.pageY};
+          this.ovlCtx.redraw(1, true)
+        }
+        break;
+    }
+  }
+
+  private drawRuler(from: Point, to: Point) {
+    const vec = vector({x: from.x, y: from.y}, {x: to.x, y: to.y});
+    const mid = midpoint({x: from.x, y: from.y}, {x: to.x, y: to.y});
+    const ctx = this.ovlCtx.context
+    ctx.strokeStyle = '#383b79';
+    ctx.fillStyle = '#383b79';
+    ctx.setLineDash([]);
+    ctx.lineWidth = 2 * this.global.zoom.factor;
+    ctx.beginPath();
+    ctx.fillRect(from.x - 3, from.y - 3, 6, 6);
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.beginPath();
+    this.drawMeasurement(mid, vec.mag, vec.dir);
+    ctx.stroke();
+  }
+
+  private drawMeasurement(pt: Point, distance: number, radians: number) {
+    const px2nm = 6.95; // pixel to Nm scaler
+    const xPos = pt.x - 50;
+    const yPos = pt.y - 12;
+    const degrees = rad2deg(radians);
+    const scaledDist = Math.round(distance / (px2nm * this.global.zoom.factor));
+    const ctx = this.ovlCtx.context
+    ctx.lineWidth = 1;
+    ctx.font = '16px courier-new';
+    ctx.fillRect(xPos, yPos, 115, 24);
+    ctx.fillStyle = 'white';
+    ctx.fillText(degrees + "\xb0 / " + scaledDist + " NM", xPos + 8, yPos + 18, 100);
+  }
+
+}
