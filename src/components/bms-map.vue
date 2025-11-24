@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {dropHandler, allowDrop} from "@/common/scripts/map_files";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {maps} from "@/data/map.ts";
@@ -19,6 +18,8 @@ import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
 import {LocateOverlay} from "@/scripts/locateOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
 import {MeassureOverlay} from "@/scripts/meassureOverlay.ts";
+import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
+import {MissionManager} from "@/scripts/missionManager.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -34,6 +35,9 @@ const global = useGlobalStore()
 const settings = useSettingsStore()
 
 const ovlMgr = new OverlayManager();
+
+const dropFileHandler = new DropFileHandler();
+const missionMgr = new MissionManager();
 
 onBeforeMount(() => {
   global.map = maps[0];
@@ -54,6 +58,12 @@ onMounted(() => {
   ovlMgr.init(ctx)
 
   const zoomPanOvl = new ZoomPanOverlay(ctx)
+
+  dropFileHandler.onIniLoaded((filename, content) => {
+    console.log(`loaded ${filename} with ${content.length} bytes`)
+    missionMgr.processDataCardridge(filename, content)
+    console.log(missionMgr.getMission())
+  })
 
   ovlMgr.registerOverlay(zoomPanOvl)
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
@@ -131,7 +141,7 @@ const activeWindow = ref('')
 
   <div ref="containerRef" id="container" v-if="global.map">
     <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.mapUrl" alt="">
-    <div id="div_layers" @drop="dropHandler" @dragover="allowDrop">
+    <div id="div_layers" @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
       <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
       <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">
         <airbase-areas :zoom="global.zoom.factor" :stations="stations" @mapClick="showPopup"/>

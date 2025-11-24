@@ -19,7 +19,7 @@ export class MissionManager {
   private mission?: Mission;
   private global = useGlobalStore();
 
-  public processDataCardridge(text: string) {
+  public processDataCardridge(title: string, data: string) {
     this.dataCardridge = {
       targets: [],
       ppts: [],
@@ -28,7 +28,7 @@ export class MissionManager {
     }
 
     this.mission = {
-      title: "",
+      title: title,
       route: [],
       package: {
         num: 1,
@@ -43,7 +43,7 @@ export class MissionManager {
       changed: false
     }
 
-    const lines = text.split("\n")
+    const lines = data.split("\n")
 
     lines.forEach(line => {
         if (line.startsWith('title')) this.addTitle(line)
@@ -71,6 +71,10 @@ export class MissionManager {
 
   public getSteerpointType(index: number) {
     return (this.isTargetWaypoint(this.dataCardridge!.targets[index]!)) ? "TGT" : "STPT";
+  }
+
+  public getMission(): Mission {
+    return this.mission!;
   }
 
   private initializeRoute(tos: number, speed: number) {
@@ -112,9 +116,13 @@ export class MissionManager {
   private addPrePlannedThreat(line: string) {
     const res = this.global.map!.resolution
     const data = line.substring(line.indexOf("=") + 1).split(",");
+    if (data.length < 3) return;
+    const rx = parseFloat(data[1]!)
+    const ry = parseFloat(data[0]!)
+    if (rx == 0 && ry == 0) return;
     const ppt: Ppt = {
-      x: parseFloat(data[1]!) / res,
-      y: this.global.map!.pixels - parseFloat(data[0]!) / res,
+      x: rx / res,
+      y: this.global.map!.pixels - ry / res,
       z: parseFloat(data[2]!),
       radius: parseFloat(data[3]!) / res,
       desc: data[4] ?? "threat"
@@ -126,9 +134,13 @@ export class MissionManager {
   private addLineSteerPoint(line: string) {
     const res = this.global.map!.resolution
     const data = line.substring(line.indexOf("=") + 1).split(",");
+    if (data.length < 2) return;
+    const rx = parseFloat(data[1]!)
+    const ry = parseFloat(data[0]!)
+    if (rx == 0 && ry == 0) return;
     const lsp: LineStpt = {
-      x: parseFloat(data[1]!) / res,
-      y: this.global.map!.pixels - parseFloat(data[0]!) / res
+      x: rx / res,
+      y: this.global.map!.pixels - ry / res
     }
     this.dataCardridge!.lines.push(lsp);
   }
@@ -137,11 +149,15 @@ export class MissionManager {
   private addTarget(line: string) {
     const res = this.global.map!.resolution
     const data = line.substring(line.indexOf("=") + 1).split(",");
+    if (data.length < 3) return;
+    const rx = parseFloat(data[1]!)
+    const ry = parseFloat(data[0]!)
+    if (rx == 0 && ry == 0) return;
     const target: Target = {
       // east : parseFloat(data[1]!),
       // north : parseFloat(data[0]!),
-      x: parseFloat(data[1]!) / res,
-      y: this.global.map!.pixels - parseFloat(data[0]!) / res,
+      x: rx / res,
+      y: this.global.map!.pixels - ry / res,
       data: parseFloat(data[2]!),
       action: parseInt(data[3]!),
       desc: data[4] ?? "Not set",
