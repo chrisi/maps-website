@@ -1527,7 +1527,7 @@ const radio_map = [
 ];
 
 // Get the flight/aircraft callsign by UHF frequency
-function getCallsignByFreq(freq) {
+export function getCallsignByFreq(freq) {
     var i = 0;
     var callsign = "";
     var frequency = freq * 1000 >> 0;
