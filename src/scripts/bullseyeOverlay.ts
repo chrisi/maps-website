@@ -1,8 +1,8 @@
+import {watch} from "vue";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {watch} from "vue";
 import {Mode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
 
@@ -10,25 +10,25 @@ export class BullseyeOverlay extends BaseOverlay {
 
   private ovlCtx: OverlayContext
 
-  private global = useGlobalStore();
-  private settings = useSettingsStore();
+  private global = useGlobalStore()
+  private settings = useSettingsStore()
 
   private location: Point = {x: 0, y: 0}
 
   constructor(ovlCtx: OverlayContext) {
     console.log("initializing bullseye overlay")
-    super();
-    this.ovlCtx = ovlCtx;
+    super()
+    this.ovlCtx = ovlCtx
     watch(() => this.settings.viz.be, () => {
       this.ovlCtx.redraw(1, true)
     })
     // copy only the values, not the reactive object
-    this.location.x = this.settings.bullseyePos.x;
-    this.location.y = this.settings.bullseyePos.y;
+    this.location.x = this.settings.bullseyePos.x
+    this.location.y = this.settings.bullseyePos.y
   }
 
   public isActive(): boolean {
-    return this.settings.viz.be;
+    return this.settings.viz.be
   }
 
   public onRedraw = (dc: DrawingContext) => {
@@ -41,9 +41,12 @@ export class BullseyeOverlay extends BaseOverlay {
   public onMouseUp = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Bullseye:
-        this.settings.bullseyePos = {x: e.pageX, y: e.pageY};
+        this.settings.bullseyePos = {
+          x: e.pageX / this.global.zoom.factor,
+          y: e.pageY / this.global.zoom.factor
+        }
         this.ovlCtx.redraw(1, true)
-        break;
+        break
     }
   }
 
@@ -51,18 +54,18 @@ export class BullseyeOverlay extends BaseOverlay {
     switch (this.global.mode) {
       case Mode.Bullseye:
         if (this.ovlCtx.isMouseDown) {
-          this.location.x = e.pageX;
-          this.location.y = e.pageY;
+          this.location.x = e.pageX
+          this.location.y = e.pageY
           this.ovlCtx.redraw(1, true)
         }
-        break;
+        break
     }
   }
 
   private drawBullseye = (dc: DrawingContext) => {
     const ctx = dc.cnvCtx
-    const x = this.location!.x;
-    const y = this.location!.y;
+    const x = this.location!.x
+    const y = this.location!.y
 
     let radius = 0;
 

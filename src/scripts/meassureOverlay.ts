@@ -15,7 +15,7 @@ export class MeassureOverlay extends BaseOverlay {
   private global = useGlobalStore();
 
   constructor(ctx: OverlayContext) {
-    console.log("initializing localte overlay")
+    console.log("initializing meassure overlay")
     super();
     this.ovlCtx = ctx;
   }

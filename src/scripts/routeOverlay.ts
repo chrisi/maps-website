@@ -1,3 +1,4 @@
+import {watch} from "vue";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
@@ -5,21 +6,31 @@ import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
   private missionMgr: MissionManager
 
-  private global = useGlobalStore();
+  private global = useGlobalStore()
+  private settings = useSettingsStore()
 
   constructor(ovlCtx: OverlayContext, missionMgr: MissionManager) {
-    console.log("initializing localte overlay")
+    console.log("initializing route overlay")
     super();
     this.missionMgr = missionMgr;
     this.missionMgr.onDataCardridgeEvent(() => {
       ovlCtx.redraw(1, true)
     })
+    watch(() => this.settings.viz.ms, () => {
+      ovlCtx.redraw(1, true)
+    })
   }
+
+  public isActive(): boolean {
+    return this.settings.viz.ms
+  }
+
 
   public onRedraw = (dc: DrawingContext) => {
     if (!this.missionMgr.isMissionLoaded()) return;

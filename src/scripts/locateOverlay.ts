@@ -12,7 +12,7 @@ export class LocateOverlay extends BaseOverlay {
   private highlightSize = 17;
 
   constructor(ctx: OverlayContext) {
-    console.log("initializing localte overlay")
+    console.log("initializing locate overlay")
     super();
     this.ctx = ctx;
   }
