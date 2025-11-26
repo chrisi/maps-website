@@ -21,7 +21,7 @@ export class RouteOverlay extends BaseOverlay {
     })
   }
 
-  public isActive(): boolean {
+  public isActive = (): boolean => {
     return this.settings.viz.ms
   }
 

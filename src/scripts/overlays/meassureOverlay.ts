@@ -23,7 +23,7 @@ export class MeassureOverlay extends BaseOverlay {
     this.drawRuler(dc, this.from, this.to);
   }
 
-  public onMouseDown(e: MouseEvent) {
+  public onMouseDown = (e: MouseEvent) => {
     switch (this.global.mode) {
       case Mode.Measure:
         this.from = {x: e.pageX, y: e.pageY};

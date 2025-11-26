@@ -18,7 +18,7 @@ export class BullseyeOverlay extends BaseOverlay {
     this.location.y = this.settings.bullseyePos.y
   }
 
-  public isActive(): boolean {
+  public isActive = (): boolean => {
     return this.settings.viz.be
   }
 
