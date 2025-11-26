@@ -1,8 +1,7 @@
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
-import type {OverlayContext} from "@/scripts/overlay.ts";
-import {useGlobalStore} from "@/stores/global.ts";
+import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
@@ -11,8 +10,6 @@ export class LocateOverlay extends BaseOverlay {
   private location: Point | undefined
 
   private highlightSize = 17;
-
-  private global = useGlobalStore();
 
   constructor(ctx: OverlayContext) {
     console.log("initializing localte overlay")
@@ -41,16 +38,16 @@ export class LocateOverlay extends BaseOverlay {
     }
   }
 
-  public onRedraw = (scale: number) => {
-    this.drawLocation(scale);
+  public onRedraw = (dc: DrawingContext) => {
+    this.drawLocation(dc);
   }
 
-  private drawLocation = (scale: number) => {
+  private drawLocation = (dc: DrawingContext) => {
     if (!this.location) return;
-    this.location.x *= scale;
-    this.location.y *= scale;
+    this.location.x *= dc.deltaScale;
+    this.location.y *= dc.deltaScale;
 
-    drawHighlight(this.ctx.context, this.location.x, this.location.y, this.highlightSize * this.global.zoom.factor);
+    drawHighlight(dc.cnvCtx, this.location.x, this.location.y, this.highlightSize * dc.absScale);
   }
 
 }

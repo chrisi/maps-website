@@ -1,5 +1,5 @@
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
-import type {OverlayContext} from "@/scripts/overlay.ts";
+import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {watch} from "vue";
@@ -31,11 +31,11 @@ export class BullseyeOverlay extends BaseOverlay {
     return this.settings.viz.be;
   }
 
-  public onRedraw = (scale: number) => {
+  public onRedraw = (dc: DrawingContext) => {
     if (!this.location) return;
-    this.location.x *= scale;
-    this.location.y *= scale;
-    this.drawBullseye();
+    this.location.x *= dc.deltaScale;
+    this.location.y *= dc.deltaScale;
+    this.drawBullseye(dc);
   }
 
   public onMouseUp = (e: MouseEvent) => {
@@ -59,8 +59,8 @@ export class BullseyeOverlay extends BaseOverlay {
     }
   }
 
-  private drawBullseye = () => {
-    const ctx = this.ovlCtx.context;
+  private drawBullseye = (dc: DrawingContext) => {
+    const ctx = dc.cnvCtx
     const x = this.location!.x;
     const y = this.location!.y;
 
@@ -74,7 +74,7 @@ export class BullseyeOverlay extends BaseOverlay {
     // Draw Radial Circles
     for (let i = 0; i < 6; i++) {
       ctx.beginPath();
-      radius += (30 * this.global.zoom.factor) * 6076.12 / this.global.map!.resolution;
+      radius += (30 * dc.absScale) * 6076.12 / this.global.map!.resolution;
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
       ctx.stroke();
     }

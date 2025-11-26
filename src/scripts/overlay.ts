@@ -1,3 +1,5 @@
+import {useGlobalStore} from "@/stores/global.ts";
+
 export interface Overlay {
   onMouseDown(e: MouseEvent): void
 
@@ -7,9 +9,15 @@ export interface Overlay {
 
   onWheel(e: WheelEvent): void
 
-  onRedraw(scale: number): void
+  onRedraw(dc: DrawingContext): void
 
   isActive(): boolean
+}
+
+export interface DrawingContext {
+  cnvCtx: CanvasRenderingContext2D,
+  absScale: number,
+  deltaScale: number
 }
 
 export interface OverlayContext {
@@ -28,6 +36,7 @@ export class OverlayManager {
 
   private overlays: Overlay[] = []
   private ovlCtx?: OverlayContext
+  private global = useGlobalStore()
 
   public init = (overlayContext: OverlayContext) => {
     overlayContext.redraw = this.redraw
@@ -44,8 +53,10 @@ export class OverlayManager {
     }
     for (const overlay of this.overlays) {
       try {
-        if (overlay.isActive())
-          overlay.onRedraw(scale)
+        if (overlay.isActive()) {
+          const dc: DrawingContext = {cnvCtx: this.ovlCtx!.context, absScale: this.global.zoom.factor, deltaScale: scale}
+          overlay.onRedraw(dc)
+        }
       } catch (err) {
         console.error(this.errorMessage(overlay) + ` on redraw with scale ${scale}.`, err);
       }

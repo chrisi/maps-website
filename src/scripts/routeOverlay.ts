@@ -2,13 +2,12 @@ import {midpoint, vector} from "@/scripts/math.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
-import type {OverlayContext} from "@/scripts/overlay.ts";
+import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
-  private ovlCtx: OverlayContext
   private missionMgr: MissionManager
 
   private global = useGlobalStore();
@@ -16,29 +15,26 @@ export class RouteOverlay extends BaseOverlay {
   constructor(ovlCtx: OverlayContext, missionMgr: MissionManager) {
     console.log("initializing localte overlay")
     super();
-    this.ovlCtx = ovlCtx;
     this.missionMgr = missionMgr;
     this.missionMgr.onDataCardridgeEvent(() => {
-      this.ovlCtx.redraw(1, true)
+      ovlCtx.redraw(1, true)
     })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public onRedraw = (scale: number) => {
+  public onRedraw = (dc: DrawingContext) => {
     if (!this.missionMgr.isMissionLoaded()) return;
 
     const crd = this.missionMgr.getDatacardridge()
-    const zoom = this.global.zoom.factor
 
-    const tgts = this.translateList(crd.targets, zoom)
-    const lines = this.translateList(crd.lines, zoom)
-    const ppts = this.translateList(crd.ppts, zoom)
+    const tgts = this.translateList(crd.targets, dc.absScale)
+    const lines = this.translateList(crd.lines, dc.absScale)
+    const ppts = this.translateList(crd.ppts, dc.absScale)
 
-    ppts.forEach(ppt => ppt.radius *= zoom);
+    ppts.forEach(ppt => ppt.radius *= dc.absScale);
 
-    this.drawLineSteerPoints(this.ovlCtx.context, lines)
-    this.drawPrePlannedThreats(this.ovlCtx.context, ppts)
-    this.drawRoute(this.ovlCtx.context, tgts);
+    this.drawLineSteerPoints(dc.cnvCtx, lines)
+    this.drawPrePlannedThreats(dc.cnvCtx, ppts)
+    this.drawRoute(dc.cnvCtx, tgts);
   }
 
   private translateList<T extends Point>(list: T[], scale: number): T[] {

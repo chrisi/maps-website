@@ -1,4 +1,4 @@
-import type {Overlay} from "@/scripts/overlay.ts";
+import type {DrawingContext, Overlay} from "@/scripts/overlay.ts";
 
 export class BaseOverlay implements Overlay {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,7 +18,7 @@ export class BaseOverlay implements Overlay {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public onRedraw(scale: number): void {
+  public onRedraw(dc: DrawingContext): void {
   }
 
   public isActive(): boolean {
