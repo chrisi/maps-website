@@ -1,9 +1,9 @@
+import {midpoint, vector} from "@/scripts/math.ts";
+import {useGlobalStore} from "@/stores/global.ts";
 import {BaseOverlay} from "@/scripts/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
 import type {OverlayContext} from "@/scripts/overlay.ts";
-import {useGlobalStore} from "@/stores/global.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
-import {midpoint, vector} from "@/scripts/math.ts";
 import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
 
 export class RouteOverlay extends BaseOverlay {
@@ -23,15 +23,18 @@ export class RouteOverlay extends BaseOverlay {
     })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onRedraw = (scale: number) => {
     if (!this.missionMgr.isMissionLoaded()) return;
-    console.log("redrawing route overlay with scale: ", scale)
 
     const crd = this.missionMgr.getDatacardridge()
+    const zoom = this.global.zoom.factor
 
-    const tgts = this.translateList(crd.targets, scale);
-    const lines = this.translateList(crd.lines, scale);
-    const ppts = this.translateList(crd.ppts, scale);
+    const tgts = this.translateList(crd.targets, zoom)
+    const lines = this.translateList(crd.lines, zoom)
+    const ppts = this.translateList(crd.ppts, zoom)
+
+    ppts.forEach(ppt => ppt.radius *= zoom);
 
     this.drawLineSteerPoints(this.ovlCtx.context, lines)
     this.drawPrePlannedThreats(this.ovlCtx.context, ppts)
