@@ -1,4 +1,4 @@
-import {BaseOverlay} from "@/scripts/baseOverlay.ts";
+import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";

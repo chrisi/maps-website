@@ -1,5 +1,5 @@
 import {watch} from "vue";
-import {BaseOverlay} from "@/scripts/baseOverlay.ts";
+import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";

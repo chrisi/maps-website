@@ -3,7 +3,7 @@ import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
 import {type OverlayContext} from "@/scripts/overlay.ts";
-import {BaseOverlay} from "@/scripts/baseOverlay.ts";
+import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import {map2LatLong} from "@/scripts/math.ts";
 
 export class ZoomPanOverlay extends BaseOverlay {

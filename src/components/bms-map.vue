@@ -14,13 +14,13 @@ import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {type OverlayContext, OverlayManager} from "@/scripts/overlay.ts";
-import {ZoomPanOverlay} from "@/scripts/zoomPanOverlay.ts";
-import {LocateOverlay} from "@/scripts/locateOverlay.ts";
-import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
-import {MeassureOverlay} from "@/scripts/meassureOverlay.ts";
+import {ZoomPanOverlay} from "@/scripts/overlays/zoomPanOverlay.ts";
+import {LocateOverlay} from "@/scripts/overlays/locateOverlay.ts";
+import {BullseyeOverlay} from "@/scripts/overlays/bullseyeOverlay.ts";
+import {MeassureOverlay} from "@/scripts/overlays/meassureOverlay.ts";
 import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
 import {MissionManager} from "@/scripts/missionManager.ts";
-import {RouteOverlay} from "@/scripts/routeOverlay.ts";
+import {RouteOverlay} from "@/scripts/overlays/routeOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
