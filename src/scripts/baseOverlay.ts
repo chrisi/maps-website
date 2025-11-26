@@ -21,4 +21,8 @@ export class BaseOverlay implements Overlay {
   public onRedraw(scale: number): void {
   }
 
+  public isActive(): boolean {
+    return true
+  }
+
 }

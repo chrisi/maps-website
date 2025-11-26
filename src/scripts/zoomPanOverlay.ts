@@ -35,7 +35,7 @@ export class ZoomPanOverlay extends BaseOverlay {
       this.global.zoom.factor = this.global.zoom.max;
   }
 
-  public scaleView(mousePos: Point | undefined) { // Add event parameter to capture mouse position
+  public scaleView(mousePos?: Point) { // Add event parameter to capture mouse position
 
     const dimension = this.global.map!.pixels * this.global.zoom.factor;
     const dim_str = dimension.toString() + "px";

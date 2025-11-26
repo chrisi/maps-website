@@ -19,7 +19,15 @@ export class MissionManager {
   private mission?: Mission;
   private global = useGlobalStore();
 
-  public processDataCardridge(title: string, data: string) {
+  private missionLoaded: boolean = false;
+
+  private dataCardridgeEventHandler: ((type: string) => void)[] = [];
+
+  public onDataCardridgeEvent(cb: ((type: string) => void)) {
+    this.dataCardridgeEventHandler.push(cb);
+  }
+
+  public loadDataCardridge(title: string, data: string) {
     this.dataCardridge = {
       targets: [],
       ppts: [],
@@ -59,6 +67,9 @@ export class MissionManager {
     this.initializePackage();
 
     this.mission!.changed = true;
+    this.missionLoaded = true;
+
+    this.dataCardridgeEventHandler.forEach(cb => cb("loaded"))
   }
 
   // Calculate and return the Centroid of the Mission
@@ -73,8 +84,16 @@ export class MissionManager {
     return (this.isTargetWaypoint(this.dataCardridge!.targets[index]!)) ? "TGT" : "STPT";
   }
 
+  public isMissionLoaded(): boolean {
+    return this.missionLoaded;
+  }
+
   public getMission(): Mission {
     return this.mission!;
+  }
+
+  public getDatacardridge(): DataCardridge {
+    return this.dataCardridge!;
   }
 
   private initializeRoute(tos: number, speed: number) {

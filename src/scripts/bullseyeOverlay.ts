@@ -27,6 +27,10 @@ export class BullseyeOverlay extends BaseOverlay {
     this.location.y = this.settings.bullseyePos.y;
   }
 
+  public isActive(): boolean {
+    return this.settings.viz.be;
+  }
+
   public onRedraw = (scale: number) => {
     if (!this.location) return;
     this.location.x *= scale;
@@ -56,7 +60,6 @@ export class BullseyeOverlay extends BaseOverlay {
   }
 
   private drawBullseye = () => {
-    if (!this.settings.viz.be) return
     const ctx = this.ovlCtx.context;
     const x = this.location!.x;
     const y = this.location!.y;

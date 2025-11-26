@@ -1,3 +1,5 @@
+import type {Point} from "@/model/base.ts";
+
 export const Action = {
   Target: -1,
   Nav: 0,
@@ -34,12 +36,12 @@ export interface Radio {
   freq: string
 }
 
-export interface LineStpt {
+export interface LineStpt extends Point {
   x: number,
   y: number,
 }
 
-export interface Ppt {
+export interface Ppt extends Point {
   x: number,
   y: number,
   z: number,
@@ -47,7 +49,7 @@ export interface Ppt {
   desc: string
 }
 
-export interface Target {
+export interface Target extends Point {
   x: number,
   y: number,
   data: number,
@@ -63,7 +65,7 @@ export interface DataCardridge {
   radio: Radio[]
 }
 
-export interface Centroid {
+export interface Centroid extends Point {
   x: number,
   y: number,
   n: number,

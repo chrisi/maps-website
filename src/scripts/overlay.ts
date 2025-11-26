@@ -8,6 +8,8 @@ export interface Overlay {
   onWheel(e: WheelEvent): void
 
   onRedraw(scale: number): void
+
+  isActive(): boolean
 }
 
 export interface OverlayContext {
@@ -41,7 +43,12 @@ export class OverlayManager {
       this.ovlCtx!.context.clearRect(0, 0, this.ovlCtx!.canvas.width, this.ovlCtx!.canvas.height);
     }
     for (const overlay of this.overlays) {
-      overlay.onRedraw(scale)
+      try {
+        if (overlay.isActive())
+          overlay.onRedraw(scale)
+      } catch (err) {
+        console.error(this.errorMessage(overlay) + ` on redraw with scale ${scale}.`, err);
+      }
     }
   }
 
@@ -76,14 +83,24 @@ export class OverlayManager {
     this.peventDefaultFiltered(e)
     for (const overlay of this.overlays) {
       this.ovlCtx!.isMouseDown = true
-      overlay.onMouseDown(e)
+      try {
+        if (overlay.isActive())
+          overlay.onMouseDown(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
     }
   }
 
   private mouseMoveHandler = (e: MouseEvent) => {
     e.preventDefault()
     for (const overlay of this.overlays) {
-      overlay.onMouseMove(e)
+      try {
+        if (overlay.isActive())
+          overlay.onMouseMove(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
     }
   }
 
@@ -91,14 +108,26 @@ export class OverlayManager {
     e.preventDefault()
     for (const overlay of this.overlays) {
       this.ovlCtx!.isMouseDown = false
-      overlay.onMouseUp(e)
+      try {
+        if (overlay.isActive())
+          overlay.onMouseUp(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
     }
   }
 
   private wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
     for (const overlay of this.overlays) {
-      overlay.onWheel(e)
+      try {
+        if (overlay.isActive())
+          overlay.onWheel(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
     }
   }
+
+  private errorMessage = (overlay: Overlay, e?: Event): string => `error in overlay '${overlay.constructor.name}'${e ? ` on '${e.type}' event` : ''}`
 }

@@ -1,11 +1,3 @@
-export interface StringContentHandler {
-  (filename: string, content: string): void
-}
-
-export interface ArrayBufferContentHandler {
-  (filename: string, content: ArrayBuffer): void
-}
-
 //
 // FILE PROCESSING FOR BMS FILES
 //
@@ -13,28 +5,28 @@ export class DropFileHandler {
 
   private filename = "";
 
-  private iniHandler: ((filename: string, content: string) => void) | null = null;
+  private iniHandler: ((filename: string, content: string) => void)[] = [];
 
-  public onIniLoaded(cb: StringContentHandler) {
-    this.iniHandler = cb;
+  public onIniLoaded(cb: ((filename: string, content: string) => void)) {
+    this.iniHandler.push(cb);
   }
 
-  private pngHandler: ((filename: string, dataUrl: string) => void) | null = null;
+  private pngHandler: ((filename: string, dataUrl: string) => void)[] = [];
 
-  public onPngLoaded(cb: StringContentHandler) {
-    this.pngHandler = cb;
+  public onPngLoaded(cb: ((filename: string, content: string) => void)) {
+    this.pngHandler.push(cb);
   }
 
-  private weatherMapHandler: ((filename: string, data: ArrayBuffer) => void) | null = null;
+  private weatherMapHandler: ((filename: string, data: ArrayBuffer) => void)[] = [];
 
-  public onWeatherMapLoaded(cb: ArrayBufferContentHandler) {
-    this.weatherMapHandler = cb;
+  public onWeatherMapLoaded(cb: ((filename: string, data: ArrayBuffer) => void)) {
+    this.weatherMapHandler.push(cb);
   }
 
-  private grib2Handler: ((filename: string, data: ArrayBuffer) => void) | null = null;
+  private grib2Handler: ((filename: string, data: ArrayBuffer) => void)[] = [];
 
-  public onGrib2Loaded(cb: ArrayBufferContentHandler) {
-    this.weatherMapHandler = cb;
+  public onGrib2Loaded(cb: ((filename: string, data: ArrayBuffer) => void)) {
+    this.grib2Handler.push(cb);
   }
 
   // Disable Default behavior and allow dropped files to be handled
@@ -59,21 +51,17 @@ export class DropFileHandler {
         if (!res) return;
         switch (typeof res) {
           case 'string':
-            if (this.iniHandler && this.filename.endsWith(".ini"))
-              this.iniHandler(this.filename, res);
-            if (this.pngHandler && this.filename.endsWith(".png")) {
-              this.pngHandler(this.filename, res);
+            if (this.filename.endsWith(".ini"))
+              this.iniHandler.forEach(cb => cb(this.filename, res));
+            if (this.filename.endsWith(".png")) {
+              this.pngHandler.forEach(cb => cb(this.filename, res));
             }
             break;
           case 'object':
-            if (this.weatherMapHandler && this.filename.endsWith(".fmap")) {
-              this.weatherMapHandler(this.filename, res);
-              return;
-            }
-            if (this.grib2Handler && this.filename.startsWith("gfs.")) {
-              this.grib2Handler(this.filename, res);
-              return;
-            }
+            if (this.filename.endsWith(".fmap"))
+              this.weatherMapHandler.forEach(cb => cb(this.filename, res));
+            if (this.filename.startsWith("gfs."))
+              this.grib2Handler.forEach(cb => cb(this.filename, res));
             break;
           default:
             console.log("unknown file type: " + typeof res);

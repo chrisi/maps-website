@@ -20,6 +20,7 @@ import {BullseyeOverlay} from "@/scripts/bullseyeOverlay.ts";
 import {MeassureOverlay} from "@/scripts/meassureOverlay.ts";
 import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
 import {MissionManager} from "@/scripts/missionManager.ts";
+import {RouteOverlay} from "@/scripts/routeOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -60,17 +61,16 @@ onMounted(() => {
   const zoomPanOvl = new ZoomPanOverlay(ctx)
 
   dropFileHandler.onIniLoaded((filename, content) => {
-    console.log(`loaded ${filename} with ${content.length} bytes`)
-    missionMgr.processDataCardridge(filename, content)
-    console.log(missionMgr.getMission())
+    missionMgr.loadDataCardridge(filename, content)
   })
 
   ovlMgr.registerOverlay(zoomPanOvl)
+  ovlMgr.registerOverlay(new RouteOverlay(ctx, missionMgr))
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
   ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
   ovlMgr.registerOverlay(new MeassureOverlay(ctx))
   ovlMgr.activatePointerEvents()
-  zoomPanOvl.scaleView(undefined)
+  zoomPanOvl.scaleView()
 })
 
 onBeforeUnmount(() => {
