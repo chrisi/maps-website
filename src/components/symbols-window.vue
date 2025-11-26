@@ -79,7 +79,6 @@ let selectedType = "100016"
 
 function genIconCode() {
   currendSymbol.value = `${selectedIdent}${selectedType}${selectedEntity.value}`
-  console.log(`current symbol: ${currendSymbol.value}`)
 }
 
 function selectSymbol(sender: string, value: string) {
@@ -93,12 +92,10 @@ function selectSymbol(sender: string, value: string) {
       selectedEntity.value = entities.value[0]!.value
       break;
   }
-  console.log(`selectSymbol: ${sender} -> ${value}`)
   genIconCode()
 }
 
 watch(selectedEntity, () => {
-  console.log(`changed entity: ${selectedEntity.value}`)
   genIconCode()
   // TODO: update properties.entity in map_actions
 })

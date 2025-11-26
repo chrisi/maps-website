@@ -5,25 +5,21 @@ import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
-  private ctx: OverlayContext
-
   private location: Point | undefined
 
   private highlightSize = 17;
 
   constructor(ctx: OverlayContext) {
-    console.log("initializing locate overlay")
-    super();
-    this.ctx = ctx;
+    super(ctx);
   }
 
   public clearLocation = () => {
-    this.location = undefined;
-    this.ctx.redraw(1, true);
+    this.location = undefined
+    this.redraw()
   }
 
   public locateAirbase = (ap: string): void => {
-    const areas = [...this.ctx.airbaseMap.children] as HTMLAreaElement[];
+    const areas = [...this.ovlCtx.airbaseMap.children] as HTMLAreaElement[];
     const area = areas.find(a => a.title === ap);
     if (area) {
       const coordArr = area.coords.split(',');
@@ -32,7 +28,7 @@ export class LocateOverlay extends BaseOverlay {
 
       this.location = {x, y}
 
-      this.ctx.redraw(1, true);
+      this.redraw()
 
       window.scrollTo(x - window.innerWidth / 2, y - window.innerHeight / 2);
     }

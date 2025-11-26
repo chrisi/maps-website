@@ -1,26 +1,17 @@
 import {watch} from "vue";
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
-import {useGlobalStore} from "@/stores/global.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
 import {Mode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
 
 export class BullseyeOverlay extends BaseOverlay {
 
-  private ovlCtx: OverlayContext
-
-  private global = useGlobalStore()
-  private settings = useSettingsStore()
-
   private location: Point = {x: 0, y: 0}
 
-  constructor(ovlCtx: OverlayContext) {
-    console.log("initializing bullseye overlay")
-    super()
-    this.ovlCtx = ovlCtx
+  constructor(ctx: OverlayContext) {
+    super(ctx)
     watch(() => this.settings.viz.be, () => {
-      this.ovlCtx.redraw(1, true)
+      ctx.redraw(1, true)
     })
     // copy only the values, not the reactive object
     this.location.x = this.settings.bullseyePos.x
@@ -45,7 +36,7 @@ export class BullseyeOverlay extends BaseOverlay {
           x: e.pageX / this.global.zoom.factor,
           y: e.pageY / this.global.zoom.factor
         }
-        this.ovlCtx.redraw(1, true)
+        this.redraw()
         break
     }
   }
@@ -56,7 +47,7 @@ export class BullseyeOverlay extends BaseOverlay {
         if (this.ovlCtx.isMouseDown) {
           this.location.x = e.pageX
           this.location.y = e.pageY
-          this.ovlCtx.redraw(1, true)
+          this.redraw()
         }
         break
     }

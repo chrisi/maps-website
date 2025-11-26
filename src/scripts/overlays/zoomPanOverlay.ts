@@ -1,6 +1,4 @@
 import {Mode} from "@/model/mode.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
-import {useGlobalStore} from "@/stores/global.ts";
 import type {Coord, CoordStr, Point} from "@/model/base.ts";
 import {type OverlayContext} from "@/scripts/overlay.ts";
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
@@ -12,16 +10,8 @@ export class ZoomPanOverlay extends BaseOverlay {
   private wheel_enabled = true;
   private last_zoom = 1
 
-  private ctx: OverlayContext
-
-  private global = useGlobalStore()
-
-  private settings = useSettingsStore()
-
   constructor(ctx: OverlayContext) {
-    console.log("initializing zoom-pan overlay")
-    super();
-    this.ctx = ctx;
+    super(ctx);
   }
 
   public zoom = (dir: number) => {
@@ -53,14 +43,14 @@ export class ZoomPanOverlay extends BaseOverlay {
     const doc_mouseX = scroll_element.scrollLeft + mouseX;
     const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-    this.ctx.airbases.style.width = dim_str;
-    this.ctx.airbases.style.height = dim_str;
+    this.ovlCtx.airbases.style.width = dim_str;
+    this.ovlCtx.airbases.style.height = dim_str;
 
-    this.ctx.map.style.width = dim_str;
-    this.ctx.map.style.height = dim_str;
+    this.ovlCtx.map.style.width = dim_str;
+    this.ovlCtx.map.style.height = dim_str;
 
-    this.ctx.canvas.width = dimension;
-    this.ctx.canvas.height = dimension;
+    this.ovlCtx.canvas.width = dimension;
+    this.ovlCtx.canvas.height = dimension;
 
     // Calculate new scroll position to keep mouse point fixed
     const new_doc_mouseX = doc_mouseX * scale;
@@ -70,7 +60,7 @@ export class ZoomPanOverlay extends BaseOverlay {
 
     this.last_zoom = this.global.zoom.factor;
 
-    this.ctx.redraw(scale);
+    this.ovlCtx.redraw(scale);
   }
 
   public onMouseDown = (e: MouseEvent) => {
@@ -87,7 +77,7 @@ export class ZoomPanOverlay extends BaseOverlay {
       this.showPointerCoord(e.pageX, e.pageY)
     switch (this.global.mode) {
       case Mode.Move:
-        if (!this.ctx.isMouseDown) break;
+        if (!this.ovlCtx.isMouseDown) break;
         const dx = this.pointerPanStart.x - e.clientX;
         const dy = this.pointerPanStart.y - e.clientY;
         window.scrollTo(dx, dy);
@@ -119,7 +109,7 @@ export class ZoomPanOverlay extends BaseOverlay {
 
   private showPointerCoord = (posX: number, posY: number) => {
     //TODO: how does this work?? 4096 is the orig size of the annotation canvas but the setup is scaled down to 3840.
-    const scalar = 4096 / this.ctx.canvas.height;
+    const scalar = 4096 / this.ovlCtx.canvas.height;
     const mapX = (posX * scalar) >> 0;
     const mapY = (posY * scalar) >> 0;
     const coord = this.canvasPos2LatLong({x: mapX, y: mapY});

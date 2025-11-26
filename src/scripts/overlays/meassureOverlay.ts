@@ -1,23 +1,16 @@
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
-import {useGlobalStore} from "@/stores/global.ts";
 import {Mode} from "@/model/mode.ts";
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 
 export class MeassureOverlay extends BaseOverlay {
 
-  private ovlCtx: OverlayContext
-
   private from: Point | undefined
   private to: Point | undefined
 
-  private global = useGlobalStore();
-
   constructor(ctx: OverlayContext) {
-    console.log("initializing meassure overlay")
-    super();
-    this.ovlCtx = ctx;
+    super(ctx);
   }
 
   public onRedraw = (dc: DrawingContext) => {
