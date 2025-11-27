@@ -18,7 +18,7 @@ interface Symbol {
 export class SymbolOverlay extends BaseOverlay {
 
   private scaledItems: ScaledItem[] = []
-  private hoverItem?: ScaledItem
+  private hoverItem: ScaledItem | undefined = undefined;
   private iconCache: Map<string, HTMLImageElement> = new Map();
 
   private symbols: Symbol[] = []
@@ -50,22 +50,41 @@ export class SymbolOverlay extends BaseOverlay {
     })
   }
 
-  public onMouseMove = (e: MouseEvent) => {
-    if (this.global.mode != Mode.Symbol) return
-    this.hoverItem = undefined;
+  private findItemAtCursor(e: MouseEvent): ScaledItem | undefined {
+    let found: ScaledItem | undefined = undefined
     this.scaledItems.forEach(itm => {
       const d = distance(itm.pt, {x: e.pageX, y: e.pageY})
       if (d < 15) {
-        this.hoverItem = itm
+        found = itm
       }
     })
-    this.ovlCtx.canvas.style.cursor = (this.hoverItem ? "pointer" : "default")
+    return found
   }
 
-  public onClick(e: MouseEvent) {
+  public onMouseMove = (e: MouseEvent) => {
     if (this.global.mode != Mode.Symbol) return
-    if (this.hoverItem) {
-      this.selectSymbolEventHandler.forEach(cb => cb(this.hoverItem!.symbol!))
+
+    const foundItem = this.findItemAtCursor(e)
+    this.ovlCtx.canvas.style.cursor = (foundItem ? "pointer" : "default")
+
+    if (this.hoverItem && this.isLeftMouseDown()) {
+      this.hoverItem.symbol.pt.x = e.pageX / this.global.zoom.factor
+      this.hoverItem.symbol.pt.y = e.pageY / this.global.zoom.factor
+      this.redraw()
+    }
+  }
+
+  public onMouseDown = (e: MouseEvent) => {
+    if (this.global.mode != Mode.Symbol) return
+    if (!this.isLeftMouseDown()) return
+    this.hoverItem = this.findItemAtCursor(e)
+  }
+
+  public onClick = (e: MouseEvent) => {
+    if (this.global.mode != Mode.Symbol) return
+    const foundItem = this.findItemAtCursor(e)
+    if (foundItem) {
+      this.selectSymbolEventHandler.forEach(cb => cb(foundItem.symbol!))
     } else {
       const s: Symbol = {
         id: this.gid++,
@@ -82,8 +101,9 @@ export class SymbolOverlay extends BaseOverlay {
 
   public onContextMenu = (e: MouseEvent) => {
     if (this.global.mode != Mode.Symbol) return
-    if (this.hoverItem) {
-      this.symbols = this.symbols.filter(s => s.id !== this.hoverItem!.symbol.id)
+    const foundItem = this.findItemAtCursor(e)
+    if (foundItem) {
+      this.symbols = this.symbols.filter(s => s.id !== foundItem.symbol.id)
       this.redraw()
     }
   }
