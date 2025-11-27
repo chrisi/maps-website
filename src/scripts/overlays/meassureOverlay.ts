@@ -24,33 +24,23 @@ export class MeassureOverlay extends BaseOverlay {
   }
 
   public onMouseDown = (e: MouseEvent) => {
-    switch (this.global.mode) {
-      case Mode.Measure:
-        this.from = {x: e.pageX, y: e.pageY};
-        this.ovlCtx.redraw(1, true)
-        break;
-    }
+    if (this.global.mode != Mode.Measure) return
+    this.from = {x: e.pageX, y: e.pageY}
+    this.ovlCtx.redraw(1, true)
   }
 
   public onMouseUp = () => {
-    switch (this.global.mode) {
-      case Mode.Measure:
-        this.to = undefined;
-        this.from = undefined;
-        this.ovlCtx.redraw(1, true)
-        break;
-    }
+    if (this.global.mode != Mode.Measure) return
+    this.to = undefined;
+    this.from = undefined;
+    this.ovlCtx.redraw(1, true)
   }
 
   public onMouseMove = (e: MouseEvent) => {
-    switch (this.global.mode) {
-      case Mode.Measure:
-        if (this.ovlCtx.isMouseDown) {
-          this.to = {x: e.pageX, y: e.pageY};
-          this.ovlCtx.redraw(1, true)
-        }
-        break;
-    }
+    if (this.global.mode != Mode.Measure) return
+    if (!this.isLeftMouseDown()) return
+    this.to = {x: e.pageX, y: e.pageY};
+    this.ovlCtx.redraw(1, true)
   }
 
   private drawRuler(dc: DrawingContext, from: Point, to: Point) {

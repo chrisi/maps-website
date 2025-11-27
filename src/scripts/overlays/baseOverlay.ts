@@ -15,6 +15,18 @@ export class BaseOverlay implements Overlay {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onClick(e: MouseEvent): void {
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onDblClick(e: MouseEvent): void {
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public onContextMenu(e: MouseEvent): void {
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onMouseDown(e: MouseEvent): void {
   }
 
@@ -36,6 +48,54 @@ export class BaseOverlay implements Overlay {
 
   public isActive(): boolean {
     return true
+  }
+
+  /**
+   * Returns true if the left mouse button is pressed.
+   * to be used in mouse-move handlers.
+   */
+  protected isLeftMouseDown(): boolean {
+    return (this.ovlCtx.mouseDown & 1) > 0
+  }
+
+  /**
+   * Returns true if the right mouse button is pressed.
+   * to be used in mouse-move handlers.
+   */
+  protected isRightMouseDown(): boolean {
+    return (this.ovlCtx.mouseDown & 2) > 0
+  }
+
+  /**
+   * Returns true if the middle mouse button is pressed.
+   * to be used in mouse-move handlers.
+   */
+  protected isAuxMouseDown(): boolean {
+    return (this.ovlCtx.mouseDown & 4) > 0
+  }
+
+  /**
+   * Returns true if the left mouse button is pressed.
+   * to be used in mouse-up/down handlers.
+   */
+  protected isLeftMouse(e: MouseEvent): boolean {
+    return e.button == 0
+  }
+
+  /**
+   * Returns true if the middle mouse button is pressed.
+   * to be used in mouse-up/down handlers.
+   */
+  protected isAuxMouse(e: MouseEvent): boolean {
+    return e.button == 1
+  }
+
+  /**
+   * Returns true if the right mouse button is pressed.
+   * to be used in mouse-up/down handlers.
+   */
+  protected isRightMouse(e: MouseEvent): boolean {
+    return e.button == 2
   }
 
   /**

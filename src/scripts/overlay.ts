@@ -1,6 +1,12 @@
 import {useGlobalStore} from "@/stores/global.ts";
 
 export interface Overlay {
+  onClick(e: MouseEvent): void
+
+  onDblClick(e: MouseEvent): void
+
+  onContextMenu(e: MouseEvent): void
+
   onMouseDown(e: MouseEvent): void
 
   onMouseMove(e: MouseEvent): void
@@ -27,7 +33,7 @@ export interface OverlayContext {
 
   redraw(scale: number, clean?: boolean): void
 
-  isMouseDown: boolean
+  mouseDown: number
 }
 
 export class OverlayManager {
@@ -71,6 +77,9 @@ export class OverlayManager {
 
   public activatePointerEvents = (): void => {
     const pane = window
+    pane.addEventListener('click', this.clickHandler as EventListener);
+    pane.addEventListener('dblclick', this.dblClickHandler as EventListener);
+    pane.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
     pane.addEventListener('mousedown', this.mouseDownHandler as EventListener);
     pane.addEventListener('mousemove', this.mouseMoveHandler as EventListener);
     pane.addEventListener('mouseup', this.mouseUpHandler as EventListener);
@@ -79,6 +88,9 @@ export class OverlayManager {
 
   public deactivatePointerEvents = (): void => {
     const pane = window
+    pane.removeEventListener('click', this.clickHandler as EventListener);
+    pane.removeEventListener('dblclick', this.dblClickHandler as EventListener);
+    pane.removeEventListener('contextmenu', this.contextMenuHandler as EventListener);
     pane.removeEventListener('mousedown', this.mouseDownHandler as EventListener);
     pane.removeEventListener('mousemove', this.mouseMoveHandler as EventListener);
     pane.removeEventListener('mouseup', this.mouseUpHandler as EventListener);
@@ -91,10 +103,46 @@ export class OverlayManager {
     e.preventDefault()
   }
 
+  private clickHandler = (e: MouseEvent) => {
+    this.peventDefaultFiltered(e)
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          overlay.onClick(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
+  private dblClickHandler = (e: MouseEvent) => {
+    this.peventDefaultFiltered(e)
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          overlay.onDblClick(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
+  private contextMenuHandler = (e: MouseEvent) => {
+    this.peventDefaultFiltered(e)
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          overlay.onContextMenu(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
   private mouseDownHandler = (e: MouseEvent) => {
     this.peventDefaultFiltered(e)
     for (const overlay of this.overlays) {
-      this.ovlCtx!.isMouseDown = true
+      this.ovlCtx!.mouseDown = e.buttons
       try {
         if (overlay.isActive())
           overlay.onMouseDown(e)
@@ -119,7 +167,7 @@ export class OverlayManager {
   private mouseUpHandler = (e: MouseEvent) => {
     e.preventDefault()
     for (const overlay of this.overlays) {
-      this.ovlCtx!.isMouseDown = false
+      this.ovlCtx!.mouseDown = e.buttons
       try {
         if (overlay.isActive())
           overlay.onMouseUp(e)

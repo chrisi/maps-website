@@ -21,6 +21,7 @@ import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
 import {MissionManager} from "@/scripts/missionManager.ts";
 import {RouteOverlay} from "@/scripts/overlays/routeOverlay.ts";
 import {StationOverlay} from "@/scripts/overlays/stationOverlay.ts";
+import {SymbolOverlay} from "@/scripts/overlays/symbolOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -50,7 +51,7 @@ onMounted(() => {
     map: mapRef.value!,
     ...cnv,
     redraw: ovlMgr.redraw,
-    isMouseDown: false
+    mouseDown: 0
   }
   ovlMgr.init(ctx)
 
@@ -63,11 +64,12 @@ onMounted(() => {
   const stationOverlay = new StationOverlay(ctx)
   stationOverlay.onSelectStation(station => showPopup(station))
 
+  ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
+  ovlMgr.registerOverlay(new SymbolOverlay(ctx))
   ovlMgr.registerOverlay(zoomPanOvl)
   ovlMgr.registerOverlay(stationOverlay)
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
   ovlMgr.registerOverlay(new RouteOverlay(ctx, missionMgr))
-  ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
   ovlMgr.registerOverlay(new MeassureOverlay(ctx))
   ovlMgr.activatePointerEvents()
   zoomPanOvl.scaleView()

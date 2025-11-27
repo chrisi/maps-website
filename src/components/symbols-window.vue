@@ -7,6 +7,7 @@ import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
+import {useGlobalStore} from "@/stores/global.ts";
 
 defineProps({
   visible: {
@@ -14,6 +15,8 @@ defineProps({
     required: true
   }
 })
+
+const global = useGlobalStore();
 
 const emit = defineEmits(['close'])
 
@@ -71,14 +74,13 @@ const sec1: ValueCaptionPair[] = [
 
 const sidcDocUrl = "https://www.jcs.mil/Portals/36/Documents/Doctrine/Other_Pubs/ms_2525d.pdf"
 
-const currendSymbol = ref("")
 const selectedEntity = ref("")
 
 let selectedIdent = "1006"
 let selectedType = "100016"
 
 function genIconCode() {
-  currendSymbol.value = `${selectedIdent}${selectedType}${selectedEntity.value}`
+  global.selectedSymbol = `${selectedIdent}${selectedType}${selectedEntity.value}`
 }
 
 function selectSymbol(sender: string, value: string) {
@@ -97,7 +99,6 @@ function selectSymbol(sender: string, value: string) {
 
 watch(selectedEntity, () => {
   genIconCode()
-  // TODO: update properties.entity in map_actions
 })
 
 onMounted(() => {
@@ -121,11 +122,11 @@ onMounted(() => {
     </tool-dropdown>
     <tool-section name="Symbol Identification Code"/>
     <tool-spacer/>
-    <div class="symbol" v-if="currendSymbol">
+    <div class="symbol" v-if="global.selectedSymbol">
       <div>
-        <img id="sidc-symbol" :src="`common/assets/${currendSymbol}.ico`" width="32" height="32" alt="symbol">
+        <img id="sidc-symbol" :src="`common/assets/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
       </div>
-      <div>{{ currendSymbol }}</div>
+      <div>{{ global.selectedSymbol }}</div>
     </div>
     <div style="text-align: center">
       <a :href="sidcDocUrl" style="font-size:70%" target="_blank">MIL-STD-2525D</a>

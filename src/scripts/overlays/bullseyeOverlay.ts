@@ -30,27 +30,21 @@ export class BullseyeOverlay extends BaseOverlay {
   }
 
   public onMouseUp = (e: MouseEvent) => {
-    switch (this.global.mode) {
-      case Mode.Bullseye:
-        this.settings.bullseyePos = {
-          x: e.pageX / this.global.zoom.factor,
-          y: e.pageY / this.global.zoom.factor
-        }
-        this.redraw()
-        break
+    if (this.global.mode != Mode.Bullseye) return
+    if (!this.isLeftMouse(e)) return
+    this.settings.bullseyePos = {
+      x: e.pageX / this.global.zoom.factor,
+      y: e.pageY / this.global.zoom.factor
     }
+    this.redraw()
   }
 
   public onMouseMove = (e: MouseEvent) => {
-    switch (this.global.mode) {
-      case Mode.Bullseye:
-        if (this.ovlCtx.isMouseDown) {
-          this.location.x = e.pageX
-          this.location.y = e.pageY
-          this.redraw()
-        }
-        break
-    }
+    if (this.global.mode != Mode.Bullseye) return
+    if (!this.isLeftMouseDown()) return
+    this.location.x = e.pageX
+    this.location.y = e.pageY
+    this.redraw()
   }
 
   private drawBullseye = (dc: DrawingContext) => {

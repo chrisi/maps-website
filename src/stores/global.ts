@@ -13,6 +13,8 @@ export const useGlobalStore = defineStore('global', () => {
   const pos = ref<Point>({x: 0, y: 0})
   const coord = ref<Coord>({lat: 0, long: 0})
 
+  const selectedSymbol = ref<string>()
+
   const zoom = reactive<Zoom>({
     factor: 1,
     min: 0.5,
@@ -21,7 +23,7 @@ export const useGlobalStore = defineStore('global', () => {
     wheelRate: 20
   })
 
-  return {message, mode, map, pos, coord, zoom}
+  return {message, mode, map, pos, coord, selectedSymbol, zoom}
 }, {
   persist: false
 })

@@ -61,47 +61,36 @@ export class ZoomPanOverlay extends BaseOverlay {
   }
 
   public onMouseDown = (e: MouseEvent) => {
-    switch (this.global.mode) {
-      case Mode.Move:
-        const ofs = document.scrollingElement!;
-        this.pointerPanStart = {x: e.clientX + ofs.scrollLeft, y: e.clientY + ofs.scrollTop};
-        break;
-    }
+    if (!((this.global.mode == Mode.Move && this.isLeftMouse(e)) || this.isAuxMouse(e))) return
+    const ofs = document.scrollingElement!;
+    this.pointerPanStart = {x: e.clientX + ofs.scrollLeft, y: e.clientY + ofs.scrollTop};
   }
 
   public onMouseMove = (e: MouseEvent) => {
     if (this.settings.viz.xy)
       this.showPointerCoord(e.pageX, e.pageY)
-    switch (this.global.mode) {
-      case Mode.Move:
-        if (!this.ovlCtx.isMouseDown) break;
-        const dx = this.pointerPanStart.x - e.clientX;
-        const dy = this.pointerPanStart.y - e.clientY;
-        window.scrollTo(dx, dy);
-        break;
-    }
+    if (!((this.global.mode == Mode.Move && this.isLeftMouseDown()) || this.isAuxMouseDown())) return
+    const dx = this.pointerPanStart.x - e.clientX
+    const dy = this.pointerPanStart.y - e.clientY
+    window.scrollTo(dx, dy)
   }
 
-  public onMouseUp = () => {
-    switch (this.global.mode) {
-      case Mode.Move:
-        this.pointerPanStart = {x: 0, y: 0};
-        break;
-    }
+  public onMouseUp = (e: MouseEvent) => {
+    if (!((this.global.mode == Mode.Move && this.isLeftMouse(e)) || this.isAuxMouse(e))) return
+    this.pointerPanStart = {x: 0, y: 0};
   }
 
   public onWheel = (e: WheelEvent) => {
     // Ensure zoom stays within limits and apply rounding to avoid floating-point drift
-    if (this.wheel_enabled) {
-      this.zoom(e.deltaY);
-      this.scaleView({x: e.clientX, y: e.clientY});
-      // saveSettings();
-      // refreshCanvas();
-      this.wheel_enabled = false;
-      setTimeout(() => {
-        this.wheel_enabled = true;
-      }, (1 / this.global.zoom.wheelRate) * 1000);
-    }
+    if (!this.wheel_enabled) return
+    this.zoom(e.deltaY);
+    this.scaleView({x: e.clientX, y: e.clientY});
+    // saveSettings();
+    // refreshCanvas();
+    this.wheel_enabled = false;
+    setTimeout(() => {
+      this.wheel_enabled = true;
+    }, (1 / this.global.zoom.wheelRate) * 1000);
   }
 
   private showPointerCoord = (posX: number, posY: number) => {
