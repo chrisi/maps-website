@@ -10,17 +10,19 @@ interface ScaledItem {
 }
 
 interface Symbol {
+  id: number
   pt: Point
-  id: string
+  sym: string
 }
 
 export class SymbolOverlay extends BaseOverlay {
 
   private scaledItems: ScaledItem[] = []
-  private hoverSymbol?: Symbol
+  private hoverItem?: ScaledItem
   private iconCache: Map<string, HTMLImageElement> = new Map();
 
   private symbols: Symbol[] = []
+  private gid = 0
 
   private selectSymbolEventHandler: ((name: Symbol) => void)[] = [];
 
@@ -44,32 +46,44 @@ export class SymbolOverlay extends BaseOverlay {
     this.scaledItems = this.translateList(this.symbols, dc.absScale);
     const intelliScale = dc.absScale + (1 - dc.absScale) * 0.7
     this.scaledItems.forEach(sym => {
-      this.drawSymbol(dc, sym.pt, intelliScale, sym.symbol.id);
+      this.drawSymbol(dc, sym.pt, intelliScale, sym.symbol.sym);
     })
   }
 
   public onMouseMove = (e: MouseEvent) => {
     if (this.global.mode != Mode.Symbol) return
-    this.hoverSymbol = undefined;
-    this.scaledItems.forEach(sym => {
-      const d = distance(sym.pt, {x: e.pageX, y: e.pageY})
+    this.hoverItem = undefined;
+    this.scaledItems.forEach(itm => {
+      const d = distance(itm.pt, {x: e.pageX, y: e.pageY})
       if (d < 15) {
-        this.hoverSymbol = sym.symbol
+        this.hoverItem = itm
       }
     })
-    this.ovlCtx.canvas.style.cursor = (this.hoverSymbol ? "pointer" : "default")
+    this.ovlCtx.canvas.style.cursor = (this.hoverItem ? "pointer" : "default")
   }
 
   public onClick(e: MouseEvent) {
     if (this.global.mode != Mode.Symbol) return
-    if (this.hoverSymbol) {
-      this.selectSymbolEventHandler.forEach(cb => cb(this.hoverSymbol!))
+    if (this.hoverItem) {
+      this.selectSymbolEventHandler.forEach(cb => cb(this.hoverItem!.symbol!))
     } else {
-      const sym: Symbol = {
-        id: this.global.selectedSymbol!,
-        pt: {x: e.pageX / this.global.zoom.factor, y: e.pageY / this.global.zoom.factor}
+      const s: Symbol = {
+        id: this.gid++,
+        sym: this.global.selectedSymbol!,
+        pt: {
+          x: e.pageX / this.global.zoom.factor,
+          y: e.pageY / this.global.zoom.factor
+        }
       }
-      this.symbols.push(sym)
+      this.symbols.push(s)
+      this.redraw()
+    }
+  }
+
+  public onContextMenu = (e: MouseEvent) => {
+    if (this.global.mode != Mode.Symbol) return
+    if (this.hoverItem) {
+      this.symbols = this.symbols.filter(s => s.id !== this.hoverItem!.symbol.id)
       this.redraw()
     }
   }

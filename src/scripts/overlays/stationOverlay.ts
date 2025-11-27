@@ -4,6 +4,7 @@ import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import {stations} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
 import {deg2rad, distance} from "@/scripts/math.ts";
+import {Mode} from "@/model/mode.ts";
 
 interface ScaledStation {
   station: Station
@@ -53,6 +54,7 @@ export class StationOverlay extends BaseOverlay {
   }
 
   public onMouseMove = (e: MouseEvent) => {
+    if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
     this.hoverStation = undefined;
     this.scaledStations.forEach(sta => {
       const d = distance(sta.pt, {x: e.pageX, y: e.pageY})
@@ -63,22 +65,23 @@ export class StationOverlay extends BaseOverlay {
     this.ovlCtx.canvas.style.cursor = (this.hoverStation ? "pointer" : "default")
   }
 
-  public onMouseUp() {
+  public onClick() {
+    if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
     if (this.hoverStation) {
       this.selectStationEventHandler.forEach(cb => cb(this.hoverStation!))
     }
   }
 
-  private drawAirbase(dc: DrawingContext, pt: Point, orientation: number, scale: number = 1.0, doubelRw: boolean = false) {
+  private drawAirbase(dc: DrawingContext, pt: Point, orientation: number, scale: number = 1.0, dualRw: boolean = false) {
     const ctx = dc.cnvCtx;
 
     const oriRad = deg2rad(orientation + 90)
 
     const length = 32 * scale
-    const rad = (doubelRw ? 8 : 6) * scale
-    const iwidth = 3 * scale
-    const owidth = 5 * scale
-    const lwidth = 1.2 * scale
+    const rad = (dualRw ? 8 : 6) * scale
+    const inWidth = 3 * scale
+    const outWidth = 5 * scale
+    const cbWidth = 1.2 * scale
     const gap = 5 * scale
 
     const dxo = Math.cos(oriRad) * (length / 2)
@@ -89,7 +92,7 @@ export class StationOverlay extends BaseOverlay {
 
     let offsets = [{x: 0, y: 0}];
 
-    if (doubelRw) {
+    if (dualRw) {
       const ox = Math.cos(oriRad + Math.PI / 2) * (gap / 2);
       const oy = Math.sin(oriRad + Math.PI / 2) * (gap / 2);
       offsets = [
@@ -98,14 +101,14 @@ export class StationOverlay extends BaseOverlay {
       ];
     }
 
-    this.drawCircle(dc, pt, rad, lwidth, 'black', 'navy')
+    this.drawCircle(dc, pt, rad, cbWidth, 'black', 'navy')
 
     ctx.beginPath();
     offsets.forEach(function (o) {
       ctx.moveTo(pt.x + o.x - dxo, pt.y + o.y - dyo);
       ctx.lineTo(pt.x + o.x + dxo, pt.y + o.y + dyo);
     });
-    ctx.lineWidth = owidth;
+    ctx.lineWidth = outWidth;
     ctx.strokeStyle = '#000000';
     ctx.stroke();
 
@@ -114,7 +117,7 @@ export class StationOverlay extends BaseOverlay {
       ctx.moveTo(pt.x + o.x - dxi, pt.y + o.y - dyi);
       ctx.lineTo(pt.x + o.x + dxi, pt.y + o.y + dyi);
     });
-    ctx.lineWidth = iwidth;
+    ctx.lineWidth = inWidth;
     ctx.strokeStyle = '#ffffff';
     ctx.stroke();
   }

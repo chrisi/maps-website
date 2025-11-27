@@ -33,3 +33,23 @@ yarn dev
 ```sh
 yarn build
 ```
+
+### Changelog
+
+* Introduced Vue.js and type-script to improve modularity and code-quality especially by taking full advantage of the type-system
+* Introduced JSON-data-structure that holds all relevant theater/airbase data for easier maintenance
+* Use of Vue.js bidirectional-data binding to reduce ui/model sync boilerplate code
+* New custom component-library for tool-windows to help with modularity and unifying the presentation
+* Split index.html into multiple components, especially the tool-windows, for easier maintenance
+* Implemented Overlay-System for the various features like Symbols, Measure, Bullseye to help with modularity and keeping related code in one place.
+* Classic map click-zone replaced by custom implementation to overcome the limitations of the <map>/<area> approach that can't handle overlapping areas
+* The airbase-map is replaced by a smart-scale map with symbols dynamically generated based on airbase data from the json-structure to no longer require the airbases-map image
+* The symbols-layer is now also smart-scaling and allows for editing and removing previously placed icons.
+* Introduced smart-scaling like in the sim itself, the elements scale but not as much as the environment to keep elements readable on zoomed out maps
+
+### Roadmap
+
+* IMCS Integration
+* Weather Integration
+* Mission Integration
+* OKB Integration
