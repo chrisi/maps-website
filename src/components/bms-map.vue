@@ -60,7 +60,7 @@ onMounted(() => {
 
   const zoomPanOvl = new ZoomPanOverlay(ctx)
 
-  dropFileHandler.onIniLoaded((filename, content) => {
+  dropFileHandler.onIniLoaded((filename: string, content: string) => {
     missionMgr.loadDataCardridge(filename, content)
   })
 
@@ -143,16 +143,16 @@ const activeWindow = ref('')
     <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.mapUrl" alt="">
     <div id="div_layers" @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
       <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
-      <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">
-        <airbase-areas :zoom="global.zoom.factor" :stations="stations" @mapClick="showPopup"/>
-        <!-- Special Map areas and Coordinates based on 4096x4096-->
-        <!-- Map Legend Area -->
-        <area shape="rect" coords="0,1920,0,1920" alt="Legend">
-        <!-- Set Default Bullseye coordinates -->
-        <area shape="circle" coords="732,1049,1" alt="Bullseye">
-      </map>
-      <img ref="airbasesRef" id="airbases" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.airbasesUrl"
-           alt="" usemap="#airbase_map">
+<!--      <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">-->
+<!--        <airbase-areas :zoom="global.zoom.factor" :stations="stations" @mapClick="showPopup"/>-->
+<!--        &lt;!&ndash; Special Map areas and Coordinates based on 4096x4096&ndash;&gt;-->
+<!--        &lt;!&ndash; Map Legend Area &ndash;&gt;-->
+<!--        <area shape="rect" coords="0,1920,0,1920" alt="Legend">-->
+<!--        &lt;!&ndash; Set Default Bullseye coordinates &ndash;&gt;-->
+<!--        <area shape="circle" coords="732,1049,1" alt="Bullseye">-->
+<!--      </map>-->
+<!--      <img ref="airbasesRef" id="airbases" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.airbasesUrl"-->
+<!--           alt="" usemap="#airbase_map">-->
       <div id="inputs">
         <div id="locate">
           <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">

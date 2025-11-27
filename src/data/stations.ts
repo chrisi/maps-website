@@ -439,7 +439,7 @@ export const stations: Station[] = [
       lat: "N37°28.430'",
       long: "E126°27.083'",
       elev: "18 ft",
-      rwy: "15L/33R-15R/33L",
+      rwy: "15L/33R - 15R/33L",
       tcn: "76X",
       atis: "128.45",
       ops: "", // Not provided in the HTML

@@ -43,8 +43,8 @@ export class ZoomPanOverlay extends BaseOverlay {
     const doc_mouseX = scroll_element.scrollLeft + mouseX;
     const doc_mouseY = scroll_element.scrollTop + mouseY;
 
-    this.ovlCtx.airbases.style.width = dim_str;
-    this.ovlCtx.airbases.style.height = dim_str;
+    // this.ovlCtx.airbases.style.width = dim_str;
+    // this.ovlCtx.airbases.style.height = dim_str;
 
     this.ovlCtx.map.style.width = dim_str;
     this.ovlCtx.map.style.height = dim_str;
