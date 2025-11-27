@@ -2,7 +2,7 @@
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 
 const props = withDefaults(defineProps<{
-  id: string
+  id?: string
   name?: string
   label: string
   modelValue?: string
@@ -24,7 +24,9 @@ const emit = defineEmits<{
 function onChange(event: Event) {
   const target = event.target as HTMLSelectElement
   const newValue = target.value
-  emit('change', props.id, newValue)
+  if (props.id) {
+    emit('change', props.id, newValue)
+  }
   emit('update:modelValue', newValue)
 }
 </script>

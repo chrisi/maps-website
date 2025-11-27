@@ -46,10 +46,12 @@ yarn build
 * The airbase-map is replaced by a smart-scale map with symbols dynamically generated based on airbase data from the json-structure to no longer require the airbases-map image
 * The symbols-layer is now also smart-scaling and allows for editing and removing previously placed icons.
 * Introduced smart-scaling like in the sim itself, the elements scale but not as much as the environment to keep elements readable on zoomed out maps
+* Pan with middle-mouse-button while in different map mode
 
 ### Roadmap
 
 * IMCS Integration
+* Whiteboard/Pen/Eraser
 * Weather Integration
-* Mission Integration
-* OKB Integration
+* Mission Integration, clickable route
+* Special page for OKB Integration,

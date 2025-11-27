@@ -75,29 +75,24 @@ const sec1: ValueCaptionPair[] = [
 const sidcDocUrl = "https://www.jcs.mil/Portals/36/Documents/Doctrine/Other_Pubs/ms_2525d.pdf"
 
 const selectedEntity = ref("")
-
-let selectedIdent = "1006"
-let selectedType = "100016"
+const selectedIdent = ref("1006")
+const selectedType = ref("100016")
 
 function genIconCode() {
-  global.selectedSymbol = `${selectedIdent}${selectedType}${selectedEntity.value}`
+  global.selectedSymbol = `${selectedIdent.value}${selectedType.value}${selectedEntity.value}`
 }
 
-function selectSymbol(sender: string, value: string) {
-  switch (sender) {
-    case "sidc-identity":
-      selectedIdent = value
-      break;
-    case "sidc-set":
-      selectedType = value
-      entities.value = entityMap[value]!
-      selectedEntity.value = entities.value[0]!.value
-      break;
-  }
+watch(selectedIdent, (value) => {
   genIconCode()
-}
+})
 
-watch(selectedEntity, () => {
+watch(selectedType, (value) => {
+  entities.value = entityMap[value]!
+  selectedEntity.value = entities.value[0]!.value
+  genIconCode()
+})
+
+watch(selectedEntity, (value) => {
   genIconCode()
 })
 
@@ -112,12 +107,12 @@ onMounted(() => {
   <tool-window :visible="visible" @close="emit('close')">
     <tool-title text="C2 Symbols"/>
     <tool-section name="Symbol Set"/>
-    <tool-dropdown id="sidc-identity" name="sidc-identity" label="Identity" :options="idents" @change="selectSymbol"/>
-    <tool-dropdown id="sidc-set" name="sidc-set" label="Type" :options="types" @change="selectSymbol"/>
+    <tool-dropdown label="Identity" v-model="selectedIdent" :options="idents"/>
+    <tool-dropdown label="Type" v-model="selectedType" :options="types"/>
     <tool-section name="Identification"/>
-    <tool-dropdown id="sidc-entity" name="sidc-entity" label="Entity" v-model="selectedEntity" :options="entities"/>
-    <tool-dropdown id="sidc-sec1" name="sidc-sec1" label="Sector 1" :options="sec1" @change="selectSymbol"/>
-    <tool-dropdown id="sidc-sec2" name="sidc-sec2" label="Sector 2" @change="selectSymbol">
+    <tool-dropdown label="Entity" v-model="selectedEntity" :options="entities"/>
+    <tool-dropdown label="Sector 1" :options="sec1"/>
+    <tool-dropdown label="Sector 2">
       <option value="00">Unspecified</option>
     </tool-dropdown>
     <tool-section name="Symbol Identification Code"/>

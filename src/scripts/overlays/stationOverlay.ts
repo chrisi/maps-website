@@ -44,12 +44,12 @@ export class StationOverlay extends BaseOverlay {
 
   public onRedraw = (dc: DrawingContext) => {
     this.scaledStations = this.translateList(stations, dc.absScale);
-    const intelliScale = dc.absScale + (0.8 - dc.absScale) * 0.7
+    const smartScale = dc.absScale + (0.8 - dc.absScale) * 0.7
     this.scaledStations.forEach(sta => {
       if (sta.station.type === 'Airbase')
-        this.drawAirbase(dc, sta.pt, sta.orientation, intelliScale, sta.doubleRwy);
+        this.drawAirbase(dc, sta.pt, sta.orientation, smartScale, sta.doubleRwy);
       if (sta.station.type === 'VORTAC')
-        this.drawVortac(dc, sta.pt, intelliScale);
+        this.drawVortac(dc, sta.pt, smartScale);
     })
   }
 

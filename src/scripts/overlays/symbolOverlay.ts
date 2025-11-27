@@ -44,9 +44,9 @@ export class SymbolOverlay extends BaseOverlay {
 
   public onRedraw = (dc: DrawingContext) => {
     this.scaledItems = this.translateList(this.symbols, dc.absScale);
-    const intelliScale = dc.absScale + (1 - dc.absScale) * 0.7
+    const smartScale = dc.absScale + (1 - dc.absScale) * 0.7
     this.scaledItems.forEach(sym => {
-      this.drawSymbol(dc, sym.pt, intelliScale, sym.symbol.sym);
+      this.drawSymbol(dc, sym.pt, smartScale, sym.symbol.sym);
     })
   }
 
