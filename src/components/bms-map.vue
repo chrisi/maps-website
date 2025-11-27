@@ -4,11 +4,10 @@ import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "v
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {maps} from "@/data/map.ts";
-import {stationsByCountryType, stations} from "@/data/stations.ts";
+import {stationsByCountryType} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
-import AirbaseAreas from "@/components/airbase-areas.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import RouteWindow from "@/components/route-window.vue";
@@ -27,8 +26,6 @@ const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
 
 const mapRef = ref<HTMLImageElement | null>(null);
-const airbasesRef = ref<HTMLImageElement | null>(null);
-const airbaseMapRef = ref<HTMLMapElement | null>(null);
 const annotationRef = ref<HTMLCanvasElement | null>(null);
 
 let canvasContext: CanvasRenderingContext2D | null = null;
@@ -51,8 +48,6 @@ onMounted(() => {
 
   const ctx: OverlayContext = {
     map: mapRef.value!,
-    airbases: airbasesRef.value!,
-    airbaseMap: airbaseMapRef.value!,
     ...cnv,
     redraw: ovlMgr.redraw,
     isMouseDown: false
@@ -148,16 +143,6 @@ const activeWindow = ref('')
     <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.mapUrl" alt="">
     <div id="div_layers" @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
       <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
-<!--      <map ref="airbaseMapRef" id="airbase_map" name="airbase_map">-->
-<!--        <airbase-areas :zoom="global.zoom.factor" :stations="stations" @mapClick="showPopup"/>-->
-<!--        &lt;!&ndash; Special Map areas and Coordinates based on 4096x4096&ndash;&gt;-->
-<!--        &lt;!&ndash; Map Legend Area &ndash;&gt;-->
-<!--        <area shape="rect" coords="0,1920,0,1920" alt="Legend">-->
-<!--        &lt;!&ndash; Set Default Bullseye coordinates &ndash;&gt;-->
-<!--        <area shape="circle" coords="732,1049,1" alt="Bullseye">-->
-<!--      </map>-->
-<!--      <img ref="airbasesRef" id="airbases" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.airbasesUrl"-->
-<!--           alt="" usemap="#airbase_map">-->
       <div id="inputs">
         <div id="locate">
           <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">
@@ -203,10 +188,6 @@ const activeWindow = ref('')
 }
 
 #annotation {
-  position: absolute;
-}
-
-#airbases {
   position: absolute;
 }
 

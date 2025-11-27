@@ -19,20 +19,6 @@ export class LocateOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  public locateAirbaseOnMap = (ap: string): void => {
-    const areas = [...this.ovlCtx.airbaseMap.children] as HTMLAreaElement[];
-    const area = areas.find(a => a.title === ap);
-    if (area) {
-      const coordArr = area.coords.split(',');
-      const x = +coordArr[0]!;
-      const y = +coordArr[1]!;
-
-      this.location = {x, y}
-      this.redraw()
-      window.scrollTo(x - window.innerWidth / 2, y - window.innerHeight / 2);
-    }
-  }
-
   public locateAirbase = (ap: string): void => {
     stations.forEach(sta => {
       if (sta.name === ap) {

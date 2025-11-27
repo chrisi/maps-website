@@ -8,5 +8,4 @@ export interface Theater {
   resolution: number
   //offset: number // deprecated -> use pixels
   mapUrl: string
-  airbasesUrl: string
 }

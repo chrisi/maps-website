@@ -22,8 +22,6 @@ export interface DrawingContext {
 
 export interface OverlayContext {
   map: HTMLImageElement,
-  airbases: HTMLImageElement,
-  airbaseMap: HTMLMapElement,
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
 
