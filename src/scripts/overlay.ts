@@ -55,10 +55,10 @@ export class OverlayManager {
       try {
         if (overlay.isActive()) {
           const dc: DrawingContext = {cnvCtx: this.ovlCtx!.context, absScale: this.global.zoom.factor, deltaScale: scale}
-          const start = performance.now() // Start timing
+          // const start = performance.now() // Start timing
           overlay.onRedraw(dc)
-          const end = performance.now() // End timing
-          console.log(`Redraw of ${overlay.constructor.name} took ${(end - start).toFixed(2)} ms`)
+          // const end = performance.now() // End timing
+          // console.trace(`Redraw of ${overlay.constructor.name} took ${(end - start).toFixed(2)} ms`)
         }
       } catch (err) {
         console.error(this.errorMessage(overlay) + ` on redraw with scale ${scale}.`, err);

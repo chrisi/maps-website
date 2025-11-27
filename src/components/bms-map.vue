@@ -21,6 +21,7 @@ import {MeassureOverlay} from "@/scripts/overlays/meassureOverlay.ts";
 import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
 import {MissionManager} from "@/scripts/missionManager.ts";
 import {RouteOverlay} from "@/scripts/overlays/routeOverlay.ts";
+import {StationOverlay} from "@/scripts/overlays/stationOverlay.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -64,9 +65,13 @@ onMounted(() => {
     missionMgr.loadDataCardridge(filename, content)
   })
 
+  const stationOverlay = new StationOverlay(ctx)
+  stationOverlay.onSelectStation(station => showPopup(station))
+
   ovlMgr.registerOverlay(zoomPanOvl)
-  ovlMgr.registerOverlay(new RouteOverlay(ctx, missionMgr))
+  ovlMgr.registerOverlay(stationOverlay)
   ovlMgr.registerOverlay(new LocateOverlay(ctx))
+  ovlMgr.registerOverlay(new RouteOverlay(ctx, missionMgr))
   ovlMgr.registerOverlay(new BullseyeOverlay(ctx))
   ovlMgr.registerOverlay(new MeassureOverlay(ctx))
   ovlMgr.activatePointerEvents()
