@@ -1,6 +1,6 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
-  id: string
+  id?: string
   name?: string
   label: string
   modelValue?: string | number
@@ -34,7 +34,7 @@ const emit = defineEmits<{
         <input type="number" :id="id" :name="name" :style="{ width: width }" class="suspend-prevent"
                :value="modelValue" :min="min" :max="max" :step="step"
                @input="event => emit('update:modelValue', (event.target as HTMLInputElement).value)"
-               @blur="event => emit('blur', id, (event.target as HTMLInputElement).value)">
+               @blur="event => emit('blur', id ?? '', (event.target as HTMLInputElement).value)">
       </div>
       <div class="control-unit" v-if="unit">
         <span style="padding-left: 2px;">{{ unit }}</span>

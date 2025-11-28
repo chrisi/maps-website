@@ -5,6 +5,7 @@ import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
+import {drawOutlined} from "@/scripts/draw.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
@@ -52,7 +53,7 @@ export class RouteOverlay extends BaseOverlay {
   // Draw a single Preplanned Threat
   private drawPrePlannedThreat(ctx: CanvasRenderingContext2D, ppt: Ppt) {
     if (ppt.x > 0 || ppt.y < this.global.map!.pixels || ppt.z > 0) {
-      ctx.strokeStyle = '#ff0000';
+      ctx.strokeStyle = 'red';
       ctx.fillStyle = "rgba(255, 0, 0, 0.08)";
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -65,7 +66,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw all Preplanned Threats
+  // Draw all Preplanned Threats
   private drawPrePlannedThreats(ctx: CanvasRenderingContext2D, list: Ppt[]) {
     ctx.setLineDash([]);
     for (let i = 0; i < list.length; i++) {
@@ -73,7 +74,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw Line Steer Point Segement
+  // Draw Line Steer Point Segement
   private drawLineSTPT(ctx: CanvasRenderingContext2D, from: Point, to: Point) {
     if (this.isLineSegment(from, to)) {
       ctx.lineWidth = 2;
@@ -84,22 +85,19 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw all Line Steer Points
+  // Draw all Line Steer Points
   private drawLineSteerPoints(ctx: CanvasRenderingContext2D, list: LineStpt[]) {
     // Set Line Properties
     ctx.setLineDash([15, 5]);
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = 'black';
 
     // Go throug the line list with maxium of 5 segments
     for (let i = 1; i < list.length; i++) if ((i % 6)) this.drawLineSTPT(ctx, list[i - 1]!, list[i]!);
   }
 
-// Draw Waypoints (i.e. targets)
+  // Draw Waypoints (i.e. targets)
   private drawWaypoint(ctx: CanvasRenderingContext2D, waypoint: Target, id: string) {
     if ((waypoint.x > 0 || waypoint.y < this.global.map!.pixels)) {
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-
       // Draw Shape based on Action
       switch (waypoint.action) {
         case Action.Target:
@@ -112,16 +110,18 @@ export class RouteOverlay extends BaseOverlay {
         case Action.S_D:
         case Action.Recon:
         case Action.Sweep:
-          ctx.moveTo(waypoint.x - 8, waypoint.y + 8);
-          ctx.lineTo(waypoint.x, waypoint.y - 8);
-          ctx.lineTo(waypoint.x + 8, waypoint.y + 8);
-          ctx.lineTo(waypoint.x - 8, waypoint.y + 8);
+          drawOutlined(ctx, "white", "black", 3, 1, c => {
+            c.moveTo(waypoint.x - 8, waypoint.y + 8);
+            c.lineTo(waypoint.x, waypoint.y - 8);
+            c.lineTo(waypoint.x + 8, waypoint.y + 8);
+            c.lineTo(waypoint.x - 8, waypoint.y + 8);
+          })
           break;
         default:
-          ctx.arc(waypoint.x, waypoint.y, 8, 0, 2 * Math.PI);
-
+          drawOutlined(ctx, "white", "black", 3, 1, c => {
+            c.arc(waypoint.x, waypoint.y, 8, 0, 2 * Math.PI);
+          })
       }
-      ctx.stroke();
 
       // Add Waypoint Number
       ctx.beginPath();
@@ -138,7 +138,7 @@ export class RouteOverlay extends BaseOverlay {
 
     // Set Line Properties
     ctx.setLineDash([]);
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = 'white';
 
     // Go throug the target list.
     for (let i = 0; i < list.length - 1; i++) {
@@ -151,7 +151,7 @@ export class RouteOverlay extends BaseOverlay {
         const mid = midpoint(point1, point2)
         this.drawLineSTPT(ctx, point1, point2);
         ctx.lineWidth = 1;
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = 'white';
         ctx.beginPath();
         ctx.fillRect(mid.x - 3, mid.y - 3, 6, 6);
         ctx.stroke();

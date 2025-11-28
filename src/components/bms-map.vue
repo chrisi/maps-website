@@ -115,11 +115,11 @@ const execTool = (tool: string) => {
       break;
     case "zoom1":
       ovl.zoom(1)
-      ovl.scaleView(undefined)
+      ovl.scaleView()
       break;
     case "zoom2":
       ovl.zoom(-1)
-      ovl.scaleView(undefined)
+      ovl.scaleView()
       break;
     case "settings":
     case "route":
@@ -138,7 +138,7 @@ const activeWindow = ref('')
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
-  <route-window :visible="activeWindow=='route'" @close="activeWindow=''"/>
+  <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
 
   <div ref="containerRef" id="container" v-if="global.map">

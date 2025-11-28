@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Coord, Point} from "@/model/base.ts";
 
 export const Action = {
   Target: -1,
@@ -50,6 +50,7 @@ export interface Ppt extends Point {
 }
 
 export interface Target extends Point {
+  crd: Coord,
   x: number,
   y: number,
   data: number,
@@ -72,6 +73,7 @@ export interface Centroid extends Point {
 }
 
 export interface Waypoint {
+  tgt: Target,
   tos: number,
   dist: number,
   crs: number,

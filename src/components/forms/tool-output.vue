@@ -2,7 +2,7 @@
 import {type CSSProperties} from "vue";
 
 withDefaults(defineProps<{
-  id: string
+  id?: string
   name?: string
   label: string
   value: string | number
