@@ -3,17 +3,20 @@ import {defineStore} from 'pinia'
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point, Zoom} from "@/model/base.ts";
+import type {Waypoint} from "@/model/mission.ts";
 
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')
 
   const mode = ref<Mode>(Mode.None)
-  const map = ref<Theater | undefined>()
+  const map = ref<Theater>()
 
   const pos = ref<Point>({x: 0, y: 0})
   const coord = ref<Coord>({lat: 0, long: 0})
 
   const selectedSymbol = ref<string>()
+
+  const currentWaypoint = ref<Waypoint>()
 
   const zoom = reactive<Zoom>({
     factor: 1,
@@ -23,7 +26,7 @@ export const useGlobalStore = defineStore('global', () => {
     wheelRate: 20
   })
 
-  return {message, mode, map, pos, coord, selectedSymbol, zoom}
+  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, zoom}
 }, {
   persist: false
 })

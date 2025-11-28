@@ -2,7 +2,7 @@
 import {nextTick, ref} from "vue";
 
 const props = withDefaults(defineProps<{
-  id: string
+  id?: string
   name?: string
   label: string
   modelValue?: string
@@ -27,7 +27,7 @@ const labelRef = ref<HTMLLabelElement | null>(null)
 const onBlur = (event: FocusEvent) => {
   const target = event.target as HTMLInputElement | null
   const value = target?.value ?? ""
-  emit('blur', props.id, value)
+  emit('blur', props.id ?? "", value)
   if (props.regexp) {
     if (value !== "" && !props.regexp.test(value)) {
       nextTick(() => {

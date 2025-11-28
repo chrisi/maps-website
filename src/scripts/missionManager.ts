@@ -10,7 +10,7 @@ import {
 } from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import {getFlightHours, PX2NM, rad2deg, vector} from "@/scripts/math.ts";
+import {getFlightHours, map2LatLong, PX2NM, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/common/scripts/map_radio";
 
 export class MissionManager {
@@ -97,22 +97,25 @@ export class MissionManager {
   }
 
   private initializeRoute(tos: number, speed: number) {
-    const tgts = this.dataCardridge!.targets;
+    const tgts = this.dataCardridge!.targets
     for (let i = 1; i < this.dataCardridge!.targets.length; i++) {
-      const start_point = {x: tgts[i - 1]!.x, y: tgts[i - 1]!.y};
-      const end_point = {x: tgts[i]!.x, y: tgts[i]!.y};
-      const leg = vector(start_point, end_point);
-      const time = getFlightHours(speed, leg.mag / PX2NM);
-      const extra = tgts[i - 1]!.duration / 60;
+      const tgtFrom = tgts[i - 1]!
+      const tgtTo = tgts[i]!
+      const ptFrom = {x: tgtFrom.x, y: tgtFrom.y}
+      const ptTo = {x: tgtTo.x, y: tgtTo.y}
+      const leg = vector(ptFrom, ptTo)
+      const time = getFlightHours(speed, leg.mag / PX2NM)
+      const extra = tgtFrom.duration / 60
       const waypoint: Waypoint =
         {
+          tgt: tgtFrom,
           tos: tos,
           dist: leg.mag / PX2NM,
           crs: rad2deg(leg.dir),
           spd: speed
-        };
+        }
 
-      this.mission!.route.push(waypoint);
+      this.mission!.route.push(waypoint)
 
       // Determine TOS for the next Waypoint
       tos += time + extra;
@@ -172,9 +175,9 @@ export class MissionManager {
     const rx = parseFloat(data[1]!)
     const ry = parseFloat(data[0]!)
     if (rx == 0 && ry == 0) return;
+    const crd = map2LatLong(this.global.map!.datum, {x: rx, y: ry});
     const target: Target = {
-      // east : parseFloat(data[1]!),
-      // north : parseFloat(data[0]!),
+      crd: crd,
       x: rx / res,
       y: this.global.map!.pixels - ry / res,
       data: parseFloat(data[2]!),

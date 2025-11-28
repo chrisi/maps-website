@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {reactive} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
@@ -13,34 +13,35 @@ import ToolSection from "@/components/forms/tool-section.vue";
 import ToolInput from "@/components/forms/tool-input.vue";
 import PureDropdown from "@/components/forms/pure-dropdown.vue";
 import ToolButton from "@/components/forms/tool-button.vue";
+import {MissionManager} from "@/scripts/missionManager.ts";
+import type {Mission} from "@/model/mission.ts";
+import {useGlobalStore} from "@/stores/global.ts";
+import {tosTime} from "@/scripts/math.ts";
+import {strLatLong} from "@/scripts/conv.ts";
 
-defineProps({
+const props = defineProps({
   visible: {
     type: Boolean,
+    required: true
+  },
+  missionManager: {
+    type: MissionManager,
     required: true
   }
 })
 
+//TODO: temp values to fill the form until impl
 interface Steerpoint {
-  lat: string;
-  long: string;
-  tos: string;
-  tas: string;
   alt: string;
-  track: string;
   formation: string;
   enroute: string;
   action: string;
   duration: string;
 }
 
+//TODO: temp values to fill the form until impl
 const steer = reactive<Steerpoint>({
-  lat: "N37°28.430'",
-  long: "E126°27.083'",
-  tos: "12:00:00",
-  tas: "330",
   alt: "22000",
-  track: "110° 8.6NM",
   formation: "3",
   enroute: "0",
   action: "10",
@@ -158,43 +159,88 @@ function btnClick(sender: string) {
   console.log(`btnClick: ${sender}`)
 }
 
+const global = useGlobalStore()
+
+const mission = ref<Mission>()
+const wpIdx = ref(0)
+
+onMounted(() => {
+  props.missionManager.onDataCardridgeEvent(() => {
+    mission.value = props.missionManager.getMission()
+    wpIdx.value = 0
+    global.currentWaypoint = mission.value!.route![0]
+  })
+})
+
+watch(wpIdx, (val) => {
+  if (!mission.value) return
+  global.currentWaypoint = mission.value!.route![val]
+})
+
+const prevWaypoint = () => {
+  if (wpIdx.value > 0) wpIdx.value--
+}
+
+const nextWaypoint = () => {
+  if (wpIdx.value < mission.value!.route!.length - 1) wpIdx.value++
+}
+
+const track = computed(() => {
+    return `${global.currentWaypoint?.crs}° ${global.currentWaypoint?.dist.toFixed(1)}NM`
+  }
+)
+
+const tos = computed(() => {
+    return tosTime(global.currentWaypoint!.tos)
+  }
+)
+
+const coord = computed(() => {
+    const crd = strLatLong(global.currentWaypoint!.tgt.crd)
+    return `${crd.lat} ${crd.long}`
+  }
+)
+
+const type = computed(() => {
+    return props.missionManager.getSteerpointType(wpIdx.value)
+  }
+)
+
 </script>
 
 <template>
   <tool-window :visible="visible" @close="emit('close')">
-    <tool-tabs :tabs="['Route','Radio','Mission']">
+    <tool-tabs v-if="mission" :tabs="['Route','Radio','Mission']">
       <template #Route>
         <tool-spacer medium/>
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-          <div class="">STPT</div>
-          <div class="">12</div>
-          <div class="">
-            <img style="padding-left: 4px;" src="/common/assets/icon_left.png" id="left" width="16" height="16" alt="left"
-                 onclick="button(event)">
-            <img style="padding-left: 4px;" src="/common/assets/icon_right.png" id="right" width="16" height="16" alt="right"
-                 onclick="button(event)">
+          <div>{{ type }}</div>
+          <div>{{ wpIdx + 1 }}</div>
+          <div style="display: flex; gap: 8px;">
+            <img class="btn" src="/common/assets/icon_left.png" alt="left" @click="prevWaypoint">
+            <img class="btn" src="/common/assets/icon_right.png" alt="right" @click="nextWaypoint">
           </div>
         </div>
         <tool-spacer separator/>
         <tool-spacer/>
-        <div class="coord">{{ steer.lat }}&nbsp;{{ steer.long }}</div>
+        <div class="coord">{{ coord }}</div>
         <tool-spacer/>
-        <tool-textfield id="tos-val" name="tos" label="TOS" v-model="steer.tos" :regexp="timeRegex"/>
-        <tool-numberfield id="tas-val" name="tas" label="TAS" v-model="steer.tas" :min="150" :max="600" value="350" :step="1" unit="kts"/>
-        <tool-numberfield id="alt-val" name="alt" label="Alt" v-model="steer.alt" :min="0" :max="45000" value="24000" :step="1" unit="ft"/>
+        <tool-textfield label="TOS" v-model="tos" :regexp="timeRegex"/>
+        <tool-numberfield label="TAS" v-model="global.currentWaypoint!.spd" :min="150" :max="600" value="350" :step="1" unit="kts"/>
+        <tool-numberfield label="Alt" v-model="steer.alt" :min="0" :max="45000" value="24000" :step="1" unit="ft"/>
         <tool-spacer medium/>
-        <tool-output id="trk-val" name="trk" label="Track" :value="steer.track"/>
+        <tool-output id="trk-val" name="trk" label="Track" :value="track"/>
         <tool-spacer medium/>
-        <tool-dropdown id="formation-select" name="formation" label="Formation" :options="formations" v-model="steer.formation"/>
-        <tool-dropdown id="enrout-select" name="enrout" label="Enroute" v-model="steer.enroute">
+        <tool-dropdown label="Formation" :options="formations" v-model="steer.formation"/>
+        <tool-dropdown label="Enroute" v-model="steer.enroute">
           <option value="0">Nav</option>
           <option value="1">SEAD</option>
         </tool-dropdown>
-        <tool-dropdown id="action-select" name="action" label="Action" :options="actions" v-model="steer.action"/>
-        <tool-textfield id="dur-val" name="dur" label="Duration" v-model="steer.duration" unit="min"/>
+        <tool-dropdown label="Action" :options="actions" v-model="steer.action"/>
+        <tool-textfield label="Duration" v-model="steer.duration" unit="min"/>
         <tool-spacer separator large/>
-        <tool-output id="support1" label="AWACS" value="Lynx5"/>
-        <tool-output id="support2" label="Tanker" value="Texaco"/>
+        <tool-output label="AWACS" value="Lynx5"/>
+        <tool-output label="Tanker" value="Texaco"/>
         <tool-spacer/>
       </template>
       <template #Radio>
@@ -241,6 +287,7 @@ function btnClick(sender: string) {
         <tool-button id="btn-wx" icon="common/assets/icon_table.png" @click="btnClick"/>
       </template>
     </tool-tabs>
+    <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>
   </tool-window>
 </template>
 
@@ -251,4 +298,10 @@ function btnClick(sender: string) {
   font-family: monospace;
   text-align: center;
 }
+
+.btn {
+  width: 16px;
+  height: 16px;
+}
+
 </style>

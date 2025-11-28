@@ -65,7 +65,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw all Preplanned Threats
+  // Draw all Preplanned Threats
   private drawPrePlannedThreats(ctx: CanvasRenderingContext2D, list: Ppt[]) {
     ctx.setLineDash([]);
     for (let i = 0; i < list.length; i++) {
@@ -73,7 +73,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw Line Steer Point Segement
+  // Draw Line Steer Point Segement
   private drawLineSTPT(ctx: CanvasRenderingContext2D, from: Point, to: Point) {
     if (this.isLineSegment(from, to)) {
       ctx.lineWidth = 2;
@@ -84,7 +84,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-// Draw all Line Steer Points
+  // Draw all Line Steer Points
   private drawLineSteerPoints(ctx: CanvasRenderingContext2D, list: LineStpt[]) {
     // Set Line Properties
     ctx.setLineDash([15, 5]);
@@ -94,7 +94,7 @@ export class RouteOverlay extends BaseOverlay {
     for (let i = 1; i < list.length; i++) if ((i % 6)) this.drawLineSTPT(ctx, list[i - 1]!, list[i]!);
   }
 
-// Draw Waypoints (i.e. targets)
+  // Draw Waypoints (i.e. targets)
   private drawWaypoint(ctx: CanvasRenderingContext2D, waypoint: Target, id: string) {
     if ((waypoint.x > 0 || waypoint.y < this.global.map!.pixels)) {
       ctx.lineWidth = 3;

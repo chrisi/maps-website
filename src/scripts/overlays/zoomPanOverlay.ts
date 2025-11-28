@@ -1,8 +1,9 @@
 import {Mode} from "@/model/mode.ts";
-import type {Coord, CoordStr, Point} from "@/model/base.ts";
+import type {Coord, Point} from "@/model/base.ts";
 import {type OverlayContext} from "@/scripts/overlay.ts";
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import {map2LatLong} from "@/scripts/math.ts";
+import {strLatLong} from "@/scripts/conv.ts";
 
 export class ZoomPanOverlay extends BaseOverlay {
 
@@ -99,23 +100,8 @@ export class ZoomPanOverlay extends BaseOverlay {
     const mapX = (posX * scalar) >> 0;
     const mapY = (posY * scalar) >> 0;
     const coord = this.canvasPos2LatLong({x: mapX, y: mapY});
-    const strCrd = this.strLatLong(coord);
+    const strCrd = strLatLong(coord);
     this.global.message = `${strCrd.lat},${strCrd.long} | X:${mapX},Y:${mapY}`;
-  }
-
-  private strLatLong = (crd: Coord): CoordStr => {
-    const degLat = crd.lat;
-    const lat = (degLat < 0 ? "S" : "N") + this.degreesString(degLat);
-    const degLong = crd.long;
-    const long = (degLong < 0 ? "W" : "E") + this.degreesString(degLong);
-    return {lat, long}
-  }
-
-  private degreesString = (degrees: number): string => {
-    const degInt = degrees >> 0;
-    const min = ((degrees - degInt) * 60).toFixed(3);
-    const deg = degInt.toFixed(0);
-    return deg + "\xb0" + min + "'";
   }
 
   private canvasPos2LatLong = (point: Point): Coord => {
