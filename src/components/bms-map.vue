@@ -115,11 +115,11 @@ const execTool = (tool: string) => {
       break;
     case "zoom1":
       ovl.zoom(1)
-      ovl.scaleView(undefined)
+      ovl.scaleView()
       break;
     case "zoom2":
       ovl.zoom(-1)
-      ovl.scaleView(undefined)
+      ovl.scaleView()
       break;
     case "settings":
     case "route":
