@@ -4,6 +4,7 @@ import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point, Zoom} from "@/model/base.ts";
 import type {Waypoint} from "@/model/mission.ts";
+import type {PointerTarget} from "@/scripts/overlay.ts";
 
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')
@@ -18,6 +19,8 @@ export const useGlobalStore = defineStore('global', () => {
 
   const currentWaypoint = ref<Waypoint>()
 
+  const pointerTargets = ref<PointerTarget[]>([])
+
   const zoom = reactive<Zoom>({
     factor: 1,
     min: 0.5,
@@ -26,7 +29,7 @@ export const useGlobalStore = defineStore('global', () => {
     wheelRate: 20
   })
 
-  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, zoom}
+  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, pointerTargets, zoom}
 }, {
   persist: false
 })

@@ -14,6 +14,8 @@ export class BaseOverlay implements Overlay {
     this.ovlCtx = ovlCtx
   }
 
+  //TODO: check optional interface implementations (e.g., onClick?())
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onClick(e: MouseEvent): void {
   }

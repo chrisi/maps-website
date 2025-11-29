@@ -95,7 +95,7 @@ export class RouteOverlay extends BaseOverlay {
     for (let i = 1; i < list.length; i++) if ((i % 6)) this.drawLineSTPT(ctx, list[i - 1]!, list[i]!);
   }
 
-  // Draw Waypoints (i.e. targets)
+  // Draw Waypoints (i.e., targets)
   private drawWaypoint(ctx: CanvasRenderingContext2D, waypoint: Target, id: string) {
     if ((waypoint.x > 0 || waypoint.y < this.global.map!.pixels)) {
       // Draw Shape based on Action
@@ -164,7 +164,7 @@ export class RouteOverlay extends BaseOverlay {
     }
   }
 
-  // is the a valid line segmenst for routes and lines?
+  // is this a valid line segmenst for routes and lines?
   private isLineSegment(from: Point, to: Point) {
     return ((from.x > 0 || from.y < this.global.map!.pixels) && (to.x > 0 || to.y < this.global.map!.pixels));
   }

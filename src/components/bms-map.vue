@@ -159,6 +159,11 @@ const activeWindow = ref('')
       </div>
       <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}</div>
       <div id="debug" class="message">{{ debugMessage }}</div>
+      <div id="dbgtg" class="message">
+        <ul>
+          <li v-for="(t,i) in global.pointerTargets" v-bind:key="i">{{ t.name }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -217,10 +222,22 @@ const activeWindow = ref('')
   margin: 15px;
 }
 
+#dbgtg ul {
+  list-style: none;
+  padding: 0;
+}
+
+#dbgtg {
+  width: 200px;
+  margin: 15px;
+  position: fixed;
+  bottom: 0;
+  left: 240px;
+}
+
 #debug {
   position: fixed;
   bottom: 0;
-  left: 0;
   margin: 15px;
 }
 </style>

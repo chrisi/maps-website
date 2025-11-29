@@ -1,4 +1,6 @@
 import {useGlobalStore} from "@/stores/global.ts";
+import type {Point} from "@/model/base.ts";
+import {distance} from "@/scripts/math.ts";
 
 export interface Overlay {
   onClick(e: MouseEvent): void
@@ -16,6 +18,10 @@ export interface Overlay {
   onWheel(e: WheelEvent): void
 
   onRedraw(dc: DrawingContext): void
+
+  onHoverPointerTarget?(targets: PointerTarget[]): void
+
+  providesPointerTargets?(): PointerTarget[]
 
   isActive(): boolean
 }
@@ -36,7 +42,20 @@ export interface OverlayContext {
   mouseDown: number
 }
 
+export interface PointerTarget {
+  pos: Point, // position of the target, in pixels
+  name: string, // generic name of the target, no matter the type for hovering hint
+  target?: object, // the target object, e.g., airbase or mil-symbol
+}
+
+interface PointerTargetCandidate {
+  dist: number, // distance to the pointer at hit detection
+  target: PointerTarget
+}
+
 export class OverlayManager {
+
+  private threshold = 15; //TODO: make dist configurable
 
   private overlays: Overlay[] = []
   private ovlCtx?: OverlayContext
@@ -97,14 +116,31 @@ export class OverlayManager {
     pane.removeEventListener('wheel', this.wheelHandler as EventListener);
   }
 
-  private peventDefaultFiltered = (e: Event) => {
+  private preventDefaultFiltered = (e: Event) => {
     const elem = e.target as HTMLElement;
     if (elem.classList.contains("suspend-prevent")) return;
     e.preventDefault()
   }
 
+  private findPointerTargets(pt: Point, singel: boolean = false): PointerTarget[] {
+    const res: PointerTargetCandidate[] = []
+    //TODO: priority management: sort overlays by priority (tbd)
+    for (const overlay of this.overlays) {
+      if (overlay.isActive() && overlay.providesPointerTargets) {
+        for (const tgt of overlay.providesPointerTargets()) {
+          const dist = distance(pt, tgt.pos)
+          if (dist < this.threshold) {
+            if (singel) return [tgt]
+            res.push({target: tgt, dist: dist})
+          }
+        }
+      }
+    }
+    return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
+  }
+
   private clickHandler = (e: MouseEvent) => {
-    this.peventDefaultFiltered(e)
+    this.preventDefaultFiltered(e)
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -116,7 +152,7 @@ export class OverlayManager {
   }
 
   private dblClickHandler = (e: MouseEvent) => {
-    this.peventDefaultFiltered(e)
+    this.preventDefaultFiltered(e)
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -128,7 +164,7 @@ export class OverlayManager {
   }
 
   private contextMenuHandler = (e: MouseEvent) => {
-    this.peventDefaultFiltered(e)
+    this.preventDefaultFiltered(e)
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -140,7 +176,7 @@ export class OverlayManager {
   }
 
   private mouseDownHandler = (e: MouseEvent) => {
-    this.peventDefaultFiltered(e)
+    this.preventDefaultFiltered(e)
     for (const overlay of this.overlays) {
       this.ovlCtx!.mouseDown = e.buttons
       try {
@@ -156,8 +192,12 @@ export class OverlayManager {
     e.preventDefault()
     for (const overlay of this.overlays) {
       try {
-        if (overlay.isActive())
+        if (overlay.isActive()) {
           overlay.onMouseMove(e)
+          const tgts = this.findPointerTargets({x: e.pageX, y: e.pageY}, e.altKey);
+          this.global.pointerTargets = tgts
+          if (tgts.length > 0) overlay.onHoverPointerTarget?.(tgts)
+        }
       } catch (err) {
         console.error(this.errorMessage(overlay, e), err);
       }

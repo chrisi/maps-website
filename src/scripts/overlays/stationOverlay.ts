@@ -1,6 +1,6 @@
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
-import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
+import type {DrawingContext, OverlayContext, PointerTarget} from "@/scripts/overlay.ts";
 import {stations} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
 import {deg2rad, distance} from "@/scripts/math.ts";
@@ -40,6 +40,13 @@ export class StationOverlay extends BaseOverlay {
       doubleRwy = s.details.rwy.includes('-')
     }
     return {station: s, pt: {x: s.posx * 2 * scale, y: s.posy * 2 * scale}, orientation: orientation, doubleRwy: doubleRwy};
+  }
+
+  public providesPointerTargets(): PointerTarget[] {
+    this.scaledStations = this.translateList(stations, this.global.zoom.factor);
+    return this.scaledStations.map(s => {
+      return {pos: s.pt, target: s, name: s.station.name, type: "Station"}
+    })
   }
 
   public onRedraw = (dc: DrawingContext) => {
