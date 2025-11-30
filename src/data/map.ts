@@ -2,6 +2,8 @@ import type {Theater} from "@/model/theater.ts"
 import {koreaStations} from "@/data/korea/stations.ts";
 import {balkanStations} from "@/data/balkans/stations.ts";
 
+export const cdnUrl = "https://cdn.falcon-bms.com/maps"
+
 export const maps: Theater[] = [
   {
     name: "Korea",
@@ -10,7 +12,8 @@ export const maps: Theater[] = [
     pixels: 3840,
     resolution: 874.890625, // feet/pixels
     // offset: 3840, // pixels
-    mapUrl: "https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg", // native 6144
+    folder: "04_KTO",
+    mapFilename: "KTO_UI_Map_6k.jpeg", // native 6144
     stations: koreaStations
   },
   {
@@ -20,7 +23,8 @@ export const maps: Theater[] = [
     pixels: 3840,
     resolution: 874.890625, // feet/pixels
     // offset: 3840, // pixels
-    mapUrl: "https://cdn.falcon-bms.com/maps/02_Balkans/maps/Balkans_UI_Map_4k.png", // native 4096
+    folder: "02_Balkans",
+    mapFilename: "Balkans_UI_Map_4k.png", // native 4096
     stations: balkanStations
   }
 ]

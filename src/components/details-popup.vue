@@ -7,8 +7,8 @@ import ToolListitem from "@/components/forms/tool-listitem.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
-
-const baseUrl = "https://cdn.falcon-bms.com/maps/04_KTO/charts/"; // TODO: centralize this
+import {useGlobalStore} from "@/stores/global.ts";
+import {cdnUrl} from "@/data/map.ts";
 
 const props = defineProps({
   station: {
@@ -19,6 +19,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const global = useGlobalStore();
 
 const emit = defineEmits(['close'])
 
@@ -35,6 +37,7 @@ watch(
 )
 
 const createUrl = (chart: Chart) => {
+  const baseUrl = `${cdnUrl}/${global.map!.folder}/charts`
   if (chart.url.endsWith('.png'))
     return `${baseUrl}/${chart.url}`
   else

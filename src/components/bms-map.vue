@@ -3,7 +3,7 @@
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {maps} from "@/data/map.ts";
+import {cdnUrl, maps} from "@/data/map.ts";
 import type {Station} from "@/model/station.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
@@ -39,7 +39,7 @@ const dropFileHandler = new DropFileHandler();
 const missionMgr = new MissionManager();
 
 onBeforeMount(() => {
-  global.map = maps[1];
+  global.map = maps[0];
 })
 
 onMounted(() => {
@@ -152,7 +152,8 @@ const activeWindow = ref('')
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
 
   <div ref="containerRef" id="container" v-if="global.map">
-    <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels" :src="global.map.mapUrl" alt="">
+    <img ref="mapRef" id="map" :width="global.map.pixels" :height="global.map.pixels"
+         :src="`${cdnUrl}/${global.map.folder}/maps/${global.map.mapFilename}`" alt="">
     <div id="div_layers" @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
       <canvas ref="annotationRef" id="annotation" :width="global.map.pixels" :height="global.map.pixels"></canvas>
       <div id="inputs">

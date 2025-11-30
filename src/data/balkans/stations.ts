@@ -21,27 +21,27 @@ export const balkanStations: Station[] = [
       charts: [
         {
           name: "Airport Diagram",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_Airport.png"
+          url: "NATO/Aviano/Aviano_Airport.png"
         },
         {
           name: "DEP - RWY 05",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_DEP_05.png"
+          url: "NATO/Aviano/Aviano_DEP_05.png"
         },
         {
           name: "DEP - RWY 23",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_DEP_23.png"
+          url: "NATO/Aviano/Aviano_DEP_23.png"
         },
         {
           name: "ILS - RWY 05",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_ILS_05.png"
+          url: "NATO/Aviano/Aviano_ILS_05.png"
         },
         {
           name: "APC - RWY 05",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_APC_RWY05.png"
+          url: "NATO/Aviano/Aviano_APC_RWY05.png"
         },
         {
           name: "APC - RWY 23",
-          url: "02_Balkans/charts/NATO/Aviano/Aviano_APC_RWY23.png"
+          url: "NATO/Aviano/Aviano_APC_RWY23.png"
         }
       ]
     }
@@ -66,19 +66,19 @@ export const balkanStations: Station[] = [
       charts: [
         {
           name: "Airport Diagram",
-          url: "02_Balkans/charts/NATO/Amendola/Amendola_Airport.png"
+          url: "NATO/Amendola/Amendola_Airport.png"
         },
         {
           name: "APC - RWY 11",
-          url: "02_Balkans/charts/NATO/Amendola/Amendola_APC_RWY11.png"
+          url: "NATO/Amendola/Amendola_APC_RWY11.png"
         },
         {
           name: "APC - RWY 29",
-          url: "02_Balkans/charts/NATO/Amendola/Amendola_APC_RWY29.png"
+          url: "NATO/Amendola/Amendola_APC_RWY29.png"
         },
         {
           name: "APP - TCN 29",
-          url: "02_Balkans/charts/NATO/Amendola/Amendola_TCN_29.png"
+          url: "NATO/Amendola/Amendola_TCN_29.png"
         }
       ]
     }
