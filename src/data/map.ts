@@ -6,7 +6,7 @@ export const cdnUrl = "https://cdn.falcon-bms.com/maps"
 
 export const maps: Theater[] = [
   {
-    name: "Korea",
+    name: "korea",
     datum: {lat: 38.5, long: 127.18},
     feet: 3359580,
     pixels: 3840,
@@ -17,7 +17,7 @@ export const maps: Theater[] = [
     stations: koreaStations
   },
   {
-    name: "Balkans",
+    name: "balkans",
     datum: {lat: 36.625, long: 11}, // this might be v1 map datum
     feet: 3359580,
     pixels: 3840,
@@ -28,3 +28,5 @@ export const maps: Theater[] = [
     stations: balkanStations
   }
 ]
+
+export const findMap = (name: string): Theater | undefined => maps.find(m => m.name === name)

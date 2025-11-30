@@ -36,8 +36,11 @@
         <td data-label="Korea Theater">
           <div class="container">
             <div class="polaroid">
-              <a href="01_KTO_Interactive_Map/index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
+              <a href="01_KTO_Interactive_Map/index.html">
+                <img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
                                                                width="150" height="150" alt="Korea Theater" border="0" class="image"></a>
+              <router-link to="/map/korea">Korea</router-link>
+              <router-link to="/map/balkans">Balkans</router-link>
             </div>
             <a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a>
           </div>

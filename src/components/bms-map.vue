@@ -3,7 +3,7 @@
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {cdnUrl, maps} from "@/data/map.ts";
+import {cdnUrl, findMap, maps} from "@/data/map.ts";
 import type {Station} from "@/model/station.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
@@ -21,6 +21,7 @@ import {MissionManager} from "@/scripts/missionManager.ts";
 import {RouteOverlay} from "@/scripts/overlays/routeOverlay.ts";
 import {StationOverlay} from "@/scripts/overlays/stationOverlay.ts";
 import {SymbolOverlay} from "@/scripts/overlays/symbolOverlay.ts";
+import {useRoute} from "vue-router";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -33,13 +34,20 @@ let canvasContext: CanvasRenderingContext2D | null = null;
 const global = useGlobalStore()
 const settings = useSettingsStore()
 
-const ovlMgr = new OverlayManager();
+const ovlMgr = new OverlayManager()
 
-const dropFileHandler = new DropFileHandler();
-const missionMgr = new MissionManager();
+const dropFileHandler = new DropFileHandler()
+const missionMgr = new MissionManager()
+
+const route = useRoute()
 
 onBeforeMount(() => {
-  global.map = maps[0];
+  console.log(route.params)
+  const name = route.params['name']
+  const mapName = Array.isArray(name) ? name[0] : name
+  if (mapName) {
+    global.map = findMap(mapName)
+  }
 })
 
 onMounted(() => {
