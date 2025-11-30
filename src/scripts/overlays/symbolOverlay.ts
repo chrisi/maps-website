@@ -1,6 +1,6 @@
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
-import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
+import type {DrawingContext, OverlayContext, PointerTarget} from "@/scripts/overlay.ts";
 import {distance} from "@/scripts/math.ts";
 import {Mode} from "@/model/mode.ts";
 
@@ -41,6 +41,14 @@ export class SymbolOverlay extends BaseOverlay {
   private translateSymbol(s: Symbol, scale: number): ScaledItem {
     return {pt: {x: s.pt.x * scale, y: s.pt.y * scale}, symbol: s};
   }
+
+  public providesPointerTargets(): PointerTarget[] {
+    this.scaledItems = this.translateList(this.symbols, this.global.zoom.factor);
+    return this.scaledItems.map(s => {
+      return {pos: s.pt, target: s, name: s.symbol.sym, type: "Station"}
+    })
+  }
+
 
   public onRedraw = (dc: DrawingContext) => {
     this.scaledItems = this.translateList(this.symbols, dc.absScale);
