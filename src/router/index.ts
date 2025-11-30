@@ -2,12 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/',
+    path: '/maps-website/',
     name: 'Home',
     component: () => import('../components/index.vue'),
   },
   {
-    path: '/map/:name',
+    path: '/maps-website/map/:name',
     name: 'Map',
     component: () => import('../components/bms-map.vue'),
   },
