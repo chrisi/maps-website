@@ -17,7 +17,7 @@
       <div class="container">
         <div style="text-align: center">Korea Theater</div>
         <div class="polaroid">
-          <router-link to="/map/korea">
+          <router-link to="/maps-website/map/korea">
             <img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
                  width="150" height="150" alt="Korea Theater" border="0" class="image">
           </router-link>
@@ -27,7 +27,7 @@
       <div class="container">
         <div style="text-align: center">Balkans Theater</div>
         <div class="polaroid">
-          <router-link to="/map/balkans">
+          <router-link to="/maps-website/map/balkans">
             <img src="https://cdn.falcon-bms.com/maps/web_assets/02_balkans-thumb.jpeg"
                  width="150" height="150" alt="Balkans Theater" border="0" class="image">
           </router-link>
