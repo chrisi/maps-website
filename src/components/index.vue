@@ -3,132 +3,38 @@
 </script>
 
 <template>
-  <div class="blue-bar">
-    <center>
-      <!-- <a href="https://www.falcon-bms.com"><img src="https://cdn.falcon-bms.com/maps/web_assets/web_logo_small.jpg" width="324" height="83"  border="0"></a> -->
-      <a href="https://www.falcon-bms.com">
-        <img src="https://www.falcon-bms.com/wp-content/uploads/2021/07/web_logo_large_alt.png"
-                                                width="324" height="83" border="0">
-      </a>
-    </center>
+  <div class="blue-bar" style="text-align: center;">
+    <a href="https://www.falcon-bms.com">
+      <img src="https://www.falcon-bms.com/wp-content/uploads/2021/07/web_logo_large_alt.png" width="324" height="83" alt="">
+    </a>
   </div>
   <div class="content">
     <h1>Falcon BMS - Interactive Maps</h1>
     <hr>
-    <h2>Theater Maps 4.37</h2>
-    <table>
-      <thead>
-      <tr>
-        <th scope="col"><strong>Korea Theater</strong><br><em>
-          <span class="">Rev: 26 JUNE 2023</span>
-        </em></th>
-        <th scope="col"><strong>Balkans Theater</strong><br><em>
-          <span>Rev: 26 JUNE 2023</span>
-        </em></th>
-        <th scope="col"><strong>Israel Theater</strong><br><em>
-          <span>Rev: 26 JUNE 2023</span>
-        </em></th>
-        <th scope="col"></th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td data-label="Korea Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="01_KTO_Interactive_Map/index.html">
-                <img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
-                                                               width="150" height="150" alt="Korea Theater" border="0" class="image"></a>
-              <router-link to="/map/korea">Korea</router-link>
-              <router-link to="/map/balkans">Balkans</router-link>
-            </div>
-            <a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a>
-          </div>
-        </td>
-        <td data-label="Balkans Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="02_Balkans_Interactive_Map/index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/02_balkans-thumb.jpeg"
-                                                                   width="150" height="150" alt="Balkans Theater" border="0"
-                                                                   class="image"></a>
-            </div>
-            <a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a>
-          </div>
-        </td>
-        <td data-label="Israel Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="03_ITO_Interactive_Map/index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/03_ito-thumb.jpeg"
-                                                               width="150" height="150" alt="Israel Theater" border="0" class="image"></a>
-            </div>
-            <a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <br>
     <h2>Theater Maps 4.38</h2>
-    <table>
-      <thead>
-      <tr>
-        <th scope="col"><strong>Korea Theater</strong><br><em>
-          <font_small>UNDER CONSTRUCTION</font_small>
-        </em></th>
-        <th scope="col"><strong>Balkans Theater</strong><br><em>
-          <font_small>PLANNED</font_small>
-        </em></th>
-        <th scope="col"><strong>Israel Theater</strong><br><em>
-          <font_small>PLANNED</font_small>
-        </em></th>
-        <th scope="col"><strong>Hellenic Theater</strong><br><em>
-          <font_small>PLANNED</font_small>
-        </em></th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td data-label="Korea Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="04_KTO_Interactive_Map/index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/04_kto-thumb.jpeg"
-                                                               width="150" height="150" alt="Korea Theater" border="0" class="image"></a>
-            </div>
-            <!-- a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a -->
-          </div>
-        </td>
-        <td data-label="Balkans Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/05_balkans-thumb.jpeg" width="150" height="150"
-                                        alt="Balkans Theater" border="0" class="image"></a>
-            </div>
-            <!-- a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a -->
-          </div>
-        </td>
-        <td data-label="Israel Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/06_ito-thumb.jpeg" width="150" height="150"
-                                        alt="Israel Theater" border="0" class="image"></a>
-            </div>
-            <!-- a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a -->
-          </div>
-        </td>
-        <td data-label="Hellenic Theater">
-          <div class="container">
-            <div class="polaroid">
-              <a href="index.html"><img src="https://cdn.falcon-bms.com/maps/web_assets/07_hto-thumb.jpeg" width="150" height="150"
-                                        alt="Hellenic Theater" border="0" class="image"></a>
-            </div>
-            <!-- a href="https://github.com/BenchmarkSims/maps-website/releases">Download</a -->
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <br>
+
+    <div style="flex-wrap: wrap; display: flex; justify-content: space-evenly">
+      <div class="container">
+        <div style="text-align: center">Korea Theater</div>
+        <div class="polaroid">
+          <router-link to="/map/korea">
+            <img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
+                 width="150" height="150" alt="Korea Theater" border="0" class="image">
+          </router-link>
+        </div>
+      </div>
+
+      <div class="container">
+        <div style="text-align: center">Balkans Theater</div>
+        <div class="polaroid">
+          <router-link to="/map/balkans">
+            <img src="https://cdn.falcon-bms.com/maps/web_assets/02_balkans-thumb.jpeg"
+                 width="150" height="150" alt="Balkans Theater" border="0" class="image">
+          </router-link>
+        </div>
+      </div>
+    </div>
+
     <h2>Map Features</h2>
     The maps provide the following features:
     <ul>
