@@ -19,6 +19,9 @@ export class StationOverlay extends BaseOverlay {
 
   private selectStationEventHandler: ((name: Station) => void)[] = [];
 
+  // TODO : centralize or eliminate completely by rescaling the database directly
+  private rescale = 0.9375 // 1 / 4096 * 3840
+
   private stations: Station[] = this.global.map!.stations
 
   public onSelectStation(cb: ((name: Station) => void)) {
@@ -40,7 +43,7 @@ export class StationOverlay extends BaseOverlay {
       orientation = parseInt(s.details.rwy.substring(0, 2)) * 10
       doubleRwy = s.details.rwy.includes('-')
     }
-    return {station: s, pt: {x: s.posx * 2 * scale, y: s.posy * 2 * scale}, orientation: orientation, doubleRwy: doubleRwy};
+    return {station: s, pt: {x: s.posx * this.rescale * scale, y: s.posy * this.rescale * scale}, orientation: orientation, doubleRwy: doubleRwy};
   }
 
   public providesPointerTargets(): PointerTarget[] {

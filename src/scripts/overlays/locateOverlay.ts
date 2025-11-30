@@ -7,7 +7,10 @@ export class LocateOverlay extends BaseOverlay {
 
   private location: Point | undefined
 
-  private highlightSize = 17;
+  private highlightSize = 17; //TODO: settings
+
+  // TODO : centralize or eliminate completely by rescaling the database directly
+  private rescale = 0.9375 // 1 / 4096 * 3840
 
   constructor(ctx: OverlayContext) {
     super(ctx);
@@ -21,7 +24,7 @@ export class LocateOverlay extends BaseOverlay {
   public locateAirbase = (ap: string): void => {
     this.global.map!.stations.forEach(sta => {
       if (sta.name === ap) {
-        this.location = {x: sta.posx * 2 * this.global.zoom.factor, y: sta.posy * 2 * this.global.zoom.factor}
+        this.location = {x: sta.posx * this.rescale * this.global.zoom.factor, y: sta.posy * this.rescale * this.global.zoom.factor}
         this.redraw()
         window.scrollTo(this.location.x - window.innerWidth / 2, this.location.y - window.innerHeight / 2);
       }
