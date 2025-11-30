@@ -39,8 +39,8 @@ export class LocateOverlay extends BaseOverlay {
     if (!this.location) return;
     this.location.x *= dc.deltaScale;
     this.location.y *= dc.deltaScale;
-
-    drawHighlight(dc.cnvCtx, this.location.x, this.location.y, this.highlightSize * dc.absScale);
+    const smartScale = dc.absScale + (1 - dc.absScale) * 0.7
+    drawHighlight(dc.cnvCtx, this.location.x, this.location.y, this.highlightSize * smartScale);
   }
 
 }

@@ -283,8 +283,8 @@ const type = computed(() => {
         </tool-input>
         <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" v-model="pkg.fuel" unit="lbs"/>
         <tool-spacer medium/>
-        <tool-button id="btn-flight" icon="common/assets/icon_table1.png" @click="btnClick"/>
-        <tool-button id="btn-wx" icon="common/assets/icon_table.png" @click="btnClick"/>
+        <tool-button id="btn-flight" icon="../common/assets/icon_table1.png" @click="btnClick"/>
+        <tool-button id="btn-wx" icon="../common/assets/icon_table.png" @click="btnClick"/>
       </template>
     </tool-tabs>
     <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>

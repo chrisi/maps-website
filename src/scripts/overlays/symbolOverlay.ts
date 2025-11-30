@@ -112,7 +112,7 @@ export class SymbolOverlay extends BaseOverlay {
     let img = this.iconCache.get(symbol);
     if (!img) {
       img = new Image();
-      img.src = `common/assets/${symbol}.ico`;
+      img.src = `../common/assets/${symbol}.ico`;
       this.iconCache.set(symbol, img);
     }
 

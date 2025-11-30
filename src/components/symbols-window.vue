@@ -82,7 +82,7 @@ function genIconCode() {
   global.selectedSymbol = `${selectedIdent.value}${selectedType.value}${selectedEntity.value}`
 }
 
-watch(selectedIdent, (value) => {
+watch(selectedIdent, () => {
   genIconCode()
 })
 
@@ -92,7 +92,7 @@ watch(selectedType, (value) => {
   genIconCode()
 })
 
-watch(selectedEntity, (value) => {
+watch(selectedEntity, () => {
   genIconCode()
 })
 
@@ -119,7 +119,7 @@ onMounted(() => {
     <tool-spacer/>
     <div class="symbol" v-if="global.selectedSymbol">
       <div>
-        <img id="sidc-symbol" :src="`common/assets/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
+        <img id="sidc-symbol" :src="`../common/assets/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
       </div>
       <div>{{ global.selectedSymbol }}</div>
     </div>
