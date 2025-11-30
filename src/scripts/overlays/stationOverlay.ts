@@ -1,7 +1,6 @@
 import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext, PointerTarget} from "@/scripts/overlay.ts";
-import {stations} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
 import {deg2rad, distance} from "@/scripts/math.ts";
 import {Mode} from "@/model/mode.ts";
@@ -19,6 +18,8 @@ export class StationOverlay extends BaseOverlay {
   private hoverStation?: Station
 
   private selectStationEventHandler: ((name: Station) => void)[] = [];
+
+  private stations: Station[] = this.global.map!.stations
 
   public onSelectStation(cb: ((name: Station) => void)) {
     this.selectStationEventHandler.push(cb);
@@ -43,14 +44,14 @@ export class StationOverlay extends BaseOverlay {
   }
 
   public providesPointerTargets(): PointerTarget[] {
-    this.scaledStations = this.translateList(stations, this.global.zoom.factor);
+    this.scaledStations = this.translateList(this.stations, this.global.zoom.factor);
     return this.scaledStations.map(s => {
       return {pos: s.pt, target: s, name: s.station.name, type: "Station"}
     })
   }
 
   public onRedraw = (dc: DrawingContext) => {
-    this.scaledStations = this.translateList(stations, dc.absScale);
+    this.scaledStations = this.translateList(this.stations, dc.absScale);
     const smartScale = dc.absScale + (0.8 - dc.absScale) * 0.7
     this.scaledStations.forEach(sta => {
       if (sta.station.type === 'Airbase')

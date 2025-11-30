@@ -1,4 +1,5 @@
 import type {Coord} from "@/model/base.ts";
+import type {Station} from "@/model/station.ts";
 
 export interface Theater {
   name: string
@@ -8,4 +9,5 @@ export interface Theater {
   resolution: number
   //offset: number // deprecated -> use pixels
   mapUrl: string
+  stations: Station[]
 }

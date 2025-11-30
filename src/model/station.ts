@@ -4,7 +4,6 @@ export interface Station {
   type: string
   posx: number,
   posy: number,
-  size: number,
   details?: Details,
 }
 
@@ -16,7 +15,7 @@ export interface Details {
   rwy: string;
   tcn: string;
   atis: string;
-  ops: string;
+  ops?: string;
   gnd: string;
   twr: string;
   appdep: string;

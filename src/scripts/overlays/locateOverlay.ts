@@ -2,7 +2,6 @@ import {BaseOverlay} from "@/scripts/overlays/baseOverlay.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
 import type {DrawingContext, OverlayContext} from "@/scripts/overlay.ts";
-import {stations} from "@/data/stations.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
@@ -20,7 +19,7 @@ export class LocateOverlay extends BaseOverlay {
   }
 
   public locateAirbase = (ap: string): void => {
-    stations.forEach(sta => {
+    this.global.map!.stations.forEach(sta => {
       if (sta.name === ap) {
         this.location = {x: sta.posx * 2 * this.global.zoom.factor, y: sta.posy * 2 * this.global.zoom.factor}
         this.redraw()

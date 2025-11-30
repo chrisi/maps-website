@@ -4,7 +4,6 @@ import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "v
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {maps} from "@/data/map.ts";
-import {stationsByCountryType} from "@/data/stations.ts";
 import type {Station} from "@/model/station.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
@@ -40,7 +39,7 @@ const dropFileHandler = new DropFileHandler();
 const missionMgr = new MissionManager();
 
 onBeforeMount(() => {
-  global.map = maps[0];
+  global.map = maps[1];
 })
 
 onMounted(() => {
@@ -130,6 +129,17 @@ const execTool = (tool: string) => {
   }
 }
 
+const getStationsByCountryType = () => {
+  return global.map!.stations.reduce((obj, sta) => {
+    const key = `${sta.country} - ${sta.type}s`;
+    if (!obj[key]) {
+      obj[key] = [];
+    }
+    obj[key].push(sta);
+    return obj;
+  }, {} as Record<string, Station[]>);
+}
+
 const activeWindow = ref('')
 
 </script>
@@ -149,7 +159,7 @@ const activeWindow = ref('')
         <div id="locate">
           <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">
             <option value=""></option>
-            <optgroup v-for="(v,k) in stationsByCountryType" v-bind:key="k" :label="k">
+            <optgroup v-for="(v,k) in getStationsByCountryType()" v-bind:key="k" :label="k">
               <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
             </optgroup>
           </select>

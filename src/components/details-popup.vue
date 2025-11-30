@@ -66,7 +66,7 @@ function openChart(chart: Chart) {
       <tool-listitem label="RWY" :value="data.rwy"/>
       <tool-listitem label="TCN" :value="data.tcn"/>
       <tool-listitem label="ATIS" :value="data.atis"/>
-      <tool-listitem label="OPS" :value="data.ops"/>
+      <tool-listitem label="OPS" :value="data.ops" v-if="data.ops"/>
       <tool-listitem label="GND" :value="data.gnd"/>
       <tool-listitem label="TWR" :value="data.twr"/>
       <tool-listitem label="APP/DEP" :value="data.appdep"/>
