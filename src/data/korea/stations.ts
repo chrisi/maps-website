@@ -882,7 +882,7 @@ export const koreaStations: Station[] = [
   {posx: 2212, posy: 2516, country: 'South Korea', name: 'WONJU', type: 'Airbase'},
   {posx: 2456, posy: 2240, country: 'South Korea', name: 'YANGYANG', type: 'Airbase'},
   {posx: 2356, posy: 2876, country: 'South Korea', name: 'YECHEON', type: 'Airbase'},
-// TODO: import new coords 4096 based
+
 //   {posx: 1083, posy: 1447, country: 'South Korea', name: 'GUMI', type: 'Airstrip'},
 //   {posx: 893, posy: 1210, country: 'South Korea', name: 'SINGAL', type: 'Airstrip'},
 //   {posx: 861, posy: 1280, country: 'South Korea', name: 'SONGWHAN', type: 'Airstrip'},
@@ -940,59 +940,52 @@ export const koreaStations: Station[] = [
 // // <area shape="circle" coords="1906,1654,17" href="javascript:void(0);" alt="North Korea Airstrips" title="OKPYONG-NI" onclick="return popup('OKPYONG-NI');"/>
 // // <area shape="circle" coords="0940,1381,17" href="javascript:void(0);" alt="North Korea Airstrips" title="PANGHYON" onclick="return popup('PANGHYON');"/-->
 //
-//   {posx: 98, posy: 233, country: 'China', name: 'SHENYANG DONGTA', type: 'Airbase'},
-//
-//   {posx: 1153, posy: 1497, country: 'South Korea', name: 'DAEGU (TAE)', type: 'VOR/DME'},
-//   {
-//     posx: 1198,
-//     posy: 1113,
-//     country: 'South Korea',
-//     name: 'GANGNEUNG (KOG)',
-//     type: 'VOR/DME'
-//   },
-//   {posx: 842, posy: 1662, country: 'South Korea', name: 'GWANGJU (KWA)', type: 'VOR/DME'},
-//   {posx: 783, posy: 1170, country: 'South Korea', name: 'INCHEON (NCN)', type: 'VOR/DME'},
-//   {posx: 783, posy: 1170, country: 'South Korea', name: 'JUNGWON (CHW)', type: 'VOR/DME'},
-//   {posx: 769, posy: 1688, country: 'South Korea', name: 'MUAN (MUA)', type: 'VOR/DME'},
-//   {posx: 1281, posy: 1479, country: 'South Korea', name: 'POHANG (KPO)', type: 'VOR/DME'},
-//   {posx: 1277, posy: 1836, country: 'Japan', name: 'TSUSHIMA (TSU)', type: 'VOR/DME'},
-//   {
-//     posx: 1616,
-//     posy: 1898,
-//     country: 'Japan',
-//     name: 'YAMAGUCHI-UBE (YUE)',
-//     type: 'VOR/DME'
-//   },
-//
-//   {posx: 866, posy: 1188, country: 'South Korea', name: 'ANYANG (SEL)', type: 'VORTAC'},
-//   {posx: 1217, posy: 1662, country: 'South Korea', name: 'BUSAN (PSN)', type: 'VORTAC'},
-//   {posx: 960, posy: 1330, country: 'South Korea', name: 'CHEONGJU (CHO)', type: 'VORTAC'},
-//   {posx: 1143, posy: 1518, country: 'South Korea', name: 'DALSUNG (TGU)', type: 'VORTAC'},
-//   {posx: 1143, posy: 1519, country: 'South Korea', name: 'DONCHON (DOC)', type: 'VORTAC'},
-//   {posx: 1168, posy: 1127, country: 'South Korea', name: 'GANGWON (KAE)', type: 'VORTAC'},
-//   {posx: 1206, posy: 1642, country: 'South Korea', name: 'GIMHAE (KMH)', type: 'VORTAC'},
-//   {posx: 842, posy: 1662, country: 'South Korea', name: 'GWANGJU (KWJ)', type: 'VORTAC'},
-//   {posx: 809, posy: 1499, country: 'South Korea', name: 'KUNSAN (KUZ)', type: 'VORTAC'},
-//   {posx: 880, posy: 1253, country: 'South Korea', name: 'OSAN (OSN)', type: 'VORTAC'},
-//   {posx: 1292, posy: 1481, country: 'South Korea', name: 'POHANG (NPH)', type: 'VORTAC'},
-//   {posx: 1058, posy: 1669, country: 'South Korea', name: 'SACHEON (SAC)', type: 'VORTAC'},
-//   {posx: 896, posy: 1180, country: 'South Korea', name: 'SEOUL (KSM)', type: 'VORTAC'},
-//   {posx: 1141, posy: 1031, country: 'South Korea', name: 'SOKCHO (SCH)', type: 'VORTAC'},
-//   {posx: 882, posy: 1253, country: 'South Korea', name: 'SONGTAN (SOT)', type: 'VORTAC'},
-//   {posx: 1273, posy: 1562, country: 'South Korea', name: 'ULSAN (USN)', type: 'VORTAC'},
-//   {posx: 876, posy: 1118, country: 'South Korea', name: 'YANGJU (YJU)', type: 'VORTAC'},
-//   {posx: 738, posy: 1337, country: 'South Korea', name: 'YANGYANG (YAG)', type: 'VORTAC'},
-//   {posx: 1098, posy: 1349, country: 'South Korea', name: 'YECHEON (CUN)', type: 'VORTAC'},
-//   {posx: 980, posy: 1722, country: 'South Korea', name: 'YEOSU (YSU)', type: 'VORTAC'},
-//
-//   {posx: 1893, posy: 1782, country: 'Japan', name: 'HONGO (HGE)', type: 'VORTAC'},
-//   {posx: 1780, posy: 1846, country: 'Japan', name: 'IWAKUNI (NEU)', type: 'VORTAC'},
-//   {posx: 1878, posy: 1577, country: 'Japan', name: 'IZUMO (XZE)', type: 'VORTAC'},
-//   {posx: 1763, posy: 1862, country: 'Japan', name: 'KUGA (IWC)', type: 'VORTAC'},
-//   {posx: 1861, posy: 1909, country: 'Japan', name: 'MATSUYAMA (MPE)', type: 'VORTAC'},
-//   {posx: 1572, posy: 1912, country: 'Japan', name: 'SOUH (SWE)', type: 'VORTAC'},
-//
-//   {posx: 118, posy: 280, country: 'China', name: 'DAHUSHAN (DHN)', type: 'VORTAC'},
-//   {posx: 447, posy: 583, country: 'China', name: 'DANDONG (DDG)', type: 'VORTAC'},
-//   {posx: 81, posy: 1208, country: 'China', name: 'WEIHAI (WEH)', type: 'VORTAC'},
+  // China
+  {posx: 208, posy: 498, country: 'China', name: 'SHENYANG DONGTA', type: 'Airbase'},
+
+  // Radio Navigation Aids VOR/DME
+  {posx: 2461, posy: 3191, country: 'South Korea', name: 'DAEGU (TAE)', type: 'VOR/DME'},
+  {posx: 2556, posy: 2373, country: 'South Korea', name: 'GANGNEUNG (KOG)', type: 'VOR/DME'},
+  {posx: 1795, posy: 3544, country: 'South Korea', name: 'GWANGJU (KWA)', type: 'VOR/DME'},
+  {posx: 1673, posy: 2496, country: 'South Korea', name: 'INCHEON (NCN)', type: 'VOR/DME'},
+  {posx: 1673, posy: 2496, country: 'South Korea', name: 'JUNGWON (CHW)', type: 'VOR/DME'},
+  {posx: 1640, posy: 3600, country: 'South Korea', name: 'MUAN (MUA)', type: 'VOR/DME'},
+  {posx: 2732, posy: 3155, country: 'South Korea', name: 'POHANG (KPO)', type: 'VOR/DME'},
+  {posx: 2721, posy: 3914, country: 'Japan', name: 'TSUSHIMA (TSU)', type: 'VOR/DME'},
+  {posx: 3444, posy: 4049, country: 'Japan', name: 'YAMAGUCHI-UBE (YUE)', type: 'VOR/DME'},
+
+  // Radio Navigation Aids VORTAC South Korea
+  {posx: 1844, posy: 2531, country: 'South Korea', name: 'ANYANG (SEL)', type: 'VORTAC'},
+  {posx: 2593, posy: 3544, country: 'South Korea', name: 'BUSAN (PSN)', type: 'VORTAC'},
+  {posx: 2047, posy: 2837, country: 'South Korea', name: 'CHEONGJU (CHO)', type: 'VORTAC'},
+  {posx: 2441, posy: 3237, country: 'South Korea', name: 'DALSUNG (TGU)', type: 'VORTAC'},
+  {posx: 2441, posy: 3241, country: 'South Korea', name: 'DONCHON (DOC)', type: 'VORTAC'},
+  {posx: 2489, posy: 2401, country: 'South Korea', name: 'GANGWON (KAE)', type: 'VORTAC'},
+  {posx: 2570, posy: 3504, country: 'South Korea', name: 'GIMHAE (KMH)', type: 'VORTAC'},
+  {posx: 1795, posy: 3544, country: 'South Korea', name: 'GWANGJU (KWJ)', type: 'VORTAC'},
+  {posx: 1726, posy: 3198, country: 'South Korea', name: 'KUNSAN (KUZ)', type: 'VORTAC'},
+  {posx: 1877, posy: 2672, country: 'South Korea', name: 'OSAN (OSN)', type: 'VORTAC'},
+  {posx: 2757, posy: 3159, country: 'South Korea', name: 'POHANG (NPH)', type: 'VORTAC'},
+  {posx: 2257, posy: 3559, country: 'South Korea', name: 'SACHEON (SAC)', type: 'VORTAC'},
+  {posx: 1909, posy: 2516, country: 'South Korea', name: 'SEOUL (KSM)', type: 'VORTAC'},
+  {posx: 2433, posy: 2199, country: 'South Korea', name: 'SOKCHO (SCH)', type: 'VORTAC'},
+  {posx: 1880, posy: 2673, country: 'South Korea', name: 'SONGTAN (SOT)', type: 'VORTAC'},
+  {posx: 2718, posy: 3331, country: 'South Korea', name: 'ULSAN (USN)', type: 'VORTAC'},
+  {posx: 1867, posy: 2383, country: 'South Korea', name: 'YANGJU (YJU)', type: 'VORTAC'},
+  {posx: 1574, posy: 2850, country: 'South Korea', name: 'YANGYANG (YAG)', type: 'VORTAC'},
+  {posx: 2342, posy: 2878, country: 'South Korea', name: 'YECHEON (CUN)', type: 'VORTAC'},
+  {posx: 2090, posy: 3673, country: 'South Korea', name: 'YEOSU (YSU)', type: 'VORTAC'},
+
+  // Radio Navigation Aids VORTAC Japan
+  {posx: 4041, posy: 3801, country: 'Japan', name: 'HONGO (HGE)', type: 'VORTAC'},
+  {posx: 3797, posy: 3936, country: 'Japan', name: 'IWAKUNI (NEU)', type: 'VORTAC'},
+  {posx: 4006, posy: 3364, country: 'Japan', name: 'IZUMO (XZE)', type: 'VORTAC'},
+  {posx: 3763, posy: 3972, country: 'Japan', name: 'KUGA (IWC)', type: 'VORTAC'},
+  {posx: 3970, posy: 4073, country: 'Japan', name: 'MATSUYAMA (MPE)', type: 'VORTAC'},
+  {posx: 3353, posy: 4081, country: 'Japan', name: 'SOUH (SWE)', type: 'VORTAC'},
+
+  // Radio Navigation Aids VORTAC China
+  {posx: 252, posy: 596, country: 'China', name: 'DAHUSHAN (DHN)', type: 'VORTAC'},
+  {posx: 952, posy: 1246, country: 'China', name: 'DANDONG (DDG)', type: 'VORTAC'},
+  {posx: 1208172, posy: 2575, country: 'China', name: 'WEIHAI (WEH)', type: 'VORTAC'},
 ]

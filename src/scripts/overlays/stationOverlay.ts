@@ -43,13 +43,19 @@ export class StationOverlay extends BaseOverlay {
       orientation = parseInt(s.details.rwy.substring(0, 2)) * 10
       doubleRwy = s.details.rwy.includes('-')
     }
-    return {station: s, pt: {x: s.posx * this.rescale * scale, y: s.posy * this.rescale * scale}, orientation: orientation, doubleRwy: doubleRwy};
+    return {
+      station: s,
+      pt: {x: s.posx * this.rescale * scale, y: s.posy * this.rescale * scale},
+      orientation: orientation,
+      doubleRwy: doubleRwy
+    };
   }
 
   public providesPointerTargets(): PointerTarget[] {
     this.scaledStations = this.translateList(this.stations, this.global.zoom.factor);
     return this.scaledStations.map(s => {
-      return {pos: s.pt, target: s, name: s.station.name, type: "Station"}
+      const thres = s.station.type == "VORTAC" ? 45 * this.global.zoom.factor : 15; //TODO: make 45 configurable
+      return {pos: s.pt, threshold: thres, target: s, name: s.station.name, type: s.station.type}
     })
   }
 
@@ -60,7 +66,11 @@ export class StationOverlay extends BaseOverlay {
       if (sta.station.type === 'Airbase')
         this.drawAirbase(dc, sta.pt, sta.orientation, smartScale, sta.doubleRwy);
       if (sta.station.type === 'VORTAC')
-        this.drawVortac(dc, sta.pt, smartScale);
+        this.drawVor(dc, sta.pt, smartScale, true);
+      if (sta.station.type === 'VOR/DME')
+        this.drawVor(dc, sta.pt, smartScale, false);
+      if (sta.station.type === 'Range')
+        this.drawReticle(dc, sta.pt, smartScale);
     })
   }
 
@@ -133,7 +143,7 @@ export class StationOverlay extends BaseOverlay {
     ctx.stroke();
   }
 
-  private drawVortac(dc: DrawingContext, pt: Point, scale: number = 1) {
+  private drawVor(dc: DrawingContext, pt: Point, scale: number = 1, isTac: boolean = false) {
     const ctx = dc.cnvCtx
 
     const hexRad = 7 * scale;       // Radius of the hexagon
@@ -145,25 +155,39 @@ export class StationOverlay extends BaseOverlay {
     ctx.save();
     ctx.translate(pt.x, pt.y);
 
-    // Angles for the 3 tabs (Bottom, Top-Left, Top-Right in Canvas coordinates)
-    const tabAngles = [Math.PI / 2, (7 * Math.PI) / 6, (11 * Math.PI) / 6]; // 90, 210, 330 degrees
+    if (isTac) {
 
-    // 1. Draw the 3 Black Tabs
-    ctx.fillStyle = '#000000';
-    tabAngles.forEach(function (angle) {
-      ctx.save();
-      ctx.rotate(angle);
+      // Angles for the 3 tabs (Bottom, Top-Left, Top-Right in Canvas coordinates)
+      const tabAngles = [Math.PI / 2, (7 * Math.PI) / 6, (11 * Math.PI) / 6]; // 90, 210, 330 degrees
 
+      // 1. Draw the 3 Black Tabs
+      ctx.fillStyle = '#000000';
+      tabAngles.forEach(function (angle) {
+        ctx.save();
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(apothem, -hexRad / 1.8);
+        ctx.lineTo(apothem + tabLen, -hexRad / 1.8);
+        ctx.lineTo(apothem + tabLen, hexRad / 1.8);
+        ctx.lineTo(apothem, hexRad / 1.8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      })
+    } else {
+
+
+      // 1. Draw DME Box
       ctx.beginPath();
-      ctx.moveTo(apothem, -hexRad / 1.8);
-      ctx.lineTo(apothem + tabLen, -hexRad / 1.8);
-      ctx.lineTo(apothem + tabLen, hexRad / 1.8);
-      ctx.lineTo(apothem, hexRad / 1.8);
-      ctx.closePath();
+      ctx.rect(-hexRad * 1.1, -hexRad * 0.9, hexRad * 2.2, hexRad * 1.8);
+      ctx.fillStyle = 'white';
       ctx.fill();
-
-      ctx.restore();
-    });
+      ctx.lineWidth = strokeW;
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+    }
 
     // 2. Draw White Hexagon
     ctx.beginPath();
@@ -175,6 +199,8 @@ export class StationOverlay extends BaseOverlay {
       if (i === 0) ctx.moveTo(hx, hy);
       else ctx.lineTo(hx, hy);
     }
+
+
     ctx.closePath();
     ctx.fillStyle = 'white';
     ctx.fill();

@@ -44,7 +44,9 @@ export interface OverlayContext {
 
 export interface PointerTarget {
   pos: Point, // position of the target, in pixels
+  threshold: number, // the distance to the pointer at which the target is considered hit
   name: string, // generic name of the target, no matter the type for hovering hint
+  type: string, // type of the target, e.g., Mil-Symbol, Airbase, can be used for priority management
   target?: object, // the target object, e.g., airbase or mil-symbol
 }
 
@@ -54,8 +56,6 @@ interface PointerTargetCandidate {
 }
 
 export class OverlayManager {
-
-  private threshold = 15; //TODO: make dist configurable
 
   private overlays: Overlay[] = []
   private ovlCtx?: OverlayContext
@@ -125,11 +125,12 @@ export class OverlayManager {
   private findPointerTargets(pt: Point, singel: boolean = false): PointerTarget[] {
     const res: PointerTargetCandidate[] = []
     //TODO: priority management: sort overlays by priority (tbd)
+    //TODO: manage exactly colocated items by trigger threshold (tbd)
     for (const overlay of this.overlays) {
       if (overlay.isActive() && overlay.providesPointerTargets) {
         for (const tgt of overlay.providesPointerTargets()) {
           const dist = distance(pt, tgt.pos)
-          if (dist < this.threshold) {
+          if (dist < tgt.threshold) {
             if (singel) return [tgt]
             res.push({target: tgt, dist: dist})
           }

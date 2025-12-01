@@ -45,7 +45,7 @@ export class SymbolOverlay extends BaseOverlay {
   public providesPointerTargets(): PointerTarget[] {
     this.scaledItems = this.translateList(this.symbols, this.global.zoom.factor);
     return this.scaledItems.map(s => {
-      return {pos: s.pt, target: s, name: s.symbol.sym, type: "Station"}
+      return {pos: s.pt, threshold: 15, target: s, name: s.symbol.sym, type: "Mil-Symbol"}
     })
   }
 
