@@ -3,7 +3,7 @@
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {cdnUrl, findMap, maps} from "@/data/map.ts";
+import {cdnUrl, findMap} from "@/data/map.ts";
 import type {Station} from "@/model/station.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
@@ -42,7 +42,6 @@ const missionMgr = new MissionManager()
 const route = useRoute()
 
 onBeforeMount(() => {
-  console.log(route.params)
   const name = route.params['name']
   const mapName = Array.isArray(name) ? name[0] : name
   if (mapName) {
@@ -184,6 +183,11 @@ const activeWindow = ref('')
         </ul>
       </div>
     </div>
+    <div id="skyvector" @pointerdown.stop @mousedown.stop @click.stop>
+      <a href="https://skyvector.com" target="_blank">
+        <img src="../../public/resources/skyvector.png" alt="SkyVector">
+      </a>
+    </div>
   </div>
 </template>
 
@@ -258,5 +262,24 @@ const activeWindow = ref('')
   position: fixed;
   bottom: 0;
   margin: 15px;
+}
+
+#skyvector {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 4px 4px 0 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#skyvector a {
+  pointer-events: auto;
+}
+
+#skyvector img {
+  width: 140px;
+  height: 40px;
 }
 </style>

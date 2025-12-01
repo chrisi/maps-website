@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import TheaterLink from "@/components/theater-link.vue";
 </script>
 
 <template>
@@ -11,30 +12,23 @@
   <div class="content">
     <h1>Falcon BMS - Interactive Maps</h1>
     <hr>
-    <h2>Theater Maps 4.38</h2>
-
-    <div style="flex-wrap: wrap; display: flex; justify-content: space-evenly">
-      <div class="container">
-        <div style="text-align: center">Korea Theater</div>
-        <div class="polaroid">
-          <router-link to="/maps-website/map/korea">
-            <img src="https://cdn.falcon-bms.com/maps/web_assets/01_kto-thumb.jpeg"
-                 width="150" height="150" alt="Korea Theater" border="0" class="image">
-          </router-link>
-        </div>
-      </div>
-
-      <div class="container">
-        <div style="text-align: center">Balkans Theater</div>
-        <div class="polaroid">
-          <router-link to="/maps-website/map/balkans">
-            <img src="https://cdn.falcon-bms.com/maps/web_assets/02_balkans-thumb.jpeg"
-                 width="150" height="150" alt="Balkans Theater" border="0" class="image">
-          </router-link>
-        </div>
-      </div>
+    <h2>Theater Maps 4.37</h2>
+    <div class="flex">
+      <theater-link link="https://maps.falcon-bms.com/01_KTO_Interactive_Map/index.html"
+                    name="KOREA" sub="Rev: 26 JUNE 2023" image="01_kto-thumb.jpeg"/>
+      <theater-link link="https://maps.falcon-bms.com/02_Balkans_Interactive_Map/index.html"
+                    name="BALKANS" sub="Rev: 26 JUNE 2023" image="02_balkans-thumb.jpeg"/>
+      <theater-link link="https://maps.falcon-bms.com/03_ITO_Interactive_Map/index.html"
+                    name="ISRAEL" sub="Rev: 26 JUNE 2023" image="03_ito-thumb.jpeg"/>
+      <div style="width: 163px"></div>
     </div>
-
+    <h2>Theater Maps 4.38</h2>
+    <div class="flex">
+      <theater-link link="/maps-website/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
+      <theater-link link="/maps-website/map/balkans" name="BALKANS" sub="IN DEVELOPMENT" image="05_balkans-thumb.jpeg"/>
+      <theater-link name="ISRAEL" sub="PLANNED" image="06_ito-thumb.jpeg"/>
+      <theater-link name="HELLENIC" sub="PLANNED" image="07_hto-thumb.jpeg"/>
+    </div>
     <h2>Map Features</h2>
     The maps provide the following features:
     <ul>
@@ -52,18 +46,21 @@
       <li>Download and Import GFS data and files</li>
       <li>Bullseye placement</li>
     </ul>
-    <h5 style="text-align: left;"><a href="https://forum.falcon-bms.com/topic/22922/falcon-bms-interactive-maps" target="_blank">Change
-      log</a> &nbsp;| &nbsp;<a href="https://cdn.falcon-bms.com/maps/manual/BMS_Interactive_Maps.pdf" target="_blank">Manual (PDF)</a>
+    <h5 style="text-align: left;">
+      <a href="https://forum.falcon-bms.com/topic/22922/falcon-bms-interactive-maps" target="_blank">Change log</a>
+      <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+      <a href="https://cdn.falcon-bms.com/maps/manual/BMS_Interactive_Maps.pdf" target="_blank">Manual (PDF)</a>
     </h5>
     <hr>
   </div>
 </template>
 
 <style scoped>
-body {
-  margin: 0;
-  padding: 0;
-  background-color: white;
+
+.flex {
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: space-evenly
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -71,71 +68,8 @@ h1, h2, h3, h4, h5, h6 {
   color: #5a87a4;
 }
 
-font {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  color: #000000;
-}
-
-font_small {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  color: #5a87a4;
-}
-
-center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
-
-a {
-  text-decoration: none;
-}
-
-div.polaroid {
-  width: 155px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-}
-
-.container:hover .image {
-  opacity: 0.8;
-  color: #000000;
-}
-
-font_right {
-  text-align: right;
-}
-
-table {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  border-collapse: collapse;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  table-layout: fixed;
-}
-
-table caption {
-  font-size: 1.5em;
-}
-
-table th,
-table td {
-  text-align: center;
-}
-
-table th {
-  text-transform: uppercase;
-}
-
-.color_background {
-  color: #163546;
+h2 {
+  margin-top: 30px;
 }
 
 .blue-bar {
@@ -148,5 +82,10 @@ table th {
 .content {
   padding: 20px;
   margin: 30px 50px;
+}
+
+a {
+  color: #5a87a4;
+  text-decoration: none;
 }
 </style>
