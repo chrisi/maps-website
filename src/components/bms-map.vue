@@ -270,7 +270,7 @@ const activeWindow = ref('')
 
 #skyvector {
   position: fixed;
-  top: 5px;
+  bottom: 5px;
   right: 5px;
   background-color: rgba(255, 255, 255, 0.6);
   padding: 4px 4px 0 4px;

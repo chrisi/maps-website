@@ -59,6 +59,10 @@ export class StationOverlay extends BaseOverlay {
     })
   }
 
+  public onHoverPointerTarget(targets: PointerTarget[]) {
+    console.log(targets)
+  }
+
   public onRedraw = (dc: DrawingContext) => {
     this.scaledStations = this.translateList(this.stations, dc.absScale);
     const smartScale = dc.absScale + (0.8 - dc.absScale) * 0.7
@@ -86,7 +90,16 @@ export class StationOverlay extends BaseOverlay {
     this.ovlCtx.canvas.style.cursor = (this.hoverStation ? "pointer" : "default")
   }
 
+  public onTouchStart() {
+    console.log("touch start")
+    if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
+    if (this.hoverStation) {
+      this.selectStationEventHandler.forEach(cb => cb(this.hoverStation!))
+    }
+  }
+
   public onClick() {
+    console.log("click")
     if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
     if (this.hoverStation) {
       this.selectStationEventHandler.forEach(cb => cb(this.hoverStation!))

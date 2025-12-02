@@ -22,9 +22,9 @@ const openLink = (url?: string) => {
 
 <template>
   <div class="polaroid" @click="openLink(link)" :class="{active: link}">
+    <img :src="`https://cdn.falcon-bms.com/maps/web_assets/${image}`" width="150" height="150" :alt="name" class="image">
     <div class="title">{{ name }}</div>
     <div class="sub">{{ sub }}</div>
-    <img :src="`https://cdn.falcon-bms.com/maps/web_assets/${image}`" width="150" height="150" :alt="name" class="image">
   </div>
 </template>
 <style scoped>
@@ -32,8 +32,14 @@ const openLink = (url?: string) => {
 .polaroid {
   width: 155px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  padding: 4px;
+  padding: 5px 3px;
   text-align: center;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+}
+
+.polaroid img {
+  border-radius: 3px;
 }
 
 .active {

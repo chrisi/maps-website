@@ -3,6 +3,14 @@ import type {Point} from "@/model/base.ts";
 import {distance} from "@/scripts/math.ts";
 
 export interface Overlay {
+  onTouchStart?(e: TouchEvent): void
+
+  onTouchMove?(e: TouchEvent): void
+
+  onTouchEnd?(e: TouchEvent): void
+
+  onTouchCancel?(e: TouchEvent): void
+
   onClick(e: MouseEvent): void
 
   onDblClick(e: MouseEvent): void
@@ -96,6 +104,7 @@ export class OverlayManager {
 
   public activatePointerEvents = (): void => {
     const pane = window
+    pane.addEventListener('touchstart', this.touchStartHandler as EventListener);
     pane.addEventListener('click', this.clickHandler as EventListener);
     pane.addEventListener('dblclick', this.dblClickHandler as EventListener);
     pane.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
@@ -107,6 +116,7 @@ export class OverlayManager {
 
   public deactivatePointerEvents = (): void => {
     const pane = window
+    pane.removeEventListener('touchstart', this.touchStartHandler as EventListener);
     pane.removeEventListener('click', this.clickHandler as EventListener);
     pane.removeEventListener('dblclick', this.dblClickHandler as EventListener);
     pane.removeEventListener('contextmenu', this.contextMenuHandler as EventListener);
@@ -146,6 +156,19 @@ export class OverlayManager {
       try {
         if (overlay.isActive())
           overlay.onClick(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
+  private touchStartHandler = (e: TouchEvent) => {
+    this.preventDefaultFiltered(e)
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          if (overlay.onTouchStart)
+            overlay.onTouchStart(e)
       } catch (err) {
         console.error(this.errorMessage(overlay, e), err);
       }

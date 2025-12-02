@@ -16,8 +16,8 @@ export class BaseOverlay implements Overlay {
 
   //TODO: check optional interface implementations (e.g., onClick?())
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onClick(e: MouseEvent): void {
+    console.log(`click: ${e.button}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -28,16 +28,16 @@ export class BaseOverlay implements Overlay {
   public onContextMenu(e: MouseEvent): void {
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onMouseDown(e: MouseEvent): void {
+    console.log(`mouse down: ${e.button}`)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onMouseMove(e: MouseEvent): void {
+    console.log(`mouse move: ${e.button}`)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onMouseUp(e: MouseEvent): void {
+    console.log(`mouse up: ${e.button}`)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
