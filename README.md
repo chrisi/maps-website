@@ -68,3 +68,5 @@ https://chrisi.github.io/maps-website/
 docker build -t maps-website .
 docker run -p 80:80 maps-website
 ```
+
+Try this in the browser: http://localhost/maps-website/
