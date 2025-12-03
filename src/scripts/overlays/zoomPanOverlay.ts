@@ -11,6 +11,14 @@ export class ZoomPanOverlay extends BaseOverlay {
   private wheel_enabled = true;
   private last_zoom = 1
 
+  private initialPinchDist = -1;
+  private initialScale = -1;
+
+  private ticking = false;
+  private pendingZoom: { factor: number, center: Point } | null = null;
+
+  private enablePinchZoom = false;
+
   constructor(ctx: OverlayContext) {
     super(ctx);
   }
@@ -67,6 +75,21 @@ export class ZoomPanOverlay extends BaseOverlay {
     this.pointerPanStart = {x: e.clientX + ofs.scrollLeft, y: e.clientY + ofs.scrollTop};
   }
 
+  public onTouchStart(e: TouchEvent) {
+    if (this.global.mode != Mode.Move && this.global.mode != Mode.None) return
+
+    if (e.touches.length === 2) {
+      const t1 = e.touches[0]!;
+      const t2 = e.touches[1]!;
+      this.initialPinchDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      this.initialScale = this.global.zoom.factor;
+      return
+    }
+
+    const ofs = document.scrollingElement!;
+    this.pointerPanStart = {x: e.touches[0]!.clientX + ofs.scrollLeft, y: e.touches[0]!.clientY + ofs.scrollTop};
+  }
+
   public onMouseMove = (e: MouseEvent) => {
     if (this.settings.viz.xy)
       this.showPointerCoord(e.pageX, e.pageY)
@@ -76,9 +99,70 @@ export class ZoomPanOverlay extends BaseOverlay {
     window.scrollTo(dx, dy)
   }
 
+  public onTouchMove(e: TouchEvent) {
+    if (this.settings.viz.xy)
+      this.showPointerCoord(e.touches[0]!.pageX, e.touches[0]!.pageY)
+    if (this.global.mode != Mode.Move && this.global.mode != Mode.None) return
+
+    if (e.touches.length === 2 && this.initialPinchDist > 0) {
+      e.preventDefault();
+
+      const t1 = e.touches[0]!;
+      const t2 = e.touches[1]!;
+      const currDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const center = {
+        x: (t1.clientX + t2.clientX) / 2,
+        y: (t1.clientY + t2.clientY) / 2
+      };
+
+      if (this.enablePinchZoom) {
+        if (Math.abs(currDist - this.initialPinchDist) > 1) {
+          let fac = this.initialScale / this.initialPinchDist * currDist;
+
+          if (fac < this.global.zoom.min) fac = this.global.zoom.min;
+          if (fac > this.global.zoom.max) fac = this.global.zoom.max;
+
+          this.pendingZoom = {factor: fac, center: center};
+
+          if (!this.ticking) {
+            window.requestAnimationFrame(() => {
+              if (this.pendingZoom) {
+                this.global.zoom.factor = this.pendingZoom.factor;
+                this.scaleView(this.pendingZoom.center);
+                this.pendingZoom = null;
+              }
+              this.ticking = false;
+            });
+            this.ticking = true;
+          }
+        }
+      }
+
+    } else if (e.touches.length === 1) {
+      const dx = this.pointerPanStart.x - e.touches[0]!.clientX
+      const dy = this.pointerPanStart.y - e.touches[0]!.clientY
+      window.scrollTo(dx, dy)
+    }
+  }
+
   public onMouseUp = (e: MouseEvent) => {
     if (!((this.global.mode == Mode.Move && this.isLeftMouse(e)) || this.isAuxMouse(e))) return
     this.pointerPanStart = {x: 0, y: 0};
+  }
+
+  public onTouchEnd = (e: TouchEvent) => {
+    if (this.global.mode != Mode.Move && this.global.mode != Mode.None) return
+
+    if (e.touches.length < 2) {
+      this.initialPinchDist = -1;
+    }
+
+    if (e.touches.length === 1) {
+      const ofs = document.scrollingElement!;
+      this.pointerPanStart = {x: e.touches[0]!.clientX + ofs.scrollLeft, y: e.touches[0]!.clientY + ofs.scrollTop};
+    } else {
+      this.pointerPanStart = {x: 0, y: 0};
+    }
   }
 
   public onWheel = (e: WheelEvent) => {

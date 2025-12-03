@@ -2,6 +2,9 @@ import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
 import {distance} from "@/scripts/math.ts";
 
+const DEBUG = true;
+const MOVE_DEBUG = false;
+
 export interface Overlay {
   onTouchStart?(e: TouchEvent): void
 
@@ -69,9 +72,16 @@ export class OverlayManager {
   private ovlCtx?: OverlayContext
   private global = useGlobalStore()
 
+  private isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  private canPinch = navigator.maxTouchPoints > 1
+  private useMouseHandlers = true
+  private useTouchHandlers = this.isMobile || this.canPinch
+  private eventSource: HTMLCanvasElement | Window = window
+
   public init = (overlayContext: OverlayContext) => {
     overlayContext.redraw = this.redraw
     this.ovlCtx = overlayContext
+    this.eventSource = this.ovlCtx!.canvas
   }
 
   public registerOverlay = (overlay: Overlay) => {
@@ -103,27 +113,45 @@ export class OverlayManager {
   }
 
   public activatePointerEvents = (): void => {
-    const pane = window
-    pane.addEventListener('touchstart', this.touchStartHandler as EventListener);
-    pane.addEventListener('click', this.clickHandler as EventListener);
-    pane.addEventListener('dblclick', this.dblClickHandler as EventListener);
-    pane.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
-    pane.addEventListener('mousedown', this.mouseDownHandler as EventListener);
-    pane.addEventListener('mousemove', this.mouseMoveHandler as EventListener);
-    pane.addEventListener('mouseup', this.mouseUpHandler as EventListener);
-    pane.addEventListener('wheel', this.wheelHandler as EventListener, {passive: false});
+    console.log(navigator.userAgent)
+    console.log("activatePointerEvents. mobile: " + this.isMobile + ", canPinch: " + this.canPinch + ", touch: " + (this.isMobile ? "touch" : "mouse"))
+    const src = this.eventSource
+    //const pane = window
+    if (this.useTouchHandlers) {
+      console.log("activate touch handlers")
+      src.addEventListener('touchstart', this.touchStartHandler as EventListener);
+      src.addEventListener('touchmove', this.touchMoveHandler as EventListener);
+      src.addEventListener('touchend', this.touchEndHandler as EventListener);
+    }
+    if (this.useMouseHandlers) {
+      console.log("activating mouse handlers")
+      src.addEventListener('click', this.clickHandler as EventListener);
+      src.addEventListener('dblclick', this.dblClickHandler as EventListener);
+      src.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
+      src.addEventListener('mousedown', this.mouseDownHandler as EventListener);
+      // using window here -> continue to pan maps when cursor is outside the window temporarilly
+      window.addEventListener('mousemove', this.mouseMoveHandler as EventListener);
+      src.addEventListener('mouseup', this.mouseUpHandler as EventListener);
+      src.addEventListener('wheel', this.wheelHandler as EventListener, {passive: false});
+    }
   }
 
   public deactivatePointerEvents = (): void => {
-    const pane = window
-    pane.removeEventListener('touchstart', this.touchStartHandler as EventListener);
-    pane.removeEventListener('click', this.clickHandler as EventListener);
-    pane.removeEventListener('dblclick', this.dblClickHandler as EventListener);
-    pane.removeEventListener('contextmenu', this.contextMenuHandler as EventListener);
-    pane.removeEventListener('mousedown', this.mouseDownHandler as EventListener);
-    pane.removeEventListener('mousemove', this.mouseMoveHandler as EventListener);
-    pane.removeEventListener('mouseup', this.mouseUpHandler as EventListener);
-    pane.removeEventListener('wheel', this.wheelHandler as EventListener);
+    const src = this.eventSource
+    if (this.useTouchHandlers) {
+      src.removeEventListener('touchstart', this.touchStartHandler as EventListener);
+      src.removeEventListener('touchmove', this.touchMoveHandler as EventListener);
+      src.removeEventListener('touchend', this.touchEndHandler as EventListener);
+    }
+    if (this.useMouseHandlers) {
+      src.removeEventListener('click', this.clickHandler as EventListener);
+      src.removeEventListener('dblclick', this.dblClickHandler as EventListener);
+      src.removeEventListener('contextmenu', this.contextMenuHandler as EventListener);
+      src.removeEventListener('mousedown', this.mouseDownHandler as EventListener);
+      window.removeEventListener('mousemove', this.mouseMoveHandler as EventListener);
+      src.removeEventListener('mouseup', this.mouseUpHandler as EventListener);
+      src.removeEventListener('wheel', this.wheelHandler as EventListener);
+    }
   }
 
   private preventDefaultFiltered = (e: Event) => {
@@ -152,6 +180,7 @@ export class OverlayManager {
 
   private clickHandler = (e: MouseEvent) => {
     this.preventDefaultFiltered(e)
+    if (DEBUG) console.log("click")
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -164,6 +193,7 @@ export class OverlayManager {
 
   private touchStartHandler = (e: TouchEvent) => {
     this.preventDefaultFiltered(e)
+    if (DEBUG) console.log("touchStart")
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -175,8 +205,37 @@ export class OverlayManager {
     }
   }
 
+  private touchMoveHandler = (e: TouchEvent) => {
+    e.preventDefault()
+    if (MOVE_DEBUG) console.log("touchMove")
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          if (overlay.onTouchMove)
+            overlay.onTouchMove(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
+  private touchEndHandler = (e: TouchEvent) => {
+    e.preventDefault()
+    if (DEBUG) console.log("touchEnd")
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isActive())
+          if (overlay.onTouchEnd)
+            overlay.onTouchEnd(e)
+      } catch (err) {
+        console.error(this.errorMessage(overlay, e), err);
+      }
+    }
+  }
+
   private dblClickHandler = (e: MouseEvent) => {
     this.preventDefaultFiltered(e)
+    if (DEBUG) console.log("dblClick")
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -189,6 +248,7 @@ export class OverlayManager {
 
   private contextMenuHandler = (e: MouseEvent) => {
     this.preventDefaultFiltered(e)
+    if (DEBUG) console.log("contextMenu")
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())
@@ -200,7 +260,8 @@ export class OverlayManager {
   }
 
   private mouseDownHandler = (e: MouseEvent) => {
-    this.preventDefaultFiltered(e)
+    this.preventDefaultFiltered(e) //TODO: check usage e.preventDefault()
+    if (DEBUG) console.log("mouseDown: " + e.buttons)
     for (const overlay of this.overlays) {
       this.ovlCtx!.mouseDown = e.buttons
       try {
@@ -214,6 +275,7 @@ export class OverlayManager {
 
   private mouseMoveHandler = (e: MouseEvent) => {
     e.preventDefault()
+    if (MOVE_DEBUG) console.log("mouseMove: " + e.buttons)
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive()) {
@@ -230,6 +292,7 @@ export class OverlayManager {
 
   private mouseUpHandler = (e: MouseEvent) => {
     e.preventDefault()
+    if (DEBUG) console.log("mouseUp: " + e.buttons)
     for (const overlay of this.overlays) {
       this.ovlCtx!.mouseDown = e.buttons
       try {
@@ -243,6 +306,7 @@ export class OverlayManager {
 
   private wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
+    if (DEBUG) console.log("wheel")
     for (const overlay of this.overlays) {
       try {
         if (overlay.isActive())

@@ -22,6 +22,7 @@ import {RouteOverlay} from "@/scripts/overlays/routeOverlay.ts";
 import {StationOverlay} from "@/scripts/overlays/stationOverlay.ts";
 import {SymbolOverlay} from "@/scripts/overlays/symbolOverlay.ts";
 import {useRoute} from "vue-router";
+import {Mode} from "@/model/mode.ts";
 
 const selectedStation = ref<Station | undefined>();
 const dropdownName = ref("");
@@ -51,6 +52,7 @@ onBeforeMount(() => {
 
 onMounted(() => {
   console.log("mounting map")
+  global.mode = Mode.Move
   const cnv = initializeCanvas();
 
   const ctx: OverlayContext = {

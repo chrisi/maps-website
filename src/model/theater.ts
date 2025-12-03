@@ -11,4 +11,5 @@ export interface Theater {
   folder: string
   mapFilename: string
   stations: Station[]
+  stationMappingSize: number
 }

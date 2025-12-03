@@ -9,9 +9,6 @@ export class LocateOverlay extends BaseOverlay {
 
   private highlightSize = 17; //TODO: settings
 
-  // TODO : centralize or eliminate completely by rescaling the database directly
-  private rescale = 0.9375 // 1 / 4096 * 3840
-
   constructor(ctx: OverlayContext) {
     super(ctx);
   }

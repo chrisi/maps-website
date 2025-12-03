@@ -19,9 +19,6 @@ export class StationOverlay extends BaseOverlay {
 
   private selectStationEventHandler: ((name: Station) => void)[] = [];
 
-  // TODO : centralize or eliminate completely by rescaling the database directly
-  private rescale = 0.9375 // 1 / 4096 * 3840
-
   private stations: Station[] = this.global.map!.stations
 
   public onSelectStation(cb: ((name: Station) => void)) {
@@ -51,6 +48,16 @@ export class StationOverlay extends BaseOverlay {
     };
   }
 
+  private findHoverStation(pt: Point) {
+    this.hoverStation = undefined;
+    this.scaledStations.forEach(sta => {
+      const d = distance(sta.pt, pt)
+      if (d < 15 && sta.station.type == 'Airbase') {
+        this.hoverStation = sta.station
+      }
+    })
+  }
+
   public providesPointerTargets(): PointerTarget[] {
     this.scaledStations = this.translateList(this.stations, this.global.zoom.factor);
     return this.scaledStations.map(s => {
@@ -59,6 +66,7 @@ export class StationOverlay extends BaseOverlay {
     })
   }
 
+  //TODO: continue to migrate from overlay specific hit detection
   public onHoverPointerTarget(targets: PointerTarget[]) {
     console.log(targets)
   }
@@ -74,32 +82,25 @@ export class StationOverlay extends BaseOverlay {
       if (sta.station.type === 'VOR/DME')
         this.drawVor(dc, sta.pt, smartScale, false);
       if (sta.station.type === 'Range')
-        this.drawReticle(dc, sta.pt, smartScale);
+        this.drawRange(dc, sta.pt, smartScale);
     })
   }
 
   public onMouseMove = (e: MouseEvent) => {
     if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
-    this.hoverStation = undefined;
-    this.scaledStations.forEach(sta => {
-      const d = distance(sta.pt, {x: e.pageX, y: e.pageY})
-      if (d < 15 && sta.station.type == 'Airbase') {
-        this.hoverStation = sta.station
-      }
-    })
+    this.findHoverStation({x: e.pageX, y: e.pageY})
     this.ovlCtx.canvas.style.cursor = (this.hoverStation ? "pointer" : "default")
   }
 
-  public onTouchStart() {
-    console.log("touch start")
+  public onTouchStart = (e: TouchEvent) => {
     if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
+    this.findHoverStation({x: e.touches![0]!.pageX, y: e.touches![0]!.pageY})
     if (this.hoverStation) {
       this.selectStationEventHandler.forEach(cb => cb(this.hoverStation!))
     }
   }
 
   public onClick() {
-    console.log("click")
     if (this.global.mode != Mode.None && this.global.mode != Mode.Move) return
     if (this.hoverStation) {
       this.selectStationEventHandler.forEach(cb => cb(this.hoverStation!))
@@ -230,7 +231,7 @@ export class StationOverlay extends BaseOverlay {
     ctx.restore();
   }
 
-  private drawReticle(dc: DrawingContext, pt: Point, scale: number = 1) {
+  private drawRange(dc: DrawingContext, pt: Point, scale: number = 1) {
     const ctx = dc.cnvCtx
 
     const ringRad = 8 * scale;

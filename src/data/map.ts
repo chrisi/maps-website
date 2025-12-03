@@ -14,7 +14,8 @@ export const maps: Theater[] = [
     // offset: 3840, // pixels
     folder: "04_KTO",
     mapFilename: "KTO_UI_Map_6k.jpeg", // native 6144
-    stations: koreaStations
+    stations: koreaStations,
+    stationMappingSize: 4096
   },
   {
     name: "balkans",
@@ -25,7 +26,8 @@ export const maps: Theater[] = [
     // offset: 3840, // pixels
     folder: "02_Balkans",
     mapFilename: "Balkans_UI_Map_4k.png", // native 4096
-    stations: balkanStations
+    stations: balkanStations,
+    stationMappingSize: 4096
   }
 ]
 
