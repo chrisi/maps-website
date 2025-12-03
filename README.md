@@ -61,3 +61,10 @@ yarn build
 ### Demo
 
 https://chrisi.github.io/maps-website/
+
+### Local Docker Build
+
+```bash
+docker build -t maps-website .
+docker run -p 80:80 maps-website
+```
