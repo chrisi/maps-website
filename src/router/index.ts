@@ -13,7 +13,7 @@ const routes = [
   },
   {
     path: '/maps-website/pan-test',
-    name: 'Map',
+    name: 'Test',
     component: () => import('../components/map-test.vue'),
   },
 ]
