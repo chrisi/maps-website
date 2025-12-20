@@ -51,7 +51,7 @@ import TheaterLink from "@/components/theater-link.vue";
       <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
       <a href="https://cdn.falcon-bms.com/maps/manual/BMS_Interactive_Maps.pdf" target="_blank">Manual (PDF)</a>
       <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-      <a href="/maps-website/pan-test" target="_blank">Pan-Test</a>
+      <router-link to="/maps-website/pan-test">Zoom/Pan-Test</router-link>
     </h5>
     <hr>
   </div>
