@@ -50,6 +50,8 @@ import TheaterLink from "@/components/theater-link.vue";
       <a href="https://forum.falcon-bms.com/topic/22922/falcon-bms-interactive-maps" target="_blank">Change log</a>
       <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
       <a href="https://cdn.falcon-bms.com/maps/manual/BMS_Interactive_Maps.pdf" target="_blank">Manual (PDF)</a>
+      <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+      <a href="/maps-website/pan-test" target="_blank">Pan-Test</a>
     </h5>
     <hr>
   </div>

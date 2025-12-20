@@ -11,6 +11,11 @@ const routes = [
     name: 'Map',
     component: () => import('../components/bms-map.vue'),
   },
+  {
+    path: '/maps-website/pan-test',
+    name: 'Map',
+    component: () => import('../components/map-test.vue'),
+  },
 ]
 
 const router = createRouter({
