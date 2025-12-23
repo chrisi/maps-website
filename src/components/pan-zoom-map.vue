@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted} from "vue";
+import {ref, computed, onMounted, watch} from "vue";
 
 defineProps({src: String});
-const emit = defineEmits(['pan-halt']);
+const emit = defineEmits(['pan-stopped', 'change']);
 
 const container = ref<HTMLDivElement>();
 const img = ref<HTMLImageElement>();
@@ -37,20 +37,15 @@ let startDist = 0;
 let startX = 0;
 let startY = 0;
 
-const scale = ref(1);
-const minScale = 1;
-const maxScale = 8;
-
 let targetScale = 1;
 let zoomMouseX = 0;
 let zoomMouseY = 0;
 
-let pinch = false
-
-const x = ref(0);
-const y = ref(0);
+const minScale = 1;
+const maxScale = 12;
 
 let isMousePanning = false;
+let isPinching = false
 
 // inertia state
 let lastTouchX = 0;
@@ -60,16 +55,119 @@ let velocityY = 0;
 let lastMoveTime = 0;
 let animationFrameId: number | null = null;
 
+const scale = ref(1);
+const x = ref(0);
+const y = ref(0);
+
+defineExpose({
+  setZoom,
+  scale,
+  x,
+  y
+});
+
 onMounted(() => {
   drawCanvas();
 });
+
+// emit change event whenever coordinates or scale update
+watch([x, y, scale], ([newX, newY, newScale]) => {
+  const rect = container.value?.getBoundingClientRect();
+  const imageElement = img.value;
+
+  let mapX = 0;
+  let mapY = 0;
+
+  if (rect && imageElement) {
+    // find the actual displayed size of the image
+    const naturalWidth = imageElement.naturalWidth;
+    const naturalHeight = imageElement.naturalHeight;
+
+    // contain logic to find the 'base' scale (see CSS: object-fit: contain)
+    // TODO: Since the image is using object-fit: contain, CSS shrinks or grows it to fit the container. We need this ratio to map screen pixels back to image pixels.
+    const baseScale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+
+    // calculate offsets if the contained image doesn't fill the container (centering)
+    const baseWidth = naturalWidth * baseScale;
+    const baseHeight = naturalHeight * baseScale;
+    const offsetX = (rect.width - baseWidth) / 2;
+    const offsetY = (rect.height - baseHeight) / 2;
+
+    // find the center of the viewport in 'source pixel' space
+    mapX = ((rect.width / 2 - newX - (offsetX * newScale)) / newScale) / baseScale;
+    mapY = ((rect.height / 2 - newY - (offsetY * newScale)) / newScale) / baseScale;
+  }
+
+  emit('change', {
+      x: Number(mapX.toFixed(2)),
+      y: Number(mapY.toFixed(2)),
+      scale: Number(newScale.toFixed(2))
+    }
+  );
+});
+
+/**
+ * Set zoom level from outside.
+ * @param newScale The target scale level.
+ // * @param centerX Optional X coordinate to zoom toward (container relative). Defaults to center.
+ // * @param centerY Optional Y coordinate to zoom toward (container relative). Defaults to center.
+ * @param mapX Optional X coordinate on the original image pixels.
+ * @param mapY Optional Y coordinate on the original image pixels.
+ */
+function setZoom(newScale: number, mapX?: number, mapY?: number) {
+  const rect = container.value?.getBoundingClientRect();
+  const imageElement = img.value;
+  if (!rect || !imageElement) return;
+
+  targetScale = Math.min(maxScale, Math.max(minScale, newScale));
+
+  if (mapX !== undefined && mapY !== undefined) {
+    const naturalWidth = imageElement.naturalWidth;
+    const naturalHeight = imageElement.naturalHeight;
+    const baseScale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+    const offsetX = (rect.width - naturalWidth * baseScale) / 2;
+    const offsetY = (rect.height - naturalHeight * baseScale) / 2;
+
+    // calculate the zoom anchor (zoomMouseX/Y) such that zooming to targetScale
+    // will land the specified map coordinate in the center of the viewport.
+    const targetX = rect.width / 2 - (mapX * baseScale * targetScale) - (offsetX * targetScale);
+    const targetY = rect.height / 2 - (mapY * baseScale * targetScale) - (offsetY * targetScale);
+
+    // to reach targetX/Y exactly using the smooth zoom formula:
+    // x_final = zoomMouseX - (zoomMouseX - x_current) * (targetScale / currentScale)
+    // solve for zoomMouseX:
+    const scaleRatio = targetScale / scale.value;
+    zoomMouseX = (targetX - x.value * scaleRatio) / (1 - scaleRatio);
+    zoomMouseY = (targetY - y.value * scaleRatio) / (1 - scaleRatio);
+
+    // Handle division by zero if scale hasn't changed
+    if (Math.abs(1 - scaleRatio) < 0.0001) {
+      zoomMouseX = rect.width / 2;
+      zoomMouseY = rect.height / 2;
+    }
+  } else {
+    zoomMouseX = rect.width / 2;
+    zoomMouseY = rect.height / 2;
+  }
+
+  // **** calculation based on viewport size ****
+  // const rect = container.value?.getBoundingClientRect();
+  // if (rect) {
+  //   zoomMouseX = centerX ?? rect.width / 2;
+  //   zoomMouseY = centerY ?? rect.height / 2;
+  // }
+
+  if (!animationFrameId) {
+    startInertia();
+  }
+}
 
 function drawCanvas() {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  // Set canvas internal resolution to match a reference size (e.g., container size)
-  // These lines will stay "anchored" to the image as it scales
+  // set canvas internal resolution to match a reference size (e.g., container size)
+  // these lines will stay "anchored" to the image as it scales
   canvas.width = 1000;
   canvas.height = 1000;
 
@@ -93,14 +191,14 @@ function drawCanvas() {
 }
 
 function startInertia() {
-  const friction = 0.95; // Resistance (0 to 1)
+  const friction = 0.95; // resistance (0 to 1)
+  const zoomSmoothing = 0.15; // smoothness (0 to 1, lower is smoother)
   const stopThreshold = 0.1;
-  const zoomSmoothing = 0.15; // Smoothness (0 to 1, lower is smoother)
 
   const step = () => {
     let continues = false;
 
-    // Inertia Panning
+    // inertia panning
     if (Math.abs(velocityX) > stopThreshold || Math.abs(velocityY) > stopThreshold) {
       velocityX *= friction;
       velocityY *= friction;
@@ -109,10 +207,10 @@ function startInertia() {
       continues = true;
     }
 
-    // Smooth Zooming
+    // smooth zooming
     if (Math.abs(scale.value - targetScale) > 0.001) {
       const prevScale = scale.value;
-      // Linear interpolation towards target
+      // linear interpolation towards target
       scale.value += (targetScale - scale.value) * zoomSmoothing;
 
       const scaleRatio = scale.value / prevScale;
@@ -126,14 +224,14 @@ function startInertia() {
       animationFrameId = requestAnimationFrame(step);
     } else {
       animationFrameId = null;
-      emit('pan-halt', { x: x.value, y: y.value, scale: scale.value });
+      emit('pan-stopped', {x: x.value, y: y.value, scale: scale.value});
     }
   };
 
   animationFrameId = requestAnimationFrame(step);
 }
 
-function getMidpoint(touches: TouchList) {
+function getPinchMidpoint(touches: TouchList) {
   return {
     x: (touches[0]!.clientX + touches[1]!.clientX) / 2,
     y: (touches[0]!.clientY + touches[1]!.clientY) / 2
@@ -147,26 +245,26 @@ function getDistance(touches: TouchList) {
 }
 
 function clampPan() {
-  const c = container.value!.getBoundingClientRect();
-  const imgW = c.width * scale.value;
-  const imgH = c.height * scale.value;
+  const clientRect = container.value!.getBoundingClientRect();
+  const imgW = clientRect.width * scale.value;
+  const imgH = clientRect.height * scale.value;
 
   // calculate bounds:
   // if img is wider than container, x can range from (containerWidth - imgWidth) to 0.
   // if img is smaller, we force it to a specific position (e.g., center or 0).
 
-  let minX = c.width - imgW;
-  let minY = c.height - imgH;
+  let minX = clientRect.width - imgW;
+  let minY = clientRect.height - imgH;
   let maxX = 0;
   let maxY = 0;
 
   // center, if the image is smaller than the container
-  if (imgW < c.width) {
-    const centerOffset = (c.width - imgW) / 2;
+  if (imgW < clientRect.width) {
+    const centerOffset = (clientRect.width - imgW) / 2;
     minX = maxX = centerOffset;
   }
-  if (imgH < c.height) {
-    const centerOffset = (c.height - imgH) / 2;
+  if (imgH < clientRect.height) {
+    const centerOffset = (clientRect.height - imgH) / 2;
     minY = maxY = centerOffset;
   }
 
@@ -180,10 +278,10 @@ function onTouchStart(e: TouchEvent) {
     animationFrameId = null;
   }
 
-  targetScale = scale.value; // Sync target on touch
+  targetScale = scale.value; // sync target on touch
 
   if (e.touches.length === 2) {
-    pinch = true
+    isPinching = true
     startDist = getDistance(e.touches);
   } else if (e.touches.length === 1 && scale.value > 1) {
     startX = e.touches[0]!.clientX - x.value;
@@ -200,28 +298,25 @@ function onTouchStart(e: TouchEvent) {
 function onTouchMove(e: TouchEvent) {
   if (e.touches.length === 2) {
     e.preventDefault();
-    const d = getDistance(e.touches);
-    const mid = getMidpoint(e.touches);
+    const dist = getDistance(e.touches);
+    const mid = getPinchMidpoint(e.touches);
 
     const prevScale = scale.value;
-    const newScale = Math.min(maxScale, Math.max(minScale, scale.value * (d / startDist)));
-
-    // calculate the ratio of the scale change
+    const newScale = Math.min(maxScale, Math.max(minScale, scale.value * (dist / startDist)));
     const scaleRatio = newScale / prevScale;
 
-    // zoom toward the midpoint:
     x.value = mid.x - (mid.x - x.value) * scaleRatio;
     y.value = mid.y - (mid.y - y.value) * scaleRatio;
 
     scale.value = newScale;
-    targetScale = newScale; // Keep target in sync during pinch
-    startDist = d;
+    targetScale = newScale; // keep target in sync during pinch
+    startDist = dist;
     clampPan();
   }
 
   // pinch: prevent unintentional jump/panning if fingers are not
   // lifted synchronously after a pinch operation
-  if (!pinch && e.touches.length === 1 && scale.value > 1) {
+  if (!isPinching && e.touches.length === 1 && scale.value > 1) {
     e.preventDefault();
     const touch = e.touches[0]!;
     const now = performance.now();
@@ -246,25 +341,25 @@ function onTouchMove(e: TouchEvent) {
 
 function onTouchEnd(e: TouchEvent) {
   if (e.touches.length === 0) {
-    if (!pinch && scale.value > 1 && (Math.abs(velocityX) > 2 || Math.abs(velocityY) > 2)) {
+    if (!isPinching && scale.value > 1 && (Math.abs(velocityX) > 2 || Math.abs(velocityY) > 2)) {
       startInertia();
-    }else {
-      // If there was no inertia to start, the pan has effectively halted immediately
-      emit('pan-halt', { x: x.value, y: y.value, scale: scale.value });
+    } else {
+      // if there was no inertia to start, the pan has effectively stopped immediately
+      emit('pan-stopped', {x: x.value, y: y.value, scale: scale.value});
     }
-    pinch = false;
+    isPinching = false;
   }
 }
 
 function onWheel(e: WheelEvent) {
   const delta = -e.deltaY;
-  const factor = 1.3; // Slightly higher factor for better feel with smoothing
+  const factor = 1.2;
   const zoom = delta > 0 ? factor : 1 / factor;
 
-  // Update target scale instead of immediate scale
+  // update target scale instead of immediate scale
   targetScale = Math.min(maxScale, Math.max(minScale, targetScale * zoom));
 
-  // Capture mouse position for the zoom anchor
+  // capture mouse position for the zoom anchor
   const rect = container.value!.getBoundingClientRect();
   zoomMouseX = e.clientX - rect.left;
   zoomMouseY = e.clientY - rect.top;
@@ -323,11 +418,10 @@ function onMouseUp(e: MouseEvent) {
     if (Math.abs(velocityX) > 2 || Math.abs(velocityY) > 2) {
       startInertia();
     } else {
-      emit('pan-halt', { x: x.value, y: y.value, scale: scale.value });
+      emit('pan-stopped', {x: x.value, y: y.value, scale: scale.value});
     }
   }
 }
-
 
 const transformStyle = computed(() => ({
   transform: `translate(${x.value}px, ${y.value}px) scale(${scale.value})`
@@ -363,7 +457,7 @@ body {
 .image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: contain; /* TODO: check contain necessary */
   display: block;
 }
 
