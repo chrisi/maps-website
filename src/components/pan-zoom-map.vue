@@ -5,6 +5,11 @@
     @touchstart="onTouchStart"
     @touchmove="onTouchMove"
     @touchend="onTouchEnd"
+    @wheel.prevent="onWheel"
+    @mousedown="onMouseDown"
+    @mousemove="onMouseMove"
+    @mouseup="onMouseUp"
+    @mouseleave="onMouseUp"
   >
     <div :style="transformStyle" class="transform-layer">
       <img
@@ -16,7 +21,6 @@
       <canvas ref="canvasRef" class="overlay-canvas"></canvas>
     </div>
   </div>
-  <div id="overlay">Sticky Toolbox</div>
 </template>
 
 <script setup lang="ts">
@@ -37,10 +41,16 @@ const scale = ref(1);
 const minScale = 1;
 const maxScale = 8;
 
+let targetScale = 1;
+let zoomMouseX = 0;
+let zoomMouseY = 0;
+
 let pinch = false
 
 const x = ref(0);
 const y = ref(0);
+
+let isMousePanning = false;
 
 // inertia state
 let lastTouchX = 0;
@@ -85,14 +95,33 @@ function drawCanvas() {
 function startInertia() {
   const friction = 0.95; // Resistance (0 to 1)
   const stopThreshold = 0.1;
+  const zoomSmoothing = 0.15; // Smoothness (0 to 1, lower is smoother)
 
   const step = () => {
-    velocityX *= friction;
-    velocityY *= friction;
+    let continues = false;
 
+    // Inertia Panning
     if (Math.abs(velocityX) > stopThreshold || Math.abs(velocityY) > stopThreshold) {
+      velocityX *= friction;
+      velocityY *= friction;
       x.value += velocityX;
       y.value += velocityY;
+      continues = true;
+    }
+
+    // Smooth Zooming
+    if (Math.abs(scale.value - targetScale) > 0.001) {
+      const prevScale = scale.value;
+      // Linear interpolation towards target
+      scale.value += (targetScale - scale.value) * zoomSmoothing;
+
+      const scaleRatio = scale.value / prevScale;
+      x.value = zoomMouseX - (zoomMouseX - x.value) * scaleRatio;
+      y.value = zoomMouseY - (zoomMouseY - y.value) * scaleRatio;
+      continues = true;
+    }
+
+    if (continues) {
       clampPan();
       animationFrameId = requestAnimationFrame(step);
     } else {
@@ -151,6 +180,8 @@ function onTouchStart(e: TouchEvent) {
     animationFrameId = null;
   }
 
+  targetScale = scale.value; // Sync target on touch
+
   if (e.touches.length === 2) {
     pinch = true
     startDist = getDistance(e.touches);
@@ -179,11 +210,11 @@ function onTouchMove(e: TouchEvent) {
     const scaleRatio = newScale / prevScale;
 
     // zoom toward the midpoint:
-    // adjust the translation so the point under the fingers stays under the fingers
     x.value = mid.x - (mid.x - x.value) * scaleRatio;
     y.value = mid.y - (mid.y - y.value) * scaleRatio;
 
     scale.value = newScale;
+    targetScale = newScale; // Keep target in sync during pinch
     startDist = d;
     clampPan();
   }
@@ -224,6 +255,79 @@ function onTouchEnd(e: TouchEvent) {
     pinch = false;
   }
 }
+
+function onWheel(e: WheelEvent) {
+  const delta = -e.deltaY;
+  const factor = 1.3; // Slightly higher factor for better feel with smoothing
+  const zoom = delta > 0 ? factor : 1 / factor;
+
+  // Update target scale instead of immediate scale
+  targetScale = Math.min(maxScale, Math.max(minScale, targetScale * zoom));
+
+  // Capture mouse position for the zoom anchor
+  const rect = container.value!.getBoundingClientRect();
+  zoomMouseX = e.clientX - rect.left;
+  zoomMouseY = e.clientY - rect.top;
+
+  if (!animationFrameId) {
+    startInertia();
+  }
+}
+
+function onMouseDown(e: MouseEvent) {
+  // Button 1 is the middle mouse button (mouse wheel click)
+  if (e.button === 1) {
+    e.preventDefault();
+    isMousePanning = true;
+
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+
+    startX = e.clientX - x.value;
+    startY = e.clientY - y.value;
+    targetScale = scale.value; // Sync target on click
+    lastTouchX = e.clientX;
+    lastTouchY = e.clientY;
+    lastMoveTime = performance.now();
+    velocityX = 0;
+    velocityY = 0;
+  }
+}
+
+function onMouseMove(e: MouseEvent) {
+  if (!isMousePanning) return;
+
+  const now = performance.now();
+  const dt = now - lastMoveTime;
+
+  if (dt > 0) {
+    velocityX = (e.clientX - lastTouchX);
+    velocityY = (e.clientY - lastTouchY);
+  }
+
+  x.value = e.clientX - startX;
+  y.value = e.clientY - startY;
+
+  lastTouchX = e.clientX;
+  lastTouchY = e.clientY;
+  lastMoveTime = now;
+
+  clampPan();
+}
+
+function onMouseUp(e: MouseEvent) {
+  if (isMousePanning) {
+    isMousePanning = false;
+    if (Math.abs(velocityX) > 2 || Math.abs(velocityY) > 2) {
+      startInertia();
+    } else {
+      emit('pan-halt', { x: x.value, y: y.value, scale: scale.value });
+    }
+  }
+}
+
 
 const transformStyle = computed(() => ({
   transform: `translate(${x.value}px, ${y.value}px) scale(${scale.value})`
@@ -270,17 +374,5 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-#overlay {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  height: 400px;
-  width: 250px;
-  color: white;
-  padding: 10px;
-  background-color: navy;
-  opacity: 0.5;
 }
 </style>
