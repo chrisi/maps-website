@@ -2,12 +2,14 @@
 import PanZoomMap from "@/components/pan-zoom-map.vue";
 import {ref} from "vue";
 
+
 const xPos = ref(0)
 const yPos = ref(0)
 const zoom = ref(1)
 
 function onPanStop({x, y, scale}: { x: number, y: number, scale: number }) {
   console.log(`Pan stopped at x: ${x}, y: ${y}, scale: ${scale}`);
+  drawCanvas()
 }
 
 function onChange({x, y, scale}: { x: number, y: number, scale: number }) {
@@ -31,12 +33,46 @@ function zoomOut() {
   }
 }
 
-function resetZoom() {
-  mapRef.value?.setZoom(1);
+function zoomToJapan() {
+  mapRef.value?.setZoom(2, 5500, 5400);
 }
 
-function zoomToJapan() {
-  mapRef.value?.setZoom(12, 5500, 5400);
+function resetZoom() {
+  mapRef.value?.resetZoom();
+}
+
+function drawCanvas() {
+  const ctx = mapRef.value?.getContext();
+  if (!ctx || !mapRef.value) return;
+
+  const canvas = ctx.canvas;
+  const w = canvas.width;
+  const h = canvas.height;
+
+  console.log('Drawing canvas with size', w, 'x', h);
+
+  // Clear previous drawings if needed, though usually we might want to keep them
+  ctx.clearRect(0, 0, w, h);
+
+  ctx.strokeStyle = 'cyan';
+  ctx.lineWidth = w / 100; // Relative line width
+
+  // Draw a cross across the entire image
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(w, h);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'magenta';
+  ctx.beginPath();
+  ctx.moveTo(w, 0);
+  ctx.lineTo(0, h);
+  ctx.stroke();
+
+  // Draw a border
+  ctx.strokeStyle = 'yellow';
+  ctx.lineWidth = w / 200;
+  ctx.strokeRect(0, 0, w, h);
 }
 
 </script>
@@ -53,6 +89,7 @@ function zoomToJapan() {
   <button @click="zoomIn">Zoom In</button>
   <button @click="zoomOut">Zoom Out</button>
   <button @click="zoomToJapan">Zoom To Japan</button>
+  <button @click="drawCanvas">Draw Rect</button>
 </template>
 
 <style scoped>
