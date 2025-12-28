@@ -9,15 +9,23 @@ const zoom = ref(1)
 </script>
 
 <template>
-  <canvas-map src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"/>
+  <canvas-map src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
+              @update:zoom="zoom = $event"
+              @update:pos="(x, y) => { xPos = x; yPos = y; }"/>
   <div id="overlay">
-    <h4>Sticky Toolbox</h4>
-    <div>Pos: {{ xPos }}/{{ yPos }}</div>
-    <div>Zoom: {{ zoom }}</div>
+    <div class="title">Coords</div>
+    <div>Pos: x-{{ xPos.toFixed(2) }} / y-{{ yPos.toFixed(2) }}</div>
+    <div>Zoom: {{ zoom.toFixed(2) }}</div>
   </div>
 </template>
 
 <style scoped>
+
+.title {
+  font-weight: bold;
+  background-color: cornflowerblue;
+}
+
 #overlay {
   position: fixed;
   top: 20px;

@@ -6,6 +6,11 @@ const props = defineProps<{
   src: string
 }>()
 
+const emit = defineEmits<{
+  (e: 'update:zoom', zoom: number): void
+  (e: 'update:pos', x: number, y: number): void
+}>()
+
 const mapRef = ref<HTMLCanvasElement | null>(null)
 const overlayRef = ref<HTMLCanvasElement | null>(null)
 
@@ -29,6 +34,8 @@ let isPanning = false;
 let targetScale = 1;
 let zoomFocalX = 0;
 let zoomFocalY = 0;
+let lastMouseX = 0;
+let lastMouseY = 0;
 let isAnimating = false;
 
 onMounted(() => {
@@ -58,6 +65,7 @@ onMounted(() => {
     targetScale = scale;
     constrain();
     redraw();
+    emit('update:zoom', scale);
   };
   mapImage.src = props.src;
 })
@@ -166,10 +174,21 @@ function smoothZoomAt(x: number, y: number, zoomFactor: number) {
   }
 }
 
+function toImageCoords(x: number, y: number) {
+  return {
+    x: (x - offsetX) / scale,
+    y: (y - offsetY) / scale
+  };
+}
+
 function onWheel(e: WheelEvent) {
   e.preventDefault();
   const zoomFactor = e.deltaY > 0 ? 0.8 : 1.25;
   smoothZoomAt(e.clientX, e.clientY, zoomFactor);
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  const coords = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', coords.x, coords.y);
 }
 
 let pointers = new Map<number, PointerEvent>();
@@ -178,6 +197,10 @@ let startScale = 1;
 
 function onDown(e: PointerEvent) {
   pointers.set(e.pointerId, e);
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  const coords = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', coords.x, coords.y);
   if (pointers.size === 1) {
     isPanning = true;
     vx = 0;
@@ -198,6 +221,11 @@ function onDown(e: PointerEvent) {
 }
 
 function onMove(e: PointerEvent) {
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  const coords = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', coords.x, coords.y);
+
   if (!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, e);
 
@@ -252,6 +280,7 @@ function onMove(e: PointerEvent) {
           zoomFactor
         );
         targetScale = scale; // Sync targetScale during pinch
+        emit('update:zoom', scale);
       }
     }
   }
@@ -292,10 +321,15 @@ function animate() {
     offsetY = zoomFocalY - (zoomFocalY - offsetY) * currentZoomFactor;
     scale = newScale;
     constrain();
+    emit('update:zoom', scale);
     changed = true;
   } else {
-    scale = targetScale;
-    constrain();
+    if (scale !== targetScale) {
+      scale = targetScale;
+      constrain();
+      emit('update:zoom', scale);
+      changed = true;
+    }
   }
 
   // Handle Inertia (only if not multi-touching)
@@ -322,6 +356,8 @@ function animate() {
   }
 
   if (changed) {
+    const coords = toImageCoords(lastMouseX, lastMouseY);
+    emit('update:pos', coords.x, coords.y);
     redraw();
     requestAnimationFrame(animate);
   } else {
