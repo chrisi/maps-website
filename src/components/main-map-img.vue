@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import PanZoomMap from "@/components/pan-zoom-map.vue";
+import ImgMap from "@/components/img-map.vue";
 import {ref} from "vue";
-
 
 const xPos = ref(0)
 const yPos = ref(0)
@@ -18,7 +17,7 @@ function onChange({x, y, scale}: { x: number, y: number, scale: number }) {
   zoom.value = scale
 }
 
-const mapRef = ref<InstanceType<typeof PanZoomMap> | null>(null);
+const mapRef = ref<InstanceType<typeof ImgMap> | null>(null);
 
 function zoomIn() {
   if (mapRef.value) {
@@ -78,7 +77,7 @@ function drawCanvas() {
 </script>
 
 <template>
-  <pan-zoom-map ref="mapRef" src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
+  <img-map ref="mapRef" src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
                 @pan-stopped="onPanStop" @change="onChange"/>
   <div id="overlay">
     <h4>Sticky Toolbox</h4>

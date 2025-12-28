@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/maps-website/pan-test',
     name: 'Test',
-    component: () => import('../components/map-test.vue'),
+    component: () => import('../components/main-map-cnv.vue'),
   },
 ]
 
