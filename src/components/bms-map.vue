@@ -269,23 +269,4 @@ const activeWindow = ref('')
   bottom: 0;
   margin: 15px;
 }
-
-#skyvector {
-  position: fixed;
-  bottom: 5px;
-  right: 5px;
-  background-color: rgba(255, 255, 255, 0.6);
-  padding: 4px 4px 0 4px;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-#skyvector a {
-  pointer-events: auto;
-}
-
-#skyvector img {
-  width: 140px;
-  height: 40px;
-}
 </style>

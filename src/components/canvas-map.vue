@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import {onMounted, ref, watch} from "vue";
+import type {Point} from "@/model/base.ts";
 
 const props = defineProps<{
   src: string
@@ -8,9 +9,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:zoom', zoom: number): void
-  (e: 'update:pos', x: number, y: number): void
+  (e: 'update:pos', pos: Point): void
   (e: 'redraw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
 }>()
+
+defineExpose({
+  locatePosition
+})
 
 const mapRef = ref<HTMLCanvasElement | null>(null)
 const overlayRef = ref<HTMLCanvasElement | null>(null)
@@ -35,6 +40,8 @@ let lastTime = 0;
 let isPanning = false;
 
 let targetScale = 1;
+let targetOffsetX: number | null = null;
+let targetOffsetY: number | null = null;
 let zoomFocalX = 0;
 let zoomFocalY = 0;
 let lastMouseX = 0;
@@ -173,6 +180,47 @@ function smoothZoomAt(x: number, y: number, zoomFactor: number) {
   if (targetScale > maxScale) targetScale = maxScale;
   zoomFocalX = x;
   zoomFocalY = y;
+  targetOffsetX = null;
+  targetOffsetY = null;
+
+  if (!isAnimating) {
+    isAnimating = true;
+    requestAnimationFrame(animate);
+  }
+}
+
+function locatePosition(pos: Point, newScale: number) {
+  targetScale = newScale;
+  if (targetScale > maxScale) targetScale = maxScale;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  targetOffsetX = vw / 2 - pos.x * targetScale;
+  targetOffsetY = vh / 2 - pos.y * targetScale;
+
+  // Constrain target offsets
+  const minScale = Math.max(vw / mapImage.width, vh / mapImage.height);
+  let effectiveTargetScale = targetScale;
+  if (effectiveTargetScale < minScale) effectiveTargetScale = minScale;
+  if (effectiveTargetScale > maxScale) effectiveTargetScale = maxScale;
+
+  const mw = mapImage.width * effectiveTargetScale;
+  const mh = mapImage.height * effectiveTargetScale;
+
+  if (mw <= vw) {
+    targetOffsetX = (vw - mw) / 2;
+  } else {
+    if (targetOffsetX > 0) targetOffsetX = 0;
+    if (targetOffsetX + mw < vw) targetOffsetX = vw - mw;
+  }
+
+  if (mh <= vh) {
+    targetOffsetY = (vh - mh) / 2;
+  } else {
+    if (targetOffsetY > 0) targetOffsetY = 0;
+    if (targetOffsetY + mh < vh) targetOffsetY = vh - mh;
+  }
 
   if (!isAnimating) {
     isAnimating = true;
@@ -193,8 +241,8 @@ function onWheel(e: WheelEvent) {
   smoothZoomAt(e.clientX, e.clientY, zoomFactor);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
-  const coords = toImageCoords(e.clientX, e.clientY);
-  emit('update:pos', coords.x, coords.y);
+  const pos = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', pos);
 }
 
 let pointers = new Map<number, PointerEvent>();
@@ -205,8 +253,8 @@ function onDown(e: PointerEvent) {
   pointers.set(e.pointerId, e);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
-  const coords = toImageCoords(e.clientX, e.clientY);
-  emit('update:pos', coords.x, coords.y);
+  const pos = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', pos);
   if (pointers.size === 1) {
     isPanning = true;
     vx = 0;
@@ -229,8 +277,8 @@ function onDown(e: PointerEvent) {
 function onMove(e: PointerEvent) {
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
-  const coords = toImageCoords(e.clientX, e.clientY);
-  emit('update:pos', coords.x, coords.y);
+  const pos = toImageCoords(e.clientX, e.clientY);
+  emit('update:pos', pos);
 
   if (!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, e);
@@ -316,31 +364,46 @@ function onUp(e: PointerEvent) {
 
 function animate() {
   let changed = false;
+  const zoomRatio = 0.15; // Animation speed
 
-  // Handle Zoom
-  if (Math.abs(scale - targetScale) > 0.0001) {
-    const zoomRatio = 0.15; // Animation speed
-    const currentZoomFactor = 1 + (targetScale / scale - 1) * zoomRatio;
+  // 1. Handle Target-based Animation (Zoom and Offset)
+  const isZooming = Math.abs(scale - targetScale) > 0.0001;
+  const hasTargetOffset = targetOffsetX !== null && targetOffsetY !== null;
+  const isMovingToTarget = hasTargetOffset && (Math.abs(offsetX - targetOffsetX!) > 0.1 || Math.abs(offsetY - targetOffsetY!) > 0.1);
 
-    const newScale = scale * currentZoomFactor;
+  if (isZooming || isMovingToTarget) {
+    if (isZooming) {
+      const currentZoomFactor = 1 + (targetScale / scale - 1) * zoomRatio;
+      if (!hasTargetOffset) {
+        // Focal point zoom (wheel/pinch)
+        offsetX = zoomFocalX - (zoomFocalX - offsetX) * currentZoomFactor;
+        offsetY = zoomFocalY - (zoomFocalY - offsetY) * currentZoomFactor;
+      }
+      scale *= currentZoomFactor;
+      if (Math.abs(scale - targetScale) <= 0.0001) scale = targetScale;
+    }
 
-    offsetX = zoomFocalX - (zoomFocalX - offsetX) * currentZoomFactor;
-    offsetY = zoomFocalY - (zoomFocalY - offsetY) * currentZoomFactor;
-    scale = newScale;
+    if (hasTargetOffset) {
+      offsetX += (targetOffsetX! - offsetX) * zoomRatio;
+      offsetY += (targetOffsetY! - offsetY) * zoomRatio;
+
+      if (Math.abs(offsetX - targetOffsetX!) < 0.1) offsetX = targetOffsetX!;
+      if (Math.abs(offsetY - targetOffsetY!) < 0.1) offsetY = targetOffsetY!;
+    }
+
     constrain();
     emit('update:zoom', scale);
     changed = true;
-  } else {
-    if (scale !== targetScale) {
-      scale = targetScale;
-      constrain();
-      emit('update:zoom', scale);
-      changed = true;
-    }
   }
 
-  // Handle Inertia (only if not multi-touching)
-  if (pointers.size === 0) {
+  // Clear targets once reached
+  if (!isZooming && !isMovingToTarget) {
+    targetOffsetX = null;
+    targetOffsetY = null;
+  }
+
+  // 2. Handle Inertia (only if not interacting and no active target animation)
+  if (pointers.size === 0 && !isMovingToTarget && !isZooming) {
     if (Math.abs(vx) > 0.1 || Math.abs(vy) > 0.1) {
       vx *= 0.95;
       vy *= 0.95;
@@ -351,7 +414,6 @@ function animate() {
       const oldY = offsetY;
       constrain();
 
-      // If constrain changed the offset, it means we hit a wall
       if (offsetX !== oldX) vx = 0;
       if (offsetY !== oldY) vy = 0;
 
@@ -363,8 +425,8 @@ function animate() {
   }
 
   if (changed) {
-    const coords = toImageCoords(lastMouseX, lastMouseY);
-    emit('update:pos', coords.x, coords.y);
+    const pos = toImageCoords(lastMouseX, lastMouseY);
+    emit('update:pos', pos);
     redraw();
     requestAnimationFrame(animate);
   } else {
