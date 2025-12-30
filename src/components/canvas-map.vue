@@ -277,7 +277,8 @@ function onMove(e: PointerEvent) {
       const dist = Math.hypot(p[0].clientX - p[1].clientX, p[0].clientY - p[1].clientY);
 
       if (startDist > 0) {
-        const newScale = (dist / startDist) * startScale;
+        let newScale = (dist / startDist) * startScale;
+        if (newScale > maxScale) newScale = maxScale;
         const zoomFactor = newScale / scale;
 
         zoomAt(
