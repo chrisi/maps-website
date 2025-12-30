@@ -1,0 +1,28 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -5px;
+  margin-left: -5px;
+}
+
+.col {
+  flex-basis: 0;
+  flex-grow: 1;
+  max-width: 100%;
+  padding-right: 5px;
+  padding-left: 5px;
+  box-sizing: border-box;
+}
+
+.col-1 { flex: 0 0 8.333333%; max-width: 8.333333%; padding: 0 5px; box-sizing: border-box; }
+.col-2 { flex: 0 0 16.666667%; max-width: 16.666667%; padding: 0 5px; box-sizing: border-box; }
+.col-3 { flex: 0 0 25%; max-width: 25%; padding: 0 5px; box-sizing: border-box; }
+.col-4 { flex: 0 0 33.333333%; max-width: 33.333333%; padding: 0 5px; box-sizing: border-box; }
+.col-5 { flex: 0 0 41.666667%; max-width: 41.666667%; padding: 0 5px; box-sizing: border-box; }
+.col-6 { flex: 0 0 50%; max-width: 50%; padding: 0 5px; box-sizing: border-box; }
+.col-7 { flex: 0 0 58.333333%; max-width: 58.333333%; padding: 0 5px; box-sizing: border-box; }
+.col-8 { flex: 0 0 66.666667%; max-width: 66.666667%; padding: 0 5px; box-sizing: border-box; }
+.col-9 { flex: 0 0 75%; max-width: 75%; padding: 0 5px; box-sizing: border-box; }
+.col-10 { flex: 0 0 83.333333%; max-width: 83.333333%; padding: 0 5px; box-sizing: border-box; }
+.col-11 { flex: 0 0 91.666667%; max-width: 91.666667%; padding: 0 5px; box-sizing: border-box; }
+.col-12 { flex: 0 0 100%; max-width: 100%; padding: 0 5px; box-sizing: border-box; }

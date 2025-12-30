@@ -14,6 +14,8 @@ import {strLatLong} from "@/scripts/conv.ts";
 import {map2LatLong} from "@/scripts/math.ts";
 import {findMap} from "@/data/map.ts";
 import {onBeforeMount, onMounted, ref, watch} from "vue";
+import OutValue from "@/components/gui/OutValue.vue";
+import OutCoord from "@/components/gui/OutCoord.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -92,9 +94,9 @@ watch(dropdownName, (newValue) => {
     @redraw="(ctx, offset, scale) => overlayManager.redraw(ctx, offset, scale)"
   />
   <div id="overlay">
-    <div class="title">Coords</div>
-    <div>Pos: x {{ pos?.x.toFixed(2) }} / y {{ pos?.y.toFixed(2) }}</div>
-    <div>Zoom: {{ zoom.toFixed(2) }}</div>
+    <out-value caption="Mode" :val="global.mode"/>
+    <out-value caption="Zoom" :val="zoom"/>
+    <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
   <div id="locate">
     <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">
@@ -125,17 +127,19 @@ watch(dropdownName, (newValue) => {
   position: fixed;
   top: 20px;
   right: 20px;
-  height: 100px;
-  width: 250px;
+  height: 80px;
+  width: 200px;
   color: white;
-  padding: 10px;
+  padding: 5px;
   background-color: navy;
-  opacity: 0.5;
+  opacity: 0.8;
+  border-radius: 4px;
 }
 
 .message {
   pointer-events: none;
-  font-family: monospace;
+  font-family: JetBrains Mono, monospace;
+  font-size: 12px;
   background-color: rgba(255, 255, 255, 0.6);
   color: black;
   padding: 4px 8px;
