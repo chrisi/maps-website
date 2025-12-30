@@ -237,7 +237,16 @@ function toImageCoords(x: number, y: number) {
 
 function onWheel(e: WheelEvent) {
   e.preventDefault();
-  const zoomFactor = e.deltaY > 0 ? 0.8 : 1.25;
+
+  let zoomFactor: number;
+  if (e.ctrlKey) {
+    // macOS trackpad pinch-to-zoom
+    zoomFactor = Math.pow(1.1, -e.deltaY / 10);
+  } else {
+    // Normal mouse wheel scroll
+    zoomFactor = e.deltaY > 0 ? 0.8 : 1.25;
+  }
+
   smoothZoomAt(e.clientX, e.clientY, zoomFactor);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
