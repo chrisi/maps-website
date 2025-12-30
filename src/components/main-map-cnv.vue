@@ -4,15 +4,16 @@ import CanvasMap from "@/components/canvas-map.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import {RouteOverlay} from "@/scripts/ov2/RouteOverlay.ts";
 import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
+import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
 import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Station} from "@/model/station.ts";
+import type {Coord, Point} from "@/model/base.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import type {Coord, Point} from "@/model/base.ts";
 import {map2LatLong} from "@/scripts/math.ts";
-import {onBeforeMount, ref, watch} from "vue";
 import {findMap} from "@/data/map.ts";
+import {onBeforeMount, onMounted, ref, watch} from "vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -30,8 +31,15 @@ const canvasMapRef = ref()
 const overlayManager = new OverlayManager()
 const stationOverlay = new StationOverlay()
 const routeOverlay = new RouteOverlay()
+const locateOverlay = new LocateOverlay()
+
 overlayManager.registerOverlay(stationOverlay)
 overlayManager.registerOverlay(routeOverlay)
+overlayManager.registerOverlay(locateOverlay)
+
+onMounted(() => {
+  locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
+})
 
 const getStationsByCountryType = () => {
   return global.map!.stations.reduce((obj, sta) => {
@@ -57,13 +65,6 @@ const canvasPos2LatLong = (point: Point): Coord => {
   return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
 }
 
-const locateAirbase = (ap: string): Point | undefined => {
-  const res = global.map!.stations.find(sta => {
-    return (sta.name === ap)
-  })
-  if (res)
-    return {x: res.posx / 4096 * 6144, y: res.posy / 4096 * 6144}
-}
 
 watch(pos, (newPos) => {
   if (newPos) {
@@ -72,15 +73,12 @@ watch(pos, (newPos) => {
 })
 
 watch(dropdownName, (newValue) => {
-  let point = locateAirbase(newValue);
-  canvasMapRef.value.locatePosition(point, 2)
-  // const ovl = ovlMgr.getOverlay(LocateOverlay)!
-  // if (newValue == "") {
-  //   ovl.clearLocation()
-  // } else {
-  //   console.log(`locating airbase '${newValue}'`)
-  //   ovl.locateAirbase(newValue)
-  // }
+  const ovl = overlayManager.getOverlay(LocateOverlay)!
+  if (newValue == "") {
+    ovl.clearLocation()
+  } else {
+    ovl.locateAirbase(newValue)
+  }
 })
 
 </script>

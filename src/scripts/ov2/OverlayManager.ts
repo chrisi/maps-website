@@ -9,6 +9,10 @@ export class OverlayManager {
         this.overlays.push(overlay)
     }
 
+    public getOverlay = <T extends Overlay>(type: new (...args: any[]) => T): T | undefined => {
+        return this.overlays.find(o => o instanceof type) as T | undefined
+    }
+
     public redraw = (context: CanvasRenderingContext2D, offset: Point, scale: number): void => {
         for (const overlay of this.overlays) {
             try {
