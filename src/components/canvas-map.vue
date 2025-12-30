@@ -9,6 +9,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:zoom', zoom: number): void
   (e: 'update:pos', x: number, y: number): void
+  (e: 'redraw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
 }>()
 
 const mapRef = ref<HTMLCanvasElement | null>(null)
@@ -20,6 +21,8 @@ const mapImage = new Image();
 watch(() => props.src, (newSrc) => {
   mapImage.src = newSrc;
 })
+
+const maxScale = 4;
 
 let scale = 1;
 let offsetX = 0;
@@ -110,8 +113,8 @@ function constrain() {
   const mh = mapImage.height * scale;
 
   // 1. Constrain Scale (Min scale: fill viewport)
-  const minScale = Math.min(vw / mapImage.width, vh / mapImage.height);
-  const maxScale = 10;
+  const minScale = Math.max(vw / mapImage.width, vh / mapImage.height);
+
   if (scale < minScale) {
     scale = minScale;
   }
@@ -153,6 +156,8 @@ function redraw() {
   const vh = window.innerHeight;
   ctx.clearRect(0, 0, vw, vh);
   ctx.drawImage(mapImage, offsetX, offsetY, mapImage.width * scale, mapImage.height * scale);
+
+  emit('redraw', ctx, {x: -offsetX / scale, y: -offsetY / scale}, scale);
 }
 
 function zoomAt(x: number, y: number, zoomFactor: number) {
@@ -165,6 +170,7 @@ function zoomAt(x: number, y: number, zoomFactor: number) {
 
 function smoothZoomAt(x: number, y: number, zoomFactor: number) {
   targetScale *= zoomFactor;
+  if (targetScale > maxScale) targetScale = maxScale;
   zoomFocalX = x;
   zoomFocalY = y;
 
