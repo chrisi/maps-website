@@ -13,7 +13,8 @@ import {useSettingsStore} from "@/stores/settings.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {map2LatLong} from "@/scripts/math.ts";
 import {findMap} from "@/data/map.ts";
-import {onBeforeMount, onMounted, ref, watch} from "vue";
+import {Mode} from "@/model/mode.ts";
+import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 
@@ -41,7 +42,20 @@ overlayManager.registerOverlay(locateOverlay)
 
 onMounted(() => {
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
+  window.addEventListener('keydown', handleKeyDown)
 })
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') global.mode = Mode.None
+  if (e.key === '1') global.mode = Mode.Measure
+  if (e.key === '2') global.mode = Mode.Bullseye
+  if (e.key === '3') global.mode = Mode.Symbol
+  if (e.key === '4') global.mode = Mode.Draw
+}
 
 const getStationsByCountryType = () => {
   return global.map!.stations.reduce((obj, sta) => {
