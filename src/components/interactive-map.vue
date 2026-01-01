@@ -29,6 +29,7 @@ onBeforeMount(() => {
 const pos = ref<Point>()
 const zoom = ref(1)
 const canvasMapRef = ref()
+const suspend = ref(false)
 
 const selectedStation = ref<Station | null>(null)
 
@@ -55,6 +56,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === '2') global.mode = Mode.Bullseye
   if (e.key === '3') global.mode = Mode.Symbol
   if (e.key === '4') global.mode = Mode.Draw
+  if (e.key === 's') suspend.value = !suspend.value
 }
 
 const showPointerCoord = (pos: Point) => {
@@ -91,13 +93,18 @@ watch(selectedStation, (newValue) => {
   <canvas-map
     ref="canvasMapRef"
     src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
+    :suspend="suspend"
     @update:zoom="zoom = $event"
     @update:pos="pos = $event"
     @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"
+    @pointerdown="overlayManager.onPointerDown($event)"
+    @pointermove="overlayManager.onPointerMove($event)"
+    @pointerup="overlayManager.onPointerUp($event)"
   />
   <div id="overlay">
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
+    <out-value caption="Suspended" :val="suspend.toString()"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
   <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
@@ -112,11 +119,6 @@ watch(selectedStation, (newValue) => {
 </template>
 
 <style scoped>
-
-.title {
-  font-weight: bold;
-  background-color: cornflowerblue;
-}
 
 #overlay {
   position: fixed;

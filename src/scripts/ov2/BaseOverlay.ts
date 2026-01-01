@@ -5,6 +5,12 @@ export interface Overlay {
   isActive(): boolean
 
   onDraw(cnv: Canvas): void
+
+  onPointerDown?(e: PointerEvent): void
+
+  onPointerMove?(e: PointerEvent): void
+
+  onPointerUp?(e: PointerEvent): void
 }
 
 export abstract class BaseOverlay implements Overlay {

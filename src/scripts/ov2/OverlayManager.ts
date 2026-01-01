@@ -51,5 +51,29 @@ export class OverlayManager {
     }
   }
 
+  public onPointerDown(e: PointerEvent): void {
+    for (const overlay of this.overlays) {
+      if (overlay.isActive() && overlay.onPointerDown) {
+        overlay.onPointerDown(e)
+      }
+    }
+  }
+
+  public onPointerMove(e: PointerEvent): void {
+    for (const overlay of this.overlays) {
+      if (overlay.isActive() && overlay.onPointerMove) {
+        overlay.onPointerMove(e)
+      }
+    }
+  }
+
+  public onPointerUp(e: PointerEvent): void {
+    for (const overlay of this.overlays) {
+      if (overlay.isActive() && overlay.onPointerUp) {
+        overlay.onPointerUp(e)
+      }
+    }
+  }
+
   private errorMessage = (overlay: Overlay, e?: Event): string => `error in overlay '${overlay.constructor.name}'${e ? ` on '${e.type}' event` : ''}`
 }

@@ -5,6 +5,7 @@ import type {Point} from "@/model/base.ts";
 
 const props = defineProps<{
   src: string
+  suspend: boolean
 }>()
 
 const emit = defineEmits<{
@@ -12,6 +13,9 @@ const emit = defineEmits<{
   (e: 'update:pos', pos: Point): void
   (e: 'init', ctx: CanvasRenderingContext2D): void
   (e: 'draw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
+  (e: 'pointerdown', event: PointerEvent): void
+  (e: 'pointerup', event: PointerEvent): void
+  (e: 'pointermove', event: PointerEvent): void
 }>()
 
 defineExpose({
@@ -34,6 +38,18 @@ watch(() => props.src, (newSrc) => {
   isLoading.value = true;
   mapLoaded.value = false;
   mapImage.src = newSrc;
+})
+
+watch(() => props.suspend, (isSuspended) => {
+  if (isSuspended) {
+    // Logic when map interactions should stop
+    isPanning = false;
+    pointers.clear();
+    vx = 0;
+    vy = 0;
+  } else {
+    // Logic when map interactions should resume
+  }
 })
 
 const maxScale = 4;
@@ -255,6 +271,7 @@ function toImageCoords(x: number, y: number) {
 }
 
 function onWheel(e: WheelEvent) {
+  if (props.suspend) return;
   e.preventDefault();
 
   let zoomFactor: number;
@@ -278,11 +295,15 @@ let startDist = 0;
 let startScale = 1;
 
 function onDown(e: PointerEvent) {
+  emit('pointerdown', e);
   pointers.set(e.pointerId, e);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
   const pos = toImageCoords(e.clientX, e.clientY);
   emit('update:pos', pos);
+
+  if (props.suspend) return;
+
   if (pointers.size === 1) {
     isPanning = true;
     vx = 0;
@@ -303,10 +324,13 @@ function onDown(e: PointerEvent) {
 }
 
 function onMove(e: PointerEvent) {
+  emit('pointermove', e);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
   const pos = toImageCoords(e.clientX, e.clientY);
   emit('update:pos', pos);
+
+  if (props.suspend) return;
 
   if (!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, e);
@@ -370,7 +394,11 @@ function onMove(e: PointerEvent) {
 }
 
 function onUp(e: PointerEvent) {
+  emit('pointerup', e);
   pointers.delete(e.pointerId);
+
+  if (props.suspend) return;
+
   if (pointers.size === 0) {
     if (!isAnimating && (isPanning && (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5))) {
       isAnimating = true;
