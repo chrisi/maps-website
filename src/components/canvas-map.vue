@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 defineExpose({
   locatePosition,
-  redraw
+  redrawOverlay
 })
 
 const mapRef = ref<HTMLCanvasElement | null>(null)
@@ -26,6 +26,8 @@ const isLoading = ref(true)
 const mapLoaded = ref(false)
 
 let ctx: CanvasRenderingContext2D | null = null;
+let ovlCtx: CanvasRenderingContext2D | null = null;
+
 const mapImage = new Image();
 
 watch(() => props.src, (newSrc) => {
@@ -56,13 +58,18 @@ let lastMouseY = 0;
 let isAnimating = false;
 
 onMounted(() => {
-  if (!mapRef.value)
+  if (!mapRef.value || !overlayRef.value)
     return
   ctx = mapRef.value.getContext("2d");
   if (ctx) {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    emit('init', ctx);
+  }
+  ovlCtx = overlayRef.value.getContext("2d");
+  if (ovlCtx) {
+    ovlCtx.imageSmoothingEnabled = true;
+    ovlCtx.imageSmoothingQuality = "high";
+    emit('init', ovlCtx);
   }
   window.addEventListener("resize", resize);
   resize();
@@ -168,13 +175,15 @@ function constrain() {
 }
 
 function redraw() {
-  if (!ctx || !mapRef.value) return;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  ctx.clearRect(0, 0, vw, vh);
+  if (!ctx) return;
   ctx.drawImage(mapImage, offsetX, offsetY, mapImage.width * scale, mapImage.height * scale);
+  redrawOverlay();
+}
 
-  emit('draw', ctx, {x: -offsetX / scale, y: -offsetY / scale}, scale);
+function redrawOverlay() {
+  if (!ovlCtx) return;
+  ovlCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  emit('draw', ovlCtx, {x: -offsetX / scale, y: -offsetY / scale}, scale);
 }
 
 function zoomAt(x: number, y: number, zoomFactor: number) {
@@ -458,7 +467,7 @@ function animate() {
 <template>
   <div class="viewport">
     <canvas id="map" ref="mapRef" :class="{ 'loaded': mapLoaded }"></canvas>
-    <canvas id="overlay" ref="overlayRef"></canvas>
+    <canvas id="overlay" ref="overlayRef" :class="{ 'loaded': mapLoaded }"></canvas>
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>
       <div class="loading-text">Loading Map...</div>
@@ -492,6 +501,12 @@ canvas {
 
 #overlay {
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#overlay.loaded {
+  opacity: 1;
 }
 
 .loading-overlay {

@@ -40,7 +40,7 @@ const locateOverlay = new LocateOverlay(overlayManager)
 onMounted(() => {
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
   overlayManager.addRedrawEventListener(() => {
-    canvasMapRef.value.redraw()
+    canvasMapRef.value.redrawOverlay()
   })
   window.addEventListener('keydown', handleKeyDown)
 })
