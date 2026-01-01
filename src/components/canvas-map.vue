@@ -20,10 +20,15 @@ defineExpose({
 const mapRef = ref<HTMLCanvasElement | null>(null)
 const overlayRef = ref<HTMLCanvasElement | null>(null)
 
+const isLoading = ref(true)
+const mapLoaded = ref(false)
+
 let ctx: CanvasRenderingContext2D | null = null;
 const mapImage = new Image();
 
 watch(() => props.src, (newSrc) => {
+  isLoading.value = true;
+  mapLoaded.value = false;
   mapImage.src = newSrc;
 })
 
@@ -68,6 +73,8 @@ onMounted(() => {
   mapRef.value.addEventListener("wheel", onWheel, {passive: false});
 
   mapImage.onload = () => {
+    isLoading.value = false;
+    mapLoaded.value = true;
     // Center image initially
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -77,6 +84,7 @@ onMounted(() => {
     redraw();
     emit('update:zoom', scale);
   };
+  isLoading.value = true;
   mapImage.src = props.src;
 })
 
@@ -447,8 +455,12 @@ function animate() {
 
 <template>
   <div class="viewport">
-    <canvas id="map" ref="mapRef"></canvas>
+    <canvas id="map" ref="mapRef" :class="{ 'loaded': mapLoaded }"></canvas>
     <canvas id="overlay" ref="overlayRef"></canvas>
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading Map...</div>
+    </div>
   </div>
 </template>
 
@@ -467,7 +479,53 @@ canvas {
   left: 0;
 }
 
+#map {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#map.loaded {
+  opacity: 1;
+}
+
 #overlay {
   pointer-events: none;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  color: white;
+  font-family: sans-serif;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 </style>
