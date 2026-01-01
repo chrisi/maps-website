@@ -17,6 +17,7 @@ import {Mode} from "@/model/mode.ts";
 import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
+import StationSelector from "@/components/station-selector.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -25,23 +26,22 @@ onBeforeMount(() => {
   global.map = findMap('korea')
 })
 
-const dropdownName = ref("");
-
 const pos = ref<Point>()
 const zoom = ref(1)
 const canvasMapRef = ref()
 
-const overlayManager = new OverlayManager()
-const stationOverlay = new StationOverlay()
-const routeOverlay = new RouteOverlay()
-const locateOverlay = new LocateOverlay()
+const selectedStation = ref<Station | null>(null)
 
-overlayManager.registerOverlay(stationOverlay)
-overlayManager.registerOverlay(routeOverlay)
-overlayManager.registerOverlay(locateOverlay)
+const overlayManager = new OverlayManager()
+new StationOverlay(overlayManager)
+new RouteOverlay(overlayManager)
+const locateOverlay = new LocateOverlay(overlayManager)
 
 onMounted(() => {
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
+  overlayManager.addRedrawEventListener(() => {
+    canvasMapRef.value.redraw()
+  })
   window.addEventListener('keydown', handleKeyDown)
 })
 
@@ -57,17 +57,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === '4') global.mode = Mode.Draw
 }
 
-const getStationsByCountryType = () => {
-  return global.map!.stations.reduce((obj, sta) => {
-    const key = `${sta.country} - ${sta.type}s`;
-    if (!obj[key]) {
-      obj[key] = [];
-    }
-    obj[key].push(sta);
-    return obj;
-  }, {} as Record<string, Station[]>);
-}
-
 const showPointerCoord = (pos: Point) => {
   const strCrd = strLatLong(canvasPos2LatLong(pos));
   global.message = `${strCrd.lat},${strCrd.long} | X:${pos.x.toFixed(0)},Y:${pos.y.toFixed(0)}`;
@@ -81,19 +70,18 @@ const canvasPos2LatLong = (point: Point): Coord => {
   return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
 }
 
-
 watch(pos, (newPos) => {
   if (newPos) {
     showPointerCoord(newPos);
   }
 })
 
-watch(dropdownName, (newValue) => {
+watch(selectedStation, (newValue) => {
   const ovl = overlayManager.getOverlay(LocateOverlay)!
-  if (newValue == "") {
-    ovl.clearLocation()
+  if (newValue) {
+    ovl.locateStation(newValue.name)
   } else {
-    ovl.locateAirbase(newValue)
+    ovl.clearLocation()
   }
 })
 
@@ -105,21 +93,14 @@ watch(dropdownName, (newValue) => {
     src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
     @update:zoom="zoom = $event"
     @update:pos="pos = $event"
-    @redraw="(ctx, offset, scale) => overlayManager.redraw(ctx, offset, scale)"
+    @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"
   />
   <div id="overlay">
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
-  <div id="locate">
-    <select id="selectAirbase" v-model="dropdownName" class="suspend-prevent">
-      <option value=""></option>
-      <optgroup v-for="(v,k) in getStationsByCountryType()" v-bind:key="k" :label="k">
-        <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
-      </optgroup>
-    </select>
-  </div>
+  <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
   <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <!--  <div id="debug" class="message">{{ debugMessage }}</div>-->
   <!--  <div id="dbgtg" class="message" v-if="global.pointerTargets.length > 0">-->
@@ -161,14 +142,10 @@ watch(dropdownName, (newValue) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-#locate {
+#station-select {
   position: fixed;
   left: 15px;
   top: 45px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 
 #cursor-val {

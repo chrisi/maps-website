@@ -1,19 +1,14 @@
 import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
+import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
   private location: Point | undefined
   private zoomFn: ((pos: Point, newScale: number) => void) | undefined
-
-  constructor(zoomFn?: (pos: Point, newScale: number) => void) {
-    super();
-    this.zoomFn = zoomFn
-  }
 
   private highlightSize = 17; //TODO: settings
 
@@ -22,14 +17,14 @@ export class LocateOverlay extends BaseOverlay {
 
   public clearLocation = () => {
     this.location = undefined
+    this.redraw()
   }
 
   public setZoomFn = (zoomFn: (pos: Point, newScale: number) => void) => {
     this.zoomFn = zoomFn
   }
 
-  public locateAirbase = (ap: string): void => {
-    console.log(`locating airbase '${ap}'`)
+  public locateStation = (ap: string): void => {
     const res = this.global.map!.stations.find(sta => {
       return (sta.name === ap)
     })
@@ -42,7 +37,7 @@ export class LocateOverlay extends BaseOverlay {
       this.location = undefined
   }
 
-  public onRedraw(cnv: Canvas): void {
+  public onDraw(cnv: Canvas): void {
     if (!this.location) return;
     const x = (this.location.x - cnv.offset.x) * cnv.scale;
     const y = (this.location.y - cnv.offset.y) * cnv.scale;

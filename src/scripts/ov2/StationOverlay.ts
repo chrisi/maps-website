@@ -24,7 +24,7 @@ export class StationOverlay extends BaseOverlay {
 
     private stations = koreaStations.map(s => this.prepareStation(s))
 
-    public onRedraw(cnv: Canvas): void {
+    public onDraw(cnv: Canvas): void {
         const smartScale = cnv.scale + (0.8 - cnv.scale) * 0.7
         this.stations.forEach(sta => {
             const pt = {

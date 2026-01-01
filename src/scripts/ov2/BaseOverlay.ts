@@ -1,15 +1,28 @@
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 
 export interface Overlay {
-    isActive(): boolean
+  isActive(): boolean
 
-    onRedraw(cnv: Canvas): void
+  onDraw(cnv: Canvas): void
 }
 
 export abstract class BaseOverlay implements Overlay {
-    public isActive(): boolean {
-        return true
-    }
 
-    public abstract onRedraw(cnv: Canvas): void
+  private readonly manager: OverlayManager
+
+  constructor(manager: OverlayManager) {
+    manager.registerOverlay(this)
+    this.manager = manager
+  }
+
+  public isActive(): boolean {
+    return true
+  }
+
+  public abstract onDraw(cnv: Canvas): void
+
+  protected redraw(): void {
+    this.manager.redraw()
+  }
 }

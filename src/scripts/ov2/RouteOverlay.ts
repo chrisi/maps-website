@@ -1,13 +1,14 @@
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {Point} from "@/model/base.ts";
+import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
-    private route: Point[]
+    private readonly route: Point[]
 
-    constructor() {
-        super();
+    constructor(manager: OverlayManager) {
+        super(manager);
         this.route = [
             {x: 1000, y: 800},
             {x: 2000, y: 1500},
@@ -18,7 +19,7 @@ export class RouteOverlay extends BaseOverlay {
         ]
     }
 
-    public onRedraw(cnv: Canvas): void {
+    public onDraw(cnv: Canvas): void {
         const {context, offset, scale} = cnv;
         if (this.route.length < 2) return;
 

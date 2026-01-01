@@ -10,11 +10,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:zoom', zoom: number): void
   (e: 'update:pos', pos: Point): void
-  (e: 'redraw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
+  (e: 'init', ctx: CanvasRenderingContext2D): void
+  (e: 'draw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
 }>()
 
 defineExpose({
-  locatePosition
+  locatePosition,
+  redraw
 })
 
 const mapRef = ref<HTMLCanvasElement | null>(null)
@@ -60,8 +62,8 @@ onMounted(() => {
   if (ctx) {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
+    emit('init', ctx);
   }
-
   window.addEventListener("resize", resize);
   resize();
 
@@ -172,7 +174,7 @@ function redraw() {
   ctx.clearRect(0, 0, vw, vh);
   ctx.drawImage(mapImage, offsetX, offsetY, mapImage.width * scale, mapImage.height * scale);
 
-  emit('redraw', ctx, {x: -offsetX / scale, y: -offsetY / scale}, scale);
+  emit('draw', ctx, {x: -offsetX / scale, y: -offsetY / scale}, scale);
 }
 
 function zoomAt(x: number, y: number, zoomFactor: number) {
