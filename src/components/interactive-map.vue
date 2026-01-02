@@ -19,6 +19,7 @@ import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import StationSelector from "@/components/station-selector.vue";
+import MapToolbar from "@/components/map-toolbar.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -39,6 +40,8 @@ new MeasureOverlay(overlayManager)
 new StationOverlay(overlayManager)
 new RouteOverlay(overlayManager)
 const locateOverlay = new LocateOverlay(overlayManager)
+
+const activeWindow = ref('')
 
 onMounted(() => {
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
@@ -90,6 +93,25 @@ const canvasPos2LatLong = (point: Point): Coord => {
   return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
 }
 
+const execTool = (tool: string) => {
+  console.log(`activated tool '${tool}'`);
+  switch (tool) {
+    case "move":
+      suspend.value = false
+      break;
+    case "settings":
+    case "route":
+    case "symbol":
+    case "whiteboard":
+      activeWindow.value = tool
+      suspend.value = true
+      break;
+    case "measure":
+      suspend.value = true
+      break;
+  }
+}
+
 watch(pos, (newPos) => {
   if (newPos) {
     showPointerCoord(newPos);
@@ -123,9 +145,13 @@ watch(selectedStation, (newValue) => {
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
+    <out-value caption="Tool" :val="activeWindow"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
-  <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
+  <div id="inputs">
+    <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
+    <map-toolbar @toolClick="execTool" class="tspc" v-model="global.mode"/>
+  </div>
   <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <!--  <div id="debug" class="message">{{ debugMessage }}</div>-->
   <!--  <div id="dbgtg" class="message" v-if="global.pointerTargets.length > 0">-->
@@ -138,11 +164,15 @@ watch(selectedStation, (newValue) => {
 
 <style scoped>
 
+.tspc {
+  margin-top: 10px !important;
+}
+
 #overlay {
   position: fixed;
   top: 20px;
   right: 20px;
-  height: 80px;
+  height: 86px;
   width: 200px;
   color: white;
   padding: 5px;
@@ -162,7 +192,7 @@ watch(selectedStation, (newValue) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-#station-select {
+#inputs {
   position: fixed;
   left: 15px;
   top: 45px;
