@@ -39,10 +39,9 @@ export class LocateOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     if (!this.location) return;
-    const x = (this.location.x - cnv.offset.x) * cnv.scale;
-    const y = (this.location.y - cnv.offset.y) * cnv.scale;
+    const pos = this.toCnv(this.location, cnv)
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7
-    drawHighlight(cnv.context, x, y, this.highlightSize * smartScale);
+    drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize * smartScale);
   }
 
 }

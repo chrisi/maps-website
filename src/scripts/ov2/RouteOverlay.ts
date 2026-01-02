@@ -5,66 +5,65 @@ import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
-    private readonly route: Point[]
+  private readonly route: Point[]
 
-    constructor(manager: OverlayManager) {
-        super(manager);
-        this.route = [
-            {x: 1000, y: 800},
-            {x: 2000, y: 1500},
-            {x: 2800, y: 3700},
-            {x: 5600, y: 5600},
-            {x: 300, y: 3800},
-            {x: 1000, y: 800}
-        ]
-    }
+  constructor(manager: OverlayManager) {
+    super(manager);
+    this.route = [
+      {x: 1000, y: 800},
+      {x: 2000, y: 1500},
+      {x: 2800, y: 3700},
+      {x: 5600, y: 5600},
+      {x: 300, y: 3800},
+      {x: 1000, y: 800}
+    ]
+  }
 
-    public onDraw(cnv: Canvas): void {
-        const {context, offset, scale} = cnv;
-        if (this.route.length < 2) return;
+  public onDraw(cnv: Canvas): void {
+    const {context, offset, scale} = cnv;
+    if (this.route.length < 2) return;
 
-        context.beginPath();
-        context.strokeStyle = "white";
-        context.lineWidth = 2;
+    context.beginPath();
+    context.strokeStyle = "white";
+    context.lineWidth = 2;
 
-        for (let i = 0; i < this.route.length; i++) {
-            const p = this.route[i];
-            if (p) {
-                const x = (p.x - offset.x) * scale;
-                const y = (p.y - offset.y) * scale;
+    for (let i = 0; i < this.route.length; i++) {
+      const p = this.route[i];
+      if (p) {
+        const tp = this.toCnv(p, cnv);
 
-                if (i === 0) {
-                    context.moveTo(x, y);
-                } else {
-                    context.lineTo(x, y);
-                }
-            }
+        if (i === 0) {
+          context.moveTo(tp.x, tp.y);
+        } else {
+          context.lineTo(tp.x, tp.y);
         }
-        context.stroke();
-
-        for (const p of this.route) {
-            this.drawWaypoint(p, cnv);
-        }
+      }
     }
+    context.stroke();
 
-    private drawWaypoint(pos: Point, cnv: Canvas): void {
-        const {context, offset, scale} = cnv;
-        const x = (pos.x - offset.x) * scale;
-        const y = (pos.y - offset.y) * scale -3;
-        const size = 8;
-
-        context.beginPath();
-        context.moveTo(x, y - size);
-        context.lineTo(x - size, y + size);
-        context.lineTo(x + size, y + size);
-        context.closePath();
-
-        context.lineJoin = "round";
-        context.strokeStyle = "black";
-        context.lineWidth = 4;
-        context.stroke();
-        context.strokeStyle = "white";
-        context.lineWidth = 2;
-        context.stroke();
+    for (const p of this.route) {
+      this.drawWaypoint(p, cnv);
     }
+  }
+
+  private drawWaypoint(pos: Point, cnv: Canvas): void {
+    const ctx = cnv.context
+    const p = this.toCnv(pos, cnv);
+
+    const size = 8;
+
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y - size - 3);
+    ctx.lineTo(p.x - size, p.y + size - 3);
+    ctx.lineTo(p.x + size, p.y + size - 3);
+    ctx.closePath();
+
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
 }

@@ -1,16 +1,17 @@
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
+import type {Point} from "@/model/base.ts";
 
 export interface Overlay {
   isActive(): boolean
 
   onDraw(cnv: Canvas): void
 
-  onPointerDown?(e: PointerEvent): void
+  onPointerDown?(e: PointerEvent, cnv?: Canvas): void
 
-  onPointerMove?(e: PointerEvent): void
+  onPointerMove?(e: PointerEvent, cnv?: Canvas): void
 
-  onPointerUp?(e: PointerEvent): void
+  onPointerUp?(e: PointerEvent, cnv?: Canvas): void
 }
 
 export abstract class BaseOverlay implements Overlay {
@@ -31,4 +32,15 @@ export abstract class BaseOverlay implements Overlay {
   protected redraw(): void {
     this.manager.redraw()
   }
+
+  protected fromCnv(pt: Point, cnv?: Canvas): Point {
+    if (!cnv) cnv = this.manager.getCanvas()
+    return {x: pt.x / cnv.scale + cnv.offset.x, y: pt.y / cnv.scale + cnv.offset.y}
+  }
+
+  protected toCnv(pt: Point, cnv?: Canvas): Point {
+    if (!cnv) cnv = this.manager.getCanvas()
+    return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
+  }
+
 }

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-
 import CanvasMap from "@/components/canvas-map.vue";
+
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import {RouteOverlay} from "@/scripts/ov2/RouteOverlay.ts";
+import {MeasureOverlay} from "@/scripts/ov2/MeasureOverlay.ts";
 import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
 import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
 import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
@@ -34,6 +35,7 @@ const suspend = ref(false)
 const selectedStation = ref<Station | null>(null)
 
 const overlayManager = new OverlayManager()
+new MeasureOverlay(overlayManager)
 new StationOverlay(overlayManager)
 new RouteOverlay(overlayManager)
 const locateOverlay = new LocateOverlay(overlayManager)
@@ -51,12 +53,28 @@ onUnmounted(() => {
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') global.mode = Mode.None
-  if (e.key === '1') global.mode = Mode.Measure
-  if (e.key === '2') global.mode = Mode.Bullseye
-  if (e.key === '3') global.mode = Mode.Symbol
-  if (e.key === '4') global.mode = Mode.Draw
-  if (e.key === 's') suspend.value = !suspend.value
+  switch (e.key) {
+    case '1':
+      global.mode = Mode.Measure
+      suspend.value = true
+      break
+    case '2':
+      global.mode = Mode.Bullseye
+      suspend.value = true
+      break
+    case '3':
+      global.mode = Mode.Symbol
+      suspend.value = true
+      break
+    case '4':
+      global.mode = Mode.Draw
+      suspend.value = true
+      break
+    case 'Escape':
+      global.mode = Mode.None
+      suspend.value = false
+      break
+  }
 }
 
 const showPointerCoord = (pos: Point) => {

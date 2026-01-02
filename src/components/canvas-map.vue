@@ -271,7 +271,7 @@ function toImageCoords(x: number, y: number) {
 }
 
 function onWheel(e: WheelEvent) {
-  if (props.suspend) return;
+  //if (props.suspend) return;
   e.preventDefault();
 
   let zoomFactor: number;

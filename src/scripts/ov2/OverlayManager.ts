@@ -26,9 +26,14 @@ export class OverlayManager {
     if (drawMap) {
       this.redrawListeners.forEach(listener => listener())
     } else {
-      if (!this.cnv) return
+      if (!this.cnv) throw new Error("Canvas not initialized")
       this.draw(this.cnv.context, this.cnv.offset, this.cnv.scale)
     }
+  }
+
+  public getCanvas(): Canvas {
+    if (!this.cnv) throw new Error("Canvas not initialized")
+    return this.cnv
   }
 
   public draw = (context: CanvasRenderingContext2D, offset: Point, scale: number): void => {
@@ -54,7 +59,7 @@ export class OverlayManager {
   public onPointerDown(e: PointerEvent): void {
     for (const overlay of this.overlays) {
       if (overlay.isActive() && overlay.onPointerDown) {
-        overlay.onPointerDown(e)
+        overlay.onPointerDown(e, this.cnv)
       }
     }
   }
@@ -62,7 +67,7 @@ export class OverlayManager {
   public onPointerMove(e: PointerEvent): void {
     for (const overlay of this.overlays) {
       if (overlay.isActive() && overlay.onPointerMove) {
-        overlay.onPointerMove(e)
+        overlay.onPointerMove(e, this.cnv)
       }
     }
   }
@@ -70,7 +75,7 @@ export class OverlayManager {
   public onPointerUp(e: PointerEvent): void {
     for (const overlay of this.overlays) {
       if (overlay.isActive() && overlay.onPointerUp) {
-        overlay.onPointerUp(e)
+        overlay.onPointerUp(e, this.cnv)
       }
     }
   }
