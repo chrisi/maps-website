@@ -20,6 +20,7 @@ import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import StationSelector from "@/components/station-selector.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
+import DetailsPopup from "@/components/details-popup.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -33,13 +34,13 @@ const zoom = ref(1)
 const canvasMapRef = ref()
 const suspend = ref(false)
 
-const selectedStation = ref<Station | null>(null)
+const selectedStation = ref<Station | undefined>()
 
 const overlayManager = new OverlayManager()
-new MeasureOverlay(overlayManager)
 new StationOverlay(overlayManager)
 new RouteOverlay(overlayManager)
 const locateOverlay = new LocateOverlay(overlayManager)
+new MeasureOverlay(overlayManager)
 
 const activeWindow = ref('')
 
@@ -130,6 +131,7 @@ watch(selectedStation, (newValue) => {
 </script>
 
 <template>
+  <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <canvas-map
     ref="canvasMapRef"
     src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
@@ -193,6 +195,7 @@ watch(selectedStation, (newValue) => {
 }
 
 #inputs {
+  pointer-events: none;
   position: fixed;
   left: 15px;
   top: 45px;

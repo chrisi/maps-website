@@ -6,17 +6,17 @@ const props = defineProps<{
   stations: Station[]
 }>()
 
-const selectedStation = defineModel<Station | null>()
+const selectedStation = defineModel<Station | undefined>()
 
 const dropdownName = ref('')
 
 const updateSelection = () => {
-  selectedStation.value = props.stations.find(s => s.name === dropdownName.value) || null
+  selectedStation.value = props.stations.find(s => s.name === dropdownName.value) || undefined
 }
 
 watch(selectedStation, (newStation) => {
   dropdownName.value = newStation?.name || ''
-}, { immediate: true })
+}, {immediate: true})
 
 const getStationsByCountryType = () => {
   return props.stations.reduce((obj, sta) => {
@@ -40,5 +40,7 @@ const getStationsByCountryType = () => {
 </template>
 
 <style scoped>
-
+select {
+  pointer-events: auto;
+}
 </style>
