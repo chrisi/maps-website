@@ -21,6 +21,7 @@ import OutCoord from "@/components/gui/OutCoord.vue";
 import StationSelector from "@/components/station-selector.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import DetailsPopup from "@/components/details-popup.vue";
+import HotspotList from "@/components/hotspot-list.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -156,11 +157,7 @@ watch(selectedStation, (newValue) => {
   </div>
   <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <!--  <div id="debug" class="message">{{ debugMessage }}</div>-->
-  <div id="hotspots" class="message" v-if="global.hotspots.length > 0">
-    <ul>
-      <li v-for="(t,i) in global.hotspots" v-bind:key="i">{{ t.type }} {{ t.name }}</li>
-    </ul>
-  </div>
+  <hotspot-list/>
   <skyvector-logo/>
 </template>
 
@@ -206,20 +203,6 @@ watch(selectedStation, (newValue) => {
   top: 0;
   left: 0;
   margin: 15px;
-}
-
-#hotspots {
-  width: 250px;
-  margin: 15px;
-  position: fixed;
-  bottom: 0;
-  left: 240px;
-}
-
-#hotspots ul {
-  list-style: none;
-  padding: 0;
-  margin: 1px;
 }
 
 #debug {
