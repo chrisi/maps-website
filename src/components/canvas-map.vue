@@ -277,9 +277,12 @@ function onWheel(e: WheelEvent) {
   let zoomFactor: number;
   if (e.ctrlKey) {
     // macOS trackpad pinch-to-zoom
-    zoomFactor = Math.pow(1.1, -e.deltaY / 10);
+    zoomFactor = Math.pow(1.01, -e.deltaY);
+  } else if (Number.isInteger(e.deltaY)) {
+    // Likely trackpad scroll (integer deltas)
+    zoomFactor = Math.pow(1.002, -e.deltaY);
   } else {
-    // Normal mouse wheel scroll
+    // Normal mouse wheel scroll (non-integer)
     zoomFactor = e.deltaY > 0 ? 0.8 : 1.25;
   }
 
