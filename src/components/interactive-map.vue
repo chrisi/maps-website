@@ -134,7 +134,7 @@ watch(selectedStation, (newValue) => {
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <canvas-map
     ref="canvasMapRef"
-    src="https://cdn.falcon-bms.com/maps/04_KTO/maps/KTO_UI_Map_6k.jpeg"
+    src="map6k.jpeg"
     :suspend="suspend"
     @update:zoom="zoom = $event"
     @update:pos="pos = $event"
@@ -156,11 +156,11 @@ watch(selectedStation, (newValue) => {
   </div>
   <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <!--  <div id="debug" class="message">{{ debugMessage }}</div>-->
-  <!--  <div id="dbgtg" class="message" v-if="global.pointerTargets.length > 0">-->
-  <!--    <ul>-->
-  <!--      <li v-for="(t,i) in global.pointerTargets" v-bind:key="i">{{ t.type }} {{ t.name }}</li>-->
-  <!--    </ul>-->
-  <!--  </div>-->
+  <div id="hotspots" class="message" v-if="global.hotspots.length > 0">
+    <ul>
+      <li v-for="(t,i) in global.hotspots" v-bind:key="i">{{ t.type }} {{ t.name }}</li>
+    </ul>
+  </div>
   <skyvector-logo/>
 </template>
 
@@ -208,12 +208,7 @@ watch(selectedStation, (newValue) => {
   margin: 15px;
 }
 
-#dbgtg ul {
-  list-style: none;
-  padding: 0;
-}
-
-#dbgtg {
+#hotspots {
   width: 250px;
   margin: 15px;
   position: fixed;
@@ -221,7 +216,9 @@ watch(selectedStation, (newValue) => {
   left: 240px;
 }
 
-#dbgtg ul {
+#hotspots ul {
+  list-style: none;
+  padding: 0;
   margin: 1px;
 }
 

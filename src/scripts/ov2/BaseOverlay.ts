@@ -1,17 +1,22 @@
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Point} from "@/model/base.ts";
+import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 
 export interface Overlay {
   isActive(): boolean
 
   onDraw(cnv: Canvas): void
 
-  onPointerDown?(e: PointerEvent, cnv?: Canvas): void
+  onPointerDown?(e: PointerEvent): void
 
-  onPointerMove?(e: PointerEvent, cnv?: Canvas): void
+  onPointerMove?(e: PointerEvent): void
 
-  onPointerUp?(e: PointerEvent, cnv?: Canvas): void
+  onPointerUp?(e: PointerEvent): void
+
+  onHoverHotspot?(targets: Hotspot[]): void
+
+  providesHotspots?(): Hotspot[]
 }
 
 export abstract class BaseOverlay implements Overlay {
@@ -31,6 +36,10 @@ export abstract class BaseOverlay implements Overlay {
 
   protected redraw(): void {
     this.manager.redraw()
+  }
+
+  protected getCanvas(): Canvas {
+    return this.manager.getCanvas()
   }
 
   protected fromCnv(pt: Point, cnv?: Canvas): Point {

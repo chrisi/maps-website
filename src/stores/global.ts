@@ -5,6 +5,7 @@ import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point, Zoom} from "@/model/base.ts";
 import type {Waypoint} from "@/model/mission.ts";
 import type {PointerTarget} from "@/scripts/overlay.ts";
+import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')
@@ -20,6 +21,7 @@ export const useGlobalStore = defineStore('global', () => {
   const currentWaypoint = ref<Waypoint>()
 
   const pointerTargets = ref<PointerTarget[]>([])
+  const hotspots = ref<Hotspot[]>([])
 
   const zoom = reactive<Zoom>({
     factor: 1,
@@ -29,7 +31,7 @@ export const useGlobalStore = defineStore('global', () => {
     wheelRate: 20
   })
 
-  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, pointerTargets, zoom}
+  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, pointerTargets, hotspots, zoom}
 }, {
   persist: false
 })

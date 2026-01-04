@@ -2,6 +2,7 @@ import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
+import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
@@ -19,9 +20,16 @@ export class RouteOverlay extends BaseOverlay {
     ]
   }
 
+  public providesHotspots(): Hotspot[] {
+    let idx = 1
+    return this.route.map(r => {
+      return {pos: {x: r.x, y: r.y}, target: r, name: "" + idx++, type: "Waypoint"}
+    })
+  }
+
   public onDraw(cnv: Canvas): void {
-    const {context, offset, scale} = cnv;
     if (this.route.length < 2) return;
+    const context = cnv.context;
 
     context.beginPath();
     context.strokeStyle = "white";

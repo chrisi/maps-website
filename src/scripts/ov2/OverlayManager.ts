@@ -1,8 +1,18 @@
 import type {Overlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {Point} from "@/model/base.ts";
+import {distance} from "@/scripts/math.ts";
+import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import {useGlobalStore} from "@/stores/global.ts";
+
+interface HotspotCandidate {
+  dist: number, // distance to the pointer at hit detection
+  target: Hotspot
+}
 
 export class OverlayManager {
+
+  private global = useGlobalStore()
 
   private cnv: Canvas | undefined
 
@@ -20,15 +30,6 @@ export class OverlayManager {
 
   public getOverlay = <T extends Overlay>(type: new (...args: any[]) => T): T | undefined => {
     return this.overlays.find(o => o instanceof type) as T | undefined
-  }
-
-  public redraw(drawMap: boolean = true): void {
-    if (drawMap) {
-      this.redrawListeners.forEach(listener => listener())
-    } else {
-      if (!this.cnv) throw new Error("Canvas not initialized")
-      this.draw(this.cnv.context, this.cnv.offset, this.cnv.scale)
-    }
   }
 
   public getCanvas(): Canvas {
@@ -56,26 +57,66 @@ export class OverlayManager {
     }
   }
 
-  public onPointerDown(e: PointerEvent): void {
+  public redraw(drawMap: boolean = true): void {
+    if (drawMap) {
+      this.redrawListeners.forEach(listener => listener())
+    } else {
+      if (!this.cnv) throw new Error("Canvas not initialized")
+      this.draw(this.cnv.context, this.cnv.offset, this.cnv.scale)
+    }
+  }
+
+  private findHotspots(pointerPos: Point, single: boolean = false): Hotspot[] {
+    if (!this.cnv) return []
+    const pt = {
+      x: pointerPos.x / this.cnv.scale + this.cnv.offset.x,
+      y: pointerPos.y / this.cnv.scale + this.cnv.offset.y
+    }
+    const res: HotspotCandidate[] = []
+    const saveScale = this.cnv?.scale ?? 1
+    //TODO: priority management: sort overlays by priority (tbd)
+    //TODO: manage exactly colocated items by trigger threshold (tbd)
     for (const overlay of this.overlays) {
-      if (overlay.isActive() && overlay.onPointerDown) {
-        overlay.onPointerDown(e, this.cnv)
+      if (overlay.isActive()) {
+        for (const hs of overlay.providesHotspots?.() ?? []) {
+          const dist = distance(pt, hs.pos)
+          const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spotsize configurable
+          if (dist < sz) {
+            if (single) return [hs]
+            res.push({target: hs, dist: dist})
+          }
+        }
+      }
+    }
+    return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
+  }
+
+  public onPointerDown(e: PointerEvent): void {
+    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
+    this.global.hotspots = hs
+    for (const overlay of this.overlays) {
+      if (overlay.isActive()) {
+        overlay.onPointerDown?.(e)
+        if (hs.length > 0) overlay.onHoverHotspot?.(hs)
       }
     }
   }
 
   public onPointerMove(e: PointerEvent): void {
+    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
+    this.global.hotspots = hs
     for (const overlay of this.overlays) {
-      if (overlay.isActive() && overlay.onPointerMove) {
-        overlay.onPointerMove(e, this.cnv)
+      if (overlay.isActive()) {
+        overlay.onPointerMove?.(e)
+        if (hs.length > 0) overlay.onHoverHotspot?.(hs)
       }
     }
   }
 
   public onPointerUp(e: PointerEvent): void {
     for (const overlay of this.overlays) {
-      if (overlay.isActive() && overlay.onPointerUp) {
-        overlay.onPointerUp(e, this.cnv)
+      if (overlay.isActive()) {
+        overlay.onPointerUp?.(e)
       }
     }
   }
