@@ -153,6 +153,7 @@ const getMapUrl = (map: Theater) => {
   <canvas-map
     ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
     :suspend="suspend"
+    :cursor="global.hotspots.length > 0 ? 'pointer' : 'default'"
     @update:zoom="zoom = $event"
     @update:pos="pos = $event"
     @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"

@@ -3,10 +3,13 @@
 import {onMounted, ref, watch} from "vue";
 import type {Point} from "@/model/base.ts";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   src: string
   suspend: boolean
-}>()
+  cursor?: string
+}>(), {
+  cursor: 'default'
+})
 
 const emit = defineEmits<{
   (e: 'update:zoom', zoom: number): void
@@ -496,7 +499,7 @@ function animate() {
 </script>
 
 <template>
-  <div class="viewport">
+  <div class="viewport" :style="{ cursor: props.cursor }">
     <canvas id="map" ref="mapRef" :class="{ 'loaded': mapLoaded }"></canvas>
     <canvas id="overlay" ref="overlayRef" :class="{ 'loaded': mapLoaded }"></canvas>
     <div v-if="isLoading" class="loading-overlay">
