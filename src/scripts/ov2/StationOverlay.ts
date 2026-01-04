@@ -3,18 +3,32 @@ import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import {deg2rad} from "@/scripts/math.ts";
 import type {Station} from "@/model/station.ts";
-import {koreaStations} from "@/data/korea/stations.ts";
 import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 
 export class StationOverlay extends BaseOverlay {
 
-  private stations = koreaStations.map(s => this.prepareStation(s))
+  private selectStationEventHandler: ((station: Station) => void)[] = [];
+
+  private stations = this.global.map!.stations.map(s => this.prepareStation(s))
+
+  public addSelectStationEventHandler(cb: ((station: Station) => void)) {
+    this.selectStationEventHandler.push(cb);
+  }
 
   public providesHotspots(): Hotspot[] {
     return this.stations.map(s => {
-      const sz = s.station.type.startsWith("VOR") ? 45 : undefined; //TODO: make 45 configurable
-      return {pos: s.pt, size: sz, target: s, name: s.station.name, type: s.station.type}
+      const sz = s.station.type.startsWith('VOR') ? 45 : undefined; //TODO: make 45 configurable
+      return {pos: s.pt, size: sz, target: s.station, name: s.station.name, type: s.station.type, provider: 'StationOverlay'}
     })
+  }
+
+  public onClickHotspot(hotspots: Hotspot[]) {
+    const sta = hotspots.find(hs => {
+      return hs.provider == 'StationOverlay'
+    })
+    if (sta) {
+      this.selectStationEventHandler.forEach(cb => cb(sta.target as Station))
+    }
   }
 
   public onDraw(cnv: Canvas): void {

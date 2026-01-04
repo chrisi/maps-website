@@ -23,7 +23,7 @@ export class RouteOverlay extends BaseOverlay {
   public providesHotspots(): Hotspot[] {
     let idx = 1
     return this.route.map(r => {
-      return {pos: {x: r.x, y: r.y}, target: r, name: "" + idx++, type: "Waypoint"}
+      return {pos: {x: r.x, y: r.y}, target: r, name: '' + idx++, type: 'Waypoint', provider: 'RouteOverlay'}
     })
   }
 

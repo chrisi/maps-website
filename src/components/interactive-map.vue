@@ -36,19 +36,19 @@ const suspend = ref(false)
 
 const selectedStation = ref<Station | undefined>()
 
-const overlayManager = new OverlayManager()
-new StationOverlay(overlayManager)
-new RouteOverlay(overlayManager)
-const locateOverlay = new LocateOverlay(overlayManager)
-new MeasureOverlay(overlayManager)
-
 const activeWindow = ref('')
 
+const overlayManager = new OverlayManager()
+
 onMounted(() => {
+  const stationOverlay = new StationOverlay(overlayManager)
+  new RouteOverlay(overlayManager)
+  const locateOverlay = new LocateOverlay(overlayManager)
+  new MeasureOverlay(overlayManager)
+
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
-  overlayManager.addRedrawEventListener(() => {
-    canvasMapRef.value.redrawOverlay()
-  })
+  stationOverlay.addSelectStationEventHandler(station => selectedStation.value = station)
+  overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
 })
 

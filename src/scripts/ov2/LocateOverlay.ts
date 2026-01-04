@@ -2,8 +2,6 @@ import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
-import {useGlobalStore} from "@/stores/global.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
@@ -11,9 +9,6 @@ export class LocateOverlay extends BaseOverlay {
   private zoomFn: ((pos: Point, newScale: number) => void) | undefined
 
   private highlightSize = 17; //TODO: settings
-
-  protected global = useGlobalStore()
-  protected settings = useSettingsStore()
 
   public clearLocation = () => {
     this.location = undefined

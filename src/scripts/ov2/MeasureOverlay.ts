@@ -3,7 +3,6 @@ import {Mode} from "@/model/mode.ts";
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import {useGlobalStore} from "@/stores/global.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
@@ -11,8 +10,6 @@ export class MeasureOverlay extends BaseOverlay {
   private to: Point | undefined
 
   private active = false
-
-  protected global = useGlobalStore()
 
   public onDraw = (cnv: Canvas) => {
     if (!this.from || !this.to) return

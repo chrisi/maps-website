@@ -92,12 +92,9 @@ export class OverlayManager {
   }
 
   public onPointerDown(e: PointerEvent): void {
-    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
-    this.global.hotspots = hs
     for (const overlay of this.overlays) {
       if (overlay.isActive()) {
         overlay.onPointerDown?.(e)
-        if (hs.length > 0) overlay.onHoverHotspot?.(hs)
       }
     }
   }
@@ -114,9 +111,12 @@ export class OverlayManager {
   }
 
   public onPointerUp(e: PointerEvent): void {
+    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
+    this.global.hotspots = hs
     for (const overlay of this.overlays) {
       if (overlay.isActive()) {
         overlay.onPointerUp?.(e)
+        if (hs.length > 0) overlay.onClickHotspot?.(hs)
       }
     }
   }

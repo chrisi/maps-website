@@ -2,6 +2,8 @@ import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import {useGlobalStore} from "@/stores/global.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 
 export interface Overlay {
   isActive(): boolean
@@ -14,12 +16,17 @@ export interface Overlay {
 
   onPointerUp?(e: PointerEvent): void
 
-  onHoverHotspot?(targets: Hotspot[]): void
+  onHoverHotspot?(hotspots: Hotspot[]): void
+
+  onClickHotspot?(hotspots: Hotspot[]): void
 
   providesHotspots?(): Hotspot[]
 }
 
 export abstract class BaseOverlay implements Overlay {
+
+  protected global = useGlobalStore()
+  protected settings = useSettingsStore()
 
   private readonly manager: OverlayManager
 
