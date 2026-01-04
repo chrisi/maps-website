@@ -131,9 +131,9 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
 
         <tool-spacer medium/>
-        <tool-button id="save" icon="../common/assets/icon_save.png" @click="btnClick"/>
-        <tool-button id="clear" icon="../common/assets/icon_clear.png" @click="btnClick"/>
-        <tool-button id="reset" icon="../common/assets/icon_reset.png" @click="btnClick"/>
+        <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>
+        <tool-button id="clear" icon="common/assets/icon_clear.png" @click="btnClick"/>
+        <tool-button id="reset" icon="common/assets/icon_reset.png" @click="btnClick"/>
       </template>
 
       <template #Connectivity>

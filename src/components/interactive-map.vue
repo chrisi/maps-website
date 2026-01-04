@@ -22,24 +22,27 @@ import StationSelector from "@/components/station-selector.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import DetailsPopup from "@/components/details-popup.vue";
 import HotspotList from "@/components/hotspot-list.vue";
+import SettingsWindow from "@/components/settings-window.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
 
-onBeforeMount(() => {
-  global.map = findMap('korea')
-})
+const debug = ref(false)
+
+const canvasMapRef = ref()
 
 const pos = ref<Point>()
 const zoom = ref(1)
-const canvasMapRef = ref()
 const suspend = ref(false)
 
 const selectedStation = ref<Station | undefined>()
-
 const activeWindow = ref('')
 
 const overlayManager = new OverlayManager()
+
+onBeforeMount(() => {
+  global.map = findMap('korea')
+})
 
 onMounted(() => {
   const stationOverlay = new StationOverlay(overlayManager)
@@ -78,6 +81,9 @@ const handleKeyDown = (e: KeyboardEvent) => {
     case 'Escape':
       global.mode = Mode.None
       suspend.value = false
+      break
+    case 'd':
+      debug.value = !debug.value
       break
   }
 }
@@ -133,6 +139,7 @@ watch(selectedStation, (newValue) => {
 
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
+  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <canvas-map
     ref="canvasMapRef"
     src="map6k.jpeg"
@@ -144,19 +151,18 @@ watch(selectedStation, (newValue) => {
     @pointermove="overlayManager.onPointerMove($event)"
     @pointerup="overlayManager.onPointerUp($event)"
   />
-  <div id="overlay">
+  <div id="overlay" v-if="debug">
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
     <out-value caption="Tool" :val="activeWindow"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
+  <div id="position" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <div id="inputs">
     <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
     <map-toolbar @toolClick="execTool" class="tspc" v-model="global.mode"/>
   </div>
-  <div id="cursor-val" class="message" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
-  <!--  <div id="debug" class="message">{{ debugMessage }}</div>-->
   <hotspot-list/>
   <skyvector-logo/>
 </template>
@@ -180,7 +186,19 @@ watch(selectedStation, (newValue) => {
   border-radius: 4px;
 }
 
-.message {
+#inputs {
+  pointer-events: none;
+  position: fixed;
+  left: 15px;
+  top: 45px;
+}
+
+#position {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 15px;
+
   pointer-events: none;
   font-family: JetBrains Mono, monospace;
   font-size: 12px;
@@ -190,26 +208,5 @@ watch(selectedStation, (newValue) => {
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
-#inputs {
-  pointer-events: none;
-  position: fixed;
-  left: 15px;
-  top: 45px;
-}
-
-#cursor-val {
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 15px;
-}
-
-#debug {
-  position: fixed;
-  bottom: 0;
-  margin: 15px;
-}
-
 
 </style>
