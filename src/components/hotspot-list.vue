@@ -14,11 +14,12 @@ const global = useGlobalStore()
 
 <style scoped>
 div {
-  width: 250px;
   margin: 15px;
   position: fixed;
   bottom: 0;
-  left: 240px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
 
   pointer-events: none;
   font-family: JetBrains Mono, monospace;
