@@ -13,7 +13,7 @@ import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {map2LatLong} from "@/scripts/math.ts";
-import {findMap} from "@/data/map.ts";
+import {cdnUrl, findMap} from "@/data/map.ts";
 import {Mode} from "@/model/mode.ts";
 import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import OutValue from "@/components/gui/OutValue.vue";
@@ -23,6 +23,7 @@ import MapToolbar from "@/components/map-toolbar.vue";
 import DetailsPopup from "@/components/details-popup.vue";
 import HotspotList from "@/components/hotspot-list.vue";
 import SettingsWindow from "@/components/settings-window.vue";
+import type {Theater} from "@/model/theater.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -39,6 +40,8 @@ const selectedStation = ref<Station | undefined>()
 const activeWindow = ref('')
 
 const overlayManager = new OverlayManager()
+
+const baseUrl = import.meta.env.BASE_URL
 
 onBeforeMount(() => {
   global.map = findMap('korea')
@@ -135,14 +138,20 @@ watch(selectedStation, (newValue) => {
   }
 })
 
+const getMapUrl = (map: Theater) => {
+  const baseUrl = import.meta.env.BASE_URL
+  if (map.local)
+    return `${baseUrl}/maps/${map.mapFilename}`
+  else
+    return `${cdnUrl}/${map.folder}/maps/${map.mapFilename}`
+}
 </script>
 
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <canvas-map
-    ref="canvasMapRef"
-    src="map6k.jpeg"
+    ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
     :suspend="suspend"
     @update:zoom="zoom = $event"
     @update:pos="pos = $event"
@@ -161,7 +170,7 @@ watch(selectedStation, (newValue) => {
   <div id="position" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <div id="inputs">
     <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
-    <map-toolbar @toolClick="execTool" class="tspc" v-model="global.mode"/>
+    <map-toolbar @toolClick="execTool" class="spacer" v-model="global.mode"/>
   </div>
   <hotspot-list/>
   <skyvector-logo/>
@@ -169,7 +178,7 @@ watch(selectedStation, (newValue) => {
 
 <style scoped>
 
-.tspc {
+.spacer {
   margin-top: 10px !important;
 }
 

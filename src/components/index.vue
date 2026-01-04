@@ -24,8 +24,9 @@ import TheaterLink from "@/components/theater-link.vue";
     </div>
     <h2>Theater Maps 4.38</h2>
     <div class="flex">
-      <theater-link link="/maps-website/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
-      <theater-link link="/maps-website/map/balkans" name="BALKANS" sub="IN DEVELOPMENT" image="05_balkans-thumb.jpeg"/>
+      <theater-link link="/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
+      <theater-link link="/map/test" name="KOREA" sub="MAP TEST" image="04_kto-thumb.jpeg"/>
+      <theater-link link="/map/balkans" name="BALKANS" sub="IN DEVELOPMENT" image="05_balkans-thumb.jpeg"/>
       <theater-link name="ISRAEL" sub="PLANNED" image="06_ito-thumb.jpeg"/>
       <theater-link name="HELLENIC" sub="PLANNED" image="07_hto-thumb.jpeg"/>
     </div>
@@ -50,8 +51,6 @@ import TheaterLink from "@/components/theater-link.vue";
       <a href="https://forum.falcon-bms.com/topic/22922/falcon-bms-interactive-maps" target="_blank">Change log</a>
       <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
       <a href="https://cdn.falcon-bms.com/maps/manual/BMS_Interactive_Maps.pdf" target="_blank">Manual (PDF)</a>
-      <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-      <router-link to="/maps-website/pan-test">Zoom/Pan-Test</router-link>
     </h5>
     <hr>
   </div>

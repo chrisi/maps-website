@@ -2,24 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/maps-website/',
+    path: '/',
     name: 'Home',
     component: () => import('../components/index.vue'),
   },
   {
-    path: '/maps-website/map/:name',
+    path: '/map/:name',
     name: 'Map',
     component: () => import('../components/bms-map.vue'),
   },
   {
-    path: '/maps-website/pan-test',
+    path: '/map/test',
     name: 'Test',
     component: () => import('../components/interactive-map.vue'),
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL), // This uses the base from vite.config.ts
   routes,
 })
 

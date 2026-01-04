@@ -131,9 +131,9 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
 
         <tool-spacer medium/>
-        <tool-button id="save" icon="common/assets/icon_save.png" @click="btnClick"/>
-        <tool-button id="clear" icon="common/assets/icon_clear.png" @click="btnClick"/>
-        <tool-button id="reset" icon="common/assets/icon_reset.png" @click="btnClick"/>
+        <tool-button id="save" icon="/common/assets/icon_save.png" @click="btnClick"/>
+        <tool-button id="clear" icon="/common/assets/icon_clear.png" @click="btnClick"/>
+        <tool-button id="reset" icon="/common/assets/icon_reset.png" @click="btnClick"/>
       </template>
 
       <template #Connectivity>
@@ -160,8 +160,8 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
         <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" v-model="gfs.forecast" width="60px"/>
 
         <tool-spacer medium/>
-        <tool-button id="download" icon="../common/assets/icon_download.png" @click="btnClick"/>
-        <tool-button id="export" icon="../common/assets/icon_save.png" @click="btnClick"/>
+        <tool-button id="download" icon="/common/assets/icon_download.png" @click="btnClick"/>
+        <tool-button id="export" icon="/common/assets/icon_save.png" @click="btnClick"/>
         <!--<tool-button id="gfs-fetch" icon="common/assets/icon_fetch.png" @click="btnClick(event)"/>-->
       </template>
     </tool-tabs>

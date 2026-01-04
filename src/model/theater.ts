@@ -12,4 +12,5 @@ export interface Theater {
   mapFilename: string
   stations: Station[]
   stationMappingSize: number
+  local: boolean
 }

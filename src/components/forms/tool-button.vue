@@ -9,11 +9,13 @@ const emit = defineEmits<{
   (e: 'click', sender: string): void
 }>()
 
+const baseUrl = import.meta.env.BASE_URL
+
 </script>
 
 <template>
   <template v-if="icon && !text">
-    <button><img :id="id" :src="icon" width="32" height="32" :alt="id" @click="emit('click',id)"></button>
+    <button><img :id="id" :src="`${baseUrl}${icon}`" width="32" height="32" :alt="id" @click="emit('click',id)"></button>
   </template>
   <template v-if="text && !icon">
     <button :id="id" @click="emit('click',id)">{{ text }}</button>
