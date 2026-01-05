@@ -9,7 +9,7 @@ export class MeasureOverlay extends BaseOverlay {
   private from: Point | undefined
   private to: Point | undefined
 
-  private active = false
+  private measuring = false
 
   public onDraw = (cnv: Canvas) => {
     if (!this.from || !this.to) return
@@ -19,7 +19,7 @@ export class MeasureOverlay extends BaseOverlay {
   public onPointerDown(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
-    this.active = true
+    this.measuring = true
     this.from = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }
@@ -27,7 +27,7 @@ export class MeasureOverlay extends BaseOverlay {
   public onPointerUp(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
-    this.active = false
+    this.measuring = false
     this.to = undefined
     this.from = undefined
     this.redraw()
@@ -35,7 +35,7 @@ export class MeasureOverlay extends BaseOverlay {
 
   public onPointerMove(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
-    if (!this.active) return
+    if (!this.measuring) return
     this.to = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }
