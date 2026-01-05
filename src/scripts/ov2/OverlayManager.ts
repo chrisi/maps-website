@@ -76,19 +76,25 @@ export class OverlayManager {
     const saveScale = this.cnv?.scale ?? 1
     //TODO: priority management: sort overlays by priority (tbd)
     //TODO: manage exactly colocated items by trigger threshold (tbd)
+    this.forEachHotspot(hs => {
+      const dist = distance(pt, hs.pos)
+      const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spotsize configurable
+      if (dist < sz) {
+        if (single) return [hs]
+        res.push({target: hs, dist: dist})
+      }
+    })
+    return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
+  }
+
+  public forEachHotspot(cb: (hotspot: Hotspot) => void) {
     for (const overlay of this.overlays) {
       if (overlay.isActive()) {
         for (const hs of overlay.providesHotspots?.() ?? []) {
-          const dist = distance(pt, hs.pos)
-          const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spotsize configurable
-          if (dist < sz) {
-            if (single) return [hs]
-            res.push({target: hs, dist: dist})
-          }
+          cb(hs)
         }
       }
     }
-    return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
   }
 
   public onPointerDown(e: PointerEvent): void {

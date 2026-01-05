@@ -6,6 +6,7 @@ import {RouteOverlay} from "@/scripts/ov2/RouteOverlay.ts";
 import {MeasureOverlay} from "@/scripts/ov2/MeasureOverlay.ts";
 import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
 import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
+import {HotspotOverlay} from "@/scripts/ov2/HotspotOverlay.ts";
 import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Station} from "@/model/station.ts";
 import type {Coord, Point} from "@/model/base.ts";
@@ -41,13 +42,15 @@ const activeWindow = ref('')
 
 const overlayManager = new OverlayManager()
 
-const baseUrl = import.meta.env.BASE_URL
-
 onBeforeMount(() => {
   global.map = findMap('korea')
 })
 
+let hotspotOvl: HotspotOverlay | undefined
+
 onMounted(() => {
+  hotspotOvl = new HotspotOverlay(overlayManager)
+  hotspotOvl.setActive(debug.value)
   const stationOverlay = new StationOverlay(overlayManager)
   new RouteOverlay(overlayManager)
   const locateOverlay = new LocateOverlay(overlayManager)
@@ -122,6 +125,10 @@ const execTool = (tool: string) => {
       break;
   }
 }
+
+watch(debug, (newValue) => {
+  hotspotOvl?.setActive(newValue)
+})
 
 watch(pos, (newPos) => {
   if (newPos) {

@@ -28,15 +28,23 @@ export abstract class BaseOverlay implements Overlay {
   protected global = useGlobalStore()
   protected settings = useSettingsStore()
 
-  private readonly manager: OverlayManager
+  protected readonly manager: OverlayManager
+
+  private active = true
 
   constructor(manager: OverlayManager) {
     manager.registerOverlay(this)
     this.manager = manager
   }
 
+  public setActive(active: boolean): void {
+    console.log(`setting overlay '${this.constructor.name}' to ${active ? 'active' : 'inactive'}`)
+    this.active = active
+    this.redraw()
+  }
+
   public isActive(): boolean {
-    return true
+    return this.active
   }
 
   public abstract onDraw(cnv: Canvas): void
@@ -45,9 +53,9 @@ export abstract class BaseOverlay implements Overlay {
     this.manager.redraw()
   }
 
-  protected getCanvas(): Canvas {
-    return this.manager.getCanvas()
-  }
+  // protected getCanvas(): Canvas {
+  //   return this.manager.getCanvas()
+  // }
 
   protected fromCnv(pt: Point, cnv?: Canvas): Point {
     if (!cnv) cnv = this.manager.getCanvas()

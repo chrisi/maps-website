@@ -1,0 +1,21 @@
+import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
+
+export class HotspotOverlay extends BaseOverlay {
+
+  public onDraw(cnv: Canvas): void {
+    const saveScale = cnv?.scale ?? 1
+    cnv.context.lineWidth = 0.5
+    cnv.context.fillStyle = "rgba(255, 0, 255, 0.2)"
+    cnv.context.strokeStyle = "rgba(255, 0, 255, 0.7)"
+    this.manager.forEachHotspot(hs => {
+      const sz = !hs.size ? 15 : (hs.size < 0 ? -hs.size : hs.size * saveScale) // TODO 15: make global hot spotsize configurable
+      const x = (hs.pos.x - cnv.offset.x) * cnv.scale
+      const y = (hs.pos.y - cnv.offset.y) * cnv.scale
+      cnv.context.beginPath()
+      cnv.context.arc(x, y, sz, 0, 2 * Math.PI)
+      cnv.context.fill()
+      cnv.context.stroke()
+    })
+  }
+}
