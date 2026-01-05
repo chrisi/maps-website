@@ -20,6 +20,8 @@ export class OverlayManager {
 
   private redrawListeners: (() => void)[] = []
 
+  private clickPos: Point | undefined = undefined
+
   public addRedrawEventListener(listener: () => void): void {
     this.redrawListeners.push(listener)
   }
@@ -98,6 +100,7 @@ export class OverlayManager {
   }
 
   public onPointerDown(e: PointerEvent): void {
+    this.clickPos = {x: e.pageX, y: e.pageY}
     for (const overlay of this.overlays) {
       if (overlay.isActive()) {
         overlay.onPointerDown?.(e)
@@ -117,12 +120,14 @@ export class OverlayManager {
   }
 
   public onPointerUp(e: PointerEvent): void {
+    const isClick = e.pageX === this.clickPos?.x && e.pageY === this.clickPos?.y
+    this.clickPos = undefined
     const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
     this.global.hotspots = hs
     for (const overlay of this.overlays) {
       if (overlay.isActive()) {
         overlay.onPointerUp?.(e)
-        if (hs.length > 0) overlay.onClickHotspot?.(hs)
+        if (isClick && hs.length > 0) overlay.onClickHotspot?.(hs)
       }
     }
   }
