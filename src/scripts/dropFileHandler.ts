@@ -75,6 +75,7 @@ export class DropFileHandler {
         if (items[i]!.kind === 'file') {
           const file = items[i]!.getAsFile();
           if (file) {
+            console.log("process file: " + file.name);
             this.filename = file.name.repeat(1);
             if (this.filename.endsWith(".ini")) reader.readAsText(file);
             if (this.filename.endsWith(".fmap")) reader.readAsArrayBuffer(file);
