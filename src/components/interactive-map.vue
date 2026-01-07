@@ -27,6 +27,7 @@ import SettingsWindow from "@/components/settings-window.vue";
 import type {Theater} from "@/model/theater.ts";
 import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
 import {MissionManager} from "@/scripts/missionManager.ts";
+import RouteWindow from "@/components/route-window.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -165,6 +166,7 @@ const getMapUrl = (map: Theater) => {
 
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
+  <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map

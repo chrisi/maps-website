@@ -41,17 +41,23 @@ export class RouteOverlay extends BaseOverlay {
   private drawPrePlannedThreats(cnv: Canvas, list: Ppt[]) {
     const ctx = cnv.context;
     ctx.setLineDash([]);
-    ctx.strokeStyle = 'red';
-    ctx.fillStyle = "rgba(255, 0, 0, 0.08)";
-    ctx.lineWidth = 2;
-    ctx.font = '16px courier-new';
+    ctx.font = '14px monospace';
     list.forEach(ppt => {
       const p = this.toCnv(ppt);
+      ctx.strokeStyle = 'red';
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.08)';
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(p.x, p.y, ppt.radius * cnv.scale, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.strokeText(ppt.desc, p.x - 16, p.y + 8, 100);
       ctx.stroke();
+
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.strokeText(ppt.desc, p.x - 16, p.y + 8);
+
+      ctx.fillStyle = 'orange';
+      ctx.fillText(ppt.desc, p.x - 16, p.y + 8);
     });
   }
 
@@ -103,10 +109,15 @@ export class RouteOverlay extends BaseOverlay {
       }
 
       // Add Waypoint Number
-      ctx.beginPath();
       ctx.lineWidth = 1;
-      ctx.font = '16px courier-new';
-      ctx.strokeText(id, waypoint.x, waypoint.y - 16, 100);
+      ctx.font = '14px monospace';
+
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
+      ctx.strokeText(id, waypoint.x - 16, waypoint.y + 8);
+
+      ctx.fillStyle = 'white';
+      ctx.fillText(id, waypoint.x - 16, waypoint.y + 8);
     }
   }
 
@@ -116,9 +127,6 @@ export class RouteOverlay extends BaseOverlay {
     const px2nm = 6.95; // pixel to Nm scaler //TODO: move to constants
 
     ctx.setLineDash([]);
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.fillStyle = 'white';
 
     // Go through the target list.
     for (let i = 0; i < list.length - 1; i++) {
@@ -129,18 +137,30 @@ export class RouteOverlay extends BaseOverlay {
         const vec = vector(p1, p2);
         const mid = midpoint(p1, p2)
 
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'white';
+
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.fillRect(mid.x - 2, mid.y - 2, 4, 4);
+        ctx.fillRect(mid.x - 3, mid.y - 3, 6, 6);
         ctx.stroke();
 
         const dist = (vec.mag / px2nm / cnv.scale).toFixed(1)
-        ctx.strokeText(dist, mid.x - 20, mid.y - 8, 40);
 
+        if (vec.mag > 50) {
+          ctx.font = '14px monospace';
+
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 2;
+          ctx.strokeText(dist, mid.x - 20, mid.y - 8, 40);
+
+          ctx.fillStyle = 'white';
+          ctx.fillText(dist, mid.x - 20, mid.y - 8, 40);
+        }
         // Only draw lines up to landing
         if (list[i + 1]!.action == 7) endRoute = true;
       }
