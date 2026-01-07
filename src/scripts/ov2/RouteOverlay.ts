@@ -1,77 +1,150 @@
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import type {Point} from "@/model/base.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import type {MissionManager} from "@/scripts/missionManager.ts";
+import {watch} from "vue";
+import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
+import {drawOutlined} from "@/scripts/draw.ts";
+import {midpoint, vector} from "@/scripts/math.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
-  private readonly route: Point[]
+  private missionMgr: MissionManager
 
-  constructor(manager: OverlayManager) {
+  constructor(manager: OverlayManager, missionMgr: MissionManager) {
     super(manager);
-    this.route = [
-      {x: 1000, y: 800},
-      {x: 2000, y: 1500},
-      {x: 2800, y: 3700},
-      {x: 5600, y: 5600},
-      {x: 300, y: 3800},
-      {x: 1000, y: 800}
-    ]
+    this.missionMgr = missionMgr;
+    this.missionMgr.onDataCartridgeEvent(() => {
+      this.redraw()
+    })
+    watch(() => this.settings.viz.ms, () => {
+      this.redraw()
+    })
   }
 
   public providesHotspots(): Hotspot[] {
-    let idx = 1
-    return this.route.map(r => {
-      return {pos: {x: r.x, y: r.y}, target: r, name: '' + idx++, type: 'Waypoint', provider: 'RouteOverlay'}
+    if (!this.missionMgr.isMissionLoaded()) return []
+    return this.missionMgr.getDatacardridge().targets.map(r => {
+      return {pos: {x: r.x, y: r.y}, target: r, name: r.desc, type: 'Waypoint', provider: 'RouteOverlay'}
     })
   }
 
   public onDraw(cnv: Canvas): void {
-    if (this.route.length < 2) return;
-    const context = cnv.context;
+    if (!this.missionMgr.isMissionLoaded()) return;
+    const crd = this.missionMgr.getDatacardridge()
+    this.drawLineSteerPoints(cnv, crd.lines);
+    this.drawPrePlannedThreats(cnv, crd.ppts);
+    this.drawRoute(cnv, crd.targets);
+  }
 
-    context.beginPath();
-    context.strokeStyle = "white";
-    context.lineWidth = 2;
+  private drawPrePlannedThreats(cnv: Canvas, list: Ppt[]) {
+    const ctx = cnv.context;
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'red';
+    ctx.fillStyle = "rgba(255, 0, 0, 0.08)";
+    ctx.lineWidth = 2;
+    ctx.font = '16px courier-new';
+    list.forEach(ppt => {
+      const p = this.toCnv(ppt);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, ppt.radius * cnv.scale, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeText(ppt.desc, p.x - 16, p.y + 8, 100);
+      ctx.stroke();
+    });
+  }
 
-    for (let i = 0; i < this.route.length; i++) {
-      const p = this.route[i];
-      if (p) {
-        const tp = this.toCnv(p, cnv);
+  private drawLineSteerPoints(cnv: Canvas, list: LineStpt[]) {
+    const ctx = cnv.context;
+    ctx.setLineDash([15, 5]);
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
 
-        if (i === 0) {
-          context.moveTo(tp.x, tp.y);
-        } else {
-          context.lineTo(tp.x, tp.y);
-        }
-      }
-    }
-    context.stroke();
-
-    for (const p of this.route) {
-      this.drawWaypoint(p, cnv);
+    // Go through the line list with maximum of 5 segments
+    for (let i = 1; i < list.length; i++) if ((i % 6)) {
+      const p1 = this.toCnv(list[i - 1]!);
+      const p2 = this.toCnv(list[i]!);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
     }
   }
 
-  private drawWaypoint(pos: Point, cnv: Canvas): void {
-    const ctx = cnv.context
-    const p = this.toCnv(pos, cnv);
+  private drawWaypoint(ctx: CanvasRenderingContext2D, waypoint: Target, id: string) {
+    if ((waypoint.x > 0 || waypoint.y < this.global.map!.pixels)) {
 
-    const size = 8;
+      const wp = this.toCnv(waypoint);
 
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y - size - 3);
-    ctx.lineTo(p.x - size, p.y + size - 3);
-    ctx.lineTo(p.x + size, p.y + size - 3);
-    ctx.closePath();
+      // Draw Shape based on Action
+      switch (waypoint.action) {
+        case Action.Target:
+        case Action.CAP:
+        case Action.Grnd_Attack:
+        case Action.Surf_Attack:
+        case Action.Strike:
+        case Action.Bomb:
+        case Action.SEAD:
+        case Action.S_D:
+        case Action.Recon:
+        case Action.Sweep:
+          drawOutlined(ctx, "white", "black", 3, 1, c => {
+            c.moveTo(wp.x - 8, wp.y + 8);
+            c.lineTo(wp.x, wp.y - 8);
+            c.lineTo(wp.x + 8, wp.y + 8);
+            c.lineTo(wp.x - 8, wp.y + 8);
+          })
+          break;
+        default:
+          drawOutlined(ctx, "white", "black", 3, 1, c => {
+            c.arc(wp.x, wp.y, 8, 0, 2 * Math.PI);
+          })
+      }
 
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    ctx.strokeStyle = "white";
+      // Add Waypoint Number
+      ctx.beginPath();
+      ctx.lineWidth = 1;
+      ctx.font = '16px courier-new';
+      ctx.strokeText(id, waypoint.x, waypoint.y - 16, 100);
+    }
+  }
+
+  private drawRoute(cnv: Canvas, list: Target[]) {
+    const ctx = cnv.context;
+    let endRoute = false;
+    const px2nm = 6.95; // pixel to Nm scaler //TODO: move to constants
+
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.fillStyle = 'white';
+
+    // Go through the target list.
+    for (let i = 0; i < list.length - 1; i++) {
+      const p1 = this.toCnv({x: list[i]!.x, y: list[i]!.y});
+      const p2 = this.toCnv({x: list[i + 1]!.x, y: list[i + 1]!.y});
+
+      if (!endRoute) {
+        const vec = vector(p1, p2);
+        const mid = midpoint(p1, p2)
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillRect(mid.x - 2, mid.y - 2, 4, 4);
+        ctx.stroke();
+
+        const dist = (vec.mag / px2nm / cnv.scale).toFixed(1)
+        ctx.strokeText(dist, mid.x - 20, mid.y - 8, 40);
+
+        // Only draw lines up to landing
+        if (list[i + 1]!.action == 7) endRoute = true;
+      }
+      this.drawWaypoint(ctx, list[i]!, "" + (i + 1));
+    }
   }
 }

@@ -15,20 +15,20 @@ import {getCallsignByFreq} from "@/common/scripts/map_radio";
 
 export class MissionManager {
 
-  private dataCardridge?: DataCardridge;
+  private dataCartridge?: DataCardridge;
   private mission?: Mission;
   private global = useGlobalStore();
 
   private missionLoaded: boolean = false;
 
-  private dataCardridgeEventHandler: ((type: string) => void)[] = [];
+  private dataCartridgeEventHandler: ((type: string) => void)[] = [];
 
-  public onDataCardridgeEvent(cb: ((type: string) => void)) {
-    this.dataCardridgeEventHandler.push(cb);
+  public onDataCartridgeEvent(cb: ((type: string) => void)) {
+    this.dataCartridgeEventHandler.push(cb);
   }
 
-  public loadDataCardridge(title: string, data: string) {
-    this.dataCardridge = {
+  public loadDataCartridge(title: string, data: string) {
+    this.dataCartridge = {
       targets: [],
       ppts: [],
       lines: [],
@@ -69,7 +69,7 @@ export class MissionManager {
     this.mission!.changed = true;
     this.missionLoaded = true;
 
-    this.dataCardridgeEventHandler.forEach(cb => cb("loaded"))
+    this.dataCartridgeEventHandler.forEach(cb => cb("loaded"))
   }
 
   // Calculate and return the Centroid of the Mission
@@ -81,7 +81,7 @@ export class MissionManager {
   }
 
   public getSteerpointType(index: number) {
-    return (this.isTargetWaypoint(this.dataCardridge!.targets[index]!)) ? "TGT" : "STPT";
+    return (this.isTargetWaypoint(this.dataCartridge!.targets[index]!)) ? "TGT" : "STPT";
   }
 
   public isMissionLoaded(): boolean {
@@ -93,12 +93,12 @@ export class MissionManager {
   }
 
   public getDatacardridge(): DataCardridge {
-    return this.dataCardridge!;
+    return this.dataCartridge!;
   }
 
   private initializeRoute(tos: number, speed: number) {
-    const tgts = this.dataCardridge!.targets
-    for (let i = 1; i < this.dataCardridge!.targets.length; i++) {
+    const tgts = this.dataCartridge!.targets
+    for (let i = 1; i < this.dataCartridge!.targets.length; i++) {
       const tgtFrom = tgts[i - 1]!
       const tgtTo = tgts[i]!
       const ptFrom = {x: tgtFrom.x, y: tgtFrom.y}
@@ -125,11 +125,11 @@ export class MissionManager {
   private initializePackage() {
     // Check if this is Callsign.ini
     // There will be no UHF/VHF
-    if (this.dataCardridge!.radio.length != 40) return;
+    if (this.dataCartridge!.radio.length != 40) return;
 
     for (let i = 0; i < 5; i++) {
       // Set Values
-      const callsign = getCallsignByFreq(this.dataCardridge!.radio[34 + i]!.freq);
+      const callsign = getCallsignByFreq(this.dataCartridge!.radio[34 + i]!.freq);
       this.mission!.package.flights.push(callsign);
     }
   }
@@ -149,7 +149,7 @@ export class MissionManager {
       radius: parseFloat(data[3]!) / res,
       desc: data[4] ?? "threat"
     }
-    this.dataCardridge!.ppts.push(ppt);
+    this.dataCartridge!.ppts.push(ppt);
   }
 
   // Parse and create line object
@@ -164,7 +164,7 @@ export class MissionManager {
       x: rx / res,
       y: this.global.map!.pixels - ry / res
     }
-    this.dataCardridge!.lines.push(lsp);
+    this.dataCartridge!.lines.push(lsp);
   }
 
   // Parse and create Target object
@@ -187,7 +187,7 @@ export class MissionManager {
     }
     target.duration = this.getTargetDuration(target.action)
 
-    this.dataCardridge!.targets.push(target);
+    this.dataCartridge!.targets.push(target);
 
     // Check for addition to Centroid
     if (target.x != 0 && target.y != 0) {
@@ -205,7 +205,7 @@ export class MissionManager {
       id: data[0]!,
       freq: freq
     };
-    this.dataCardridge!.radio.push(entry);
+    this.dataCartridge!.radio.push(entry);
   }
 
   // Add title if found in file (Mission.ini)
@@ -243,5 +243,10 @@ export class MissionManager {
       default:
         return 0;
     }
+  }
+
+  //TODO: moved here from overlay draw, better integrate once on import instead of every redraw
+  private validPoint(pt: Point) {
+    return (pt.x > 0 || pt.y < this.global.map!.pixels)
   }
 }

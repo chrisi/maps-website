@@ -9,8 +9,8 @@ export const maps: Theater[] = [
     name: "korea",
     datum: {lat: 38.5, long: 127.18},
     feet: 3359580,
-    pixels: 3840,
-    resolution: 874.890625, // feet/pixels
+    pixels: 6144,
+    resolution: 546.80664062, // feet/pixels
     // offset: 3840, // pixels
     folder: "04_KTO",
     mapFilename: "KTO_UI_Map_6k.jpeg", // native 6144

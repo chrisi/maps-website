@@ -66,7 +66,7 @@ onMounted(() => {
   const zoomPanOvl = new ZoomPanOverlay(ctx)
 
   dropFileHandler.onIniLoaded((filename: string, content: string) => {
-    missionMgr.loadDataCardridge(filename, content)
+    missionMgr.loadDataCartridge(filename, content)
   })
 
   const stationOverlay = new StationOverlay(ctx)

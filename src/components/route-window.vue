@@ -165,7 +165,7 @@ const mission = ref<Mission>()
 const wpIdx = ref(0)
 
 onMounted(() => {
-  props.missionManager.onDataCardridgeEvent(() => {
+  props.missionManager.onDataCartridgeEvent(() => {
     mission.value = props.missionManager.getMission()
     wpIdx.value = 0
     global.currentWaypoint = mission.value!.route![0]

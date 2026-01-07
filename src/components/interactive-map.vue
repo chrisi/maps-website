@@ -25,6 +25,8 @@ import DetailsPopup from "@/components/details-popup.vue";
 import HotspotList from "@/components/hotspot-list.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import type {Theater} from "@/model/theater.ts";
+import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
+import {MissionManager} from "@/scripts/missionManager.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -42,6 +44,13 @@ const activeWindow = ref('')
 
 const overlayManager = new OverlayManager()
 
+const dropFileHandler = new DropFileHandler()
+const missionMgr = new MissionManager()
+
+dropFileHandler.onIniLoaded((filename: string, content: string) => {
+  missionMgr.loadDataCartridge(filename, content)
+})
+
 onBeforeMount(() => {
   global.map = findMap('korea')
 })
@@ -52,7 +61,7 @@ onMounted(() => {
   hotspotOvl = new HotspotOverlay(overlayManager)
   hotspotOvl.setActive(debug.value)
   const stationOverlay = new StationOverlay(overlayManager)
-  new RouteOverlay(overlayManager)
+  new RouteOverlay(overlayManager, missionMgr)
   const locateOverlay = new LocateOverlay(overlayManager)
   new MeasureOverlay(overlayManager)
 
@@ -157,18 +166,20 @@ const getMapUrl = (map: Theater) => {
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
-  <canvas-map
-    ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
-    :suspend="suspend"
-    :cursor="global.hotspots.length > 0 ? 'pointer' : 'default'"
-    @update:zoom="zoom = $event"
-    @update:pos="pos = $event"
-    @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"
-    @pointerdown="overlayManager.onPointerDown($event)"
-    @pointermove="overlayManager.onPointerMove($event)"
-    @pointerup="overlayManager.onPointerUp($event)"
-  />
-  <div id="overlay" v-if="debug">
+  <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
+    <canvas-map
+      ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
+      :suspend="suspend"
+      :cursor="global.hotspots.length > 0 ? 'pointer' : 'default'"
+      @update:zoom="zoom = $event"
+      @update:pos="pos = $event"
+      @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"
+      @pointerdown="overlayManager.onPointerDown($event)"
+      @pointermove="overlayManager.onPointerMove($event)"
+      @pointerup="overlayManager.onPointerUp($event)"
+    />
+  </div>
+  <div id="debug" v-if="debug">
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
@@ -190,7 +201,7 @@ const getMapUrl = (map: Theater) => {
   margin-top: 10px !important;
 }
 
-#overlay {
+#debug {
   position: fixed;
   top: 20px;
   right: 20px;

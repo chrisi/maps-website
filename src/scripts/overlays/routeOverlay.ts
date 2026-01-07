@@ -14,7 +14,7 @@ export class RouteOverlay extends BaseOverlay {
   constructor(ctx: OverlayContext, missionMgr: MissionManager) {
     super(ctx);
     this.missionMgr = missionMgr;
-    this.missionMgr.onDataCardridgeEvent(() => {
+    this.missionMgr.onDataCartridgeEvent(() => {
       ctx.redraw(1, true)
     })
     watch(() => this.settings.viz.ms, () => {
