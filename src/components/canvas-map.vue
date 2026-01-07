@@ -31,16 +31,54 @@ const overlayRef = ref<HTMLCanvasElement | null>(null)
 
 const isLoading = ref(true)
 const mapLoaded = ref(false)
+const loadProgress = ref(0)
 
 let ctx: CanvasRenderingContext2D | null = null;
 let ovlCtx: CanvasRenderingContext2D | null = null;
 
 const mapImage = new Image();
 
-watch(() => props.src, (newSrc) => {
+async function loadMapImage(src: string) {
   isLoading.value = true;
   mapLoaded.value = false;
-  mapImage.src = newSrc;
+  loadProgress.value = 0;
+
+  try {
+    const response = await fetch(src);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const contentLength = response.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+    let loaded = 0;
+    const reader = response.body?.getReader();
+    if (!reader) {
+      mapImage.src = src;
+      return;
+    }
+
+    const chunks = [];
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.length;
+      if (total > 0) {
+        loadProgress.value = Math.round((loaded / total) * 100);
+      }
+    }
+
+    const blob = new Blob(chunks);
+    mapImage.src = URL.createObjectURL(blob);
+  } catch (error) {
+    console.error("Failed to load map image:", error);
+    // Fallback to simple image loading if fetch fails
+    mapImage.src = src;
+  }
+}
+
+watch(() => props.src, (newSrc) => {
+  loadMapImage(newSrc);
 })
 
 watch(() => props.suspend, (isSuspended) => {
@@ -93,16 +131,14 @@ onMounted(() => {
   window.addEventListener("resize", resize);
   resize();
 
-  mapRef.value.style.touchAction = 'none'
-  mapRef.value.addEventListener("pointerdown", onDown);
-  mapRef.value.addEventListener("pointermove", onMove);
-  mapRef.value.addEventListener("pointerup", onUp);
-  mapRef.value.addEventListener("pointercancel", onUp);
-  mapRef.value.addEventListener("wheel", onWheel, {passive: false});
-
   mapImage.onload = () => {
     isLoading.value = false;
     mapLoaded.value = true;
+
+    if (mapImage.src.startsWith('blob:')) {
+      URL.revokeObjectURL(mapImage.src);
+    }
+
     // Center image initially
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -112,8 +148,17 @@ onMounted(() => {
     redraw();
     emit('update:zoom', scale);
   };
-  isLoading.value = true;
-  mapImage.src = props.src;
+
+  if (props.src) {
+    loadMapImage(props.src);
+  }
+
+  mapRef.value.style.touchAction = 'none'
+  mapRef.value.addEventListener("pointerdown", onDown);
+  mapRef.value.addEventListener("pointermove", onMove);
+  mapRef.value.addEventListener("pointerup", onUp);
+  mapRef.value.addEventListener("pointercancel", onUp);
+  mapRef.value.addEventListener("wheel", onWheel, {passive: false});
 })
 
 function resize() {
@@ -505,6 +550,10 @@ function animate() {
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>
       <div class="loading-text">Loading Map...</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" :style="{ width: loadProgress + '%' }"></div>
+      </div>
+      <div class="progress-text">{{ loadProgress }}%</div>
     </div>
   </div>
 </template>
@@ -578,5 +627,25 @@ canvas {
 .loading-text {
   font-size: 1.2rem;
   font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.progress-bar-container {
+  width: 200px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #4caf50;
+  transition: width 0.2s ease-out;
+}
+
+.progress-text {
+  font-size: 0.9rem;
 }
 </style>
