@@ -54,6 +54,7 @@ dropFileHandler.onIniLoaded((filename: string, content: string) => {
 
 onBeforeMount(() => {
   global.map = findMap('korea')
+  global.message = "N00°00.000',N00°00.000' | X.0,Y:0"
 })
 
 let hotspotOvl: HotspotOverlay | undefined
