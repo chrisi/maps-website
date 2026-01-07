@@ -25,8 +25,9 @@ export class RouteOverlay extends BaseOverlay {
 
   public providesHotspots(): Hotspot[] {
     if (!this.missionMgr.isMissionLoaded()) return []
+    let idx = 1
     return this.missionMgr.getDatacardridge().targets.map(r => {
-      return {pos: {x: r.x, y: r.y}, target: r, name: r.desc, type: 'Waypoint', provider: 'RouteOverlay'}
+      return {pos: {x: r.x, y: r.y}, target: r, name: "" + idx++, type: 'Waypoint', provider: 'RouteOverlay'}
     })
   }
 
@@ -95,16 +96,18 @@ export class RouteOverlay extends BaseOverlay {
         case Action.S_D:
         case Action.Recon:
         case Action.Sweep:
-          drawOutlined(ctx, "white", "black", 3, 1, c => {
-            c.moveTo(wp.x - 8, wp.y + 8);
-            c.lineTo(wp.x, wp.y - 8);
-            c.lineTo(wp.x + 8, wp.y + 8);
-            c.lineTo(wp.x - 8, wp.y + 8);
+          drawOutlined(ctx, "white", "black", 2.6, 0.6, c => {
+            const triSize = 8
+            const triOfs = 1
+            c.moveTo(wp.x - triSize, wp.y + triSize - triOfs);
+            c.lineTo(wp.x, wp.y - triSize - triOfs);
+            c.lineTo(wp.x + triSize, wp.y + triSize - triOfs);
+            c.lineTo(wp.x - triSize, wp.y + triSize - triOfs);
           })
           break;
         default:
-          drawOutlined(ctx, "white", "black", 3, 1, c => {
-            c.arc(wp.x, wp.y, 8, 0, 2 * Math.PI);
+          drawOutlined(ctx, "white", "black", 2.6, 0.6, c => {
+            c.arc(wp.x, wp.y, 7, 0, 2 * Math.PI);
           })
       }
 
@@ -151,6 +154,7 @@ export class RouteOverlay extends BaseOverlay {
 
         const dist = (vec.mag / px2nm / cnv.scale).toFixed(1)
 
+        // Omit distance if the route segment is too short on current scale to declutter UI
         if (vec.mag > 50) {
           ctx.font = '14px monospace';
 
