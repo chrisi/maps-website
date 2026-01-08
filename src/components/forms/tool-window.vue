@@ -21,6 +21,7 @@ const emit = defineEmits(['close'])
 
 <style scoped>
 .modal-backdrop {
+  pointer-events: none;
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -31,6 +32,7 @@ const emit = defineEmits(['close'])
 }
 
 .modal-content {
+  pointer-events: auto;
   position: fixed;
   left: 55px;
   top: 77px;

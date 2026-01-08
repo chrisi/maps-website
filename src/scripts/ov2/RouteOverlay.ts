@@ -4,13 +4,16 @@ import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {watch} from "vue";
-import {Action, type LineStpt, type Ppt, type Target} from "@/model/mission.ts";
+import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
 import {drawOutlined} from "@/scripts/draw.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
+import {drawHighlight} from "@/common/scripts/map_draw";
 
 export class RouteOverlay extends BaseOverlay {
 
   private missionMgr: MissionManager
+
+  private highlightSize = 20; //TODO: settings
 
   constructor(manager: OverlayManager, missionMgr: MissionManager) {
     super(manager);
@@ -26,9 +29,18 @@ export class RouteOverlay extends BaseOverlay {
   public providesHotspots(): Hotspot[] {
     if (!this.missionMgr.isMissionLoaded()) return []
     let idx = 1
-    return this.missionMgr.getDatacardridge().targets.map(r => {
-      return {pos: {x: r.x, y: r.y}, target: r, name: "" + idx++, type: 'Waypoint', provider: 'RouteOverlay'}
+    return this.missionMgr.getMission().route.map(r => {
+      return {pos: {x: r.tgt.x, y: r.tgt.y}, target: r, name: "" + idx++, type: 'Waypoint', provider: 'RouteOverlay'}
     })
+  }
+
+  public onClickHotspot(hotspots: Hotspot[]) {
+    const wp = hotspots.find(hs => {
+      return hs.provider == 'RouteOverlay'
+    })
+    if (wp) {
+      this.global.currentWaypoint = wp.target as Waypoint
+    }
   }
 
   public onDraw(cnv: Canvas): void {
@@ -37,6 +49,11 @@ export class RouteOverlay extends BaseOverlay {
     this.drawLineSteerPoints(cnv, crd.lines);
     this.drawPrePlannedThreats(cnv, crd.ppts);
     this.drawRoute(cnv, crd.targets);
+
+    if (this.global.currentWaypoint) {
+      const pos = this.toCnv(this.global.currentWaypoint.tgt, cnv)
+      drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize);
+    }
   }
 
   private drawPrePlannedThreats(cnv: Canvas, list: Ppt[]) {

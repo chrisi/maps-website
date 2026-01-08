@@ -80,8 +80,8 @@ export class MissionManager {
     }
   }
 
-  public getSteerpointType(index: number) {
-    return (this.isTargetWaypoint(this.dataCartridge!.targets[index]!)) ? "TGT" : "STPT";
+  public getSteerpointType(wp: Waypoint) {
+    return (this.isTargetWaypoint(wp.tgt) ? "TGT" : "STPT");
   }
 
   public isMissionLoaded(): boolean {
@@ -108,6 +108,7 @@ export class MissionManager {
       const extra = tgtFrom.duration / 60
       const waypoint: Waypoint =
         {
+          no: i,
           tgt: tgtFrom,
           tos: tos,
           dist: leg.mag / PX2NM,

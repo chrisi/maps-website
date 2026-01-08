@@ -6,7 +6,7 @@ import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 export class LocateOverlay extends BaseOverlay {
 
   private location: Point | undefined
-  private zoomFn: ((pos: Point, newScale: number) => void) | undefined
+  private zoomFn: ((pos: Point, newScale?: number) => void) | undefined
 
   private highlightSize = 17; //TODO: settings
 
@@ -15,7 +15,7 @@ export class LocateOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  public setZoomFn = (zoomFn: (pos: Point, newScale: number) => void) => {
+  public setZoomFn = (zoomFn: (pos: Point, newScale?: number) => void) => {
     this.zoomFn = zoomFn
   }
 

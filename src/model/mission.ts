@@ -73,6 +73,7 @@ export interface Centroid extends Point {
 }
 
 export interface Waypoint {
+  no: number,
   tgt: Target,
   tos: number,
   dist: number,

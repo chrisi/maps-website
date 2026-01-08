@@ -162,27 +162,25 @@ function btnClick(sender: string) {
 const global = useGlobalStore()
 
 const mission = ref<Mission>()
-const wpIdx = ref(0)
 
 onMounted(() => {
   props.missionManager.onDataCartridgeEvent(() => {
     mission.value = props.missionManager.getMission()
-    wpIdx.value = 0
-    global.currentWaypoint = mission.value!.route![0]
+    if (!global.currentWaypoint)
+      global.currentWaypoint = mission.value!.route![0]
   })
 })
 
-watch(wpIdx, (val) => {
-  if (!mission.value) return
-  global.currentWaypoint = mission.value!.route![val]
-})
-
 const prevWaypoint = () => {
-  if (wpIdx.value > 0) wpIdx.value--
+  const idx = global.currentWaypoint!.no - 1
+  if (idx > 0)
+    global.currentWaypoint = mission.value!.route![idx - 1]
 }
 
 const nextWaypoint = () => {
-  if (wpIdx.value < mission.value!.route!.length - 1) wpIdx.value++
+  const idx = global.currentWaypoint!.no - 1
+  if (idx < mission.value!.route!.length - 1)
+    global.currentWaypoint = mission.value!.route![idx + 1]
 }
 
 const track = computed(() => {
@@ -202,7 +200,7 @@ const coord = computed(() => {
 )
 
 const type = computed(() => {
-    return props.missionManager.getSteerpointType(wpIdx.value)
+    return props.missionManager.getSteerpointType(global.currentWaypoint!)
   }
 )
 
@@ -215,7 +213,7 @@ const type = computed(() => {
         <tool-spacer medium/>
         <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
           <div>{{ type }}</div>
-          <div>{{ wpIdx + 1 }}</div>
+          <div>{{ global.currentWaypoint!.no }}</div>
           <div style="display: flex; gap: 8px;">
             <img class="btn" src="/common/assets/icon_left.png" alt="left" @click="prevWaypoint">
             <img class="btn" src="/common/assets/icon_right.png" alt="right" @click="nextWaypoint">
@@ -283,8 +281,8 @@ const type = computed(() => {
         </tool-input>
         <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" v-model="pkg.fuel" unit="lbs"/>
         <tool-spacer medium/>
-        <tool-button id="btn-flight" icon="../common/assets/icon_table1.png" @click="btnClick"/>
-        <tool-button id="btn-wx" icon="../common/assets/icon_table.png" @click="btnClick"/>
+        <tool-button id="btn-flight" icon="/common/assets/icon_table1.png" @click="btnClick"/>
+        <tool-button id="btn-wx" icon="/common/assets/icon_table.png" @click="btnClick"/>
       </template>
     </tool-tabs>
     <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>

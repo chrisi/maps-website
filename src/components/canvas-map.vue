@@ -272,8 +272,10 @@ function smoothZoomAt(x: number, y: number, zoomFactor: number) {
   }
 }
 
-function locatePosition(pos: Point, newScale: number) {
-  targetScale = newScale;
+function locatePosition(pos: Point, newScale?: number) {
+  if (newScale !== undefined) {
+    targetScale = newScale;
+  }
   if (targetScale > maxScale) targetScale = maxScale;
 
   const vw = window.innerWidth;

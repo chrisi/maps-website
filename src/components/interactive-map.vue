@@ -97,6 +97,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
       break
     case 'Escape':
       global.mode = Mode.None
+      activeWindow.value = ''
+      selectedStation.value = undefined
       suspend.value = false
       break
     case 'd':
@@ -123,6 +125,8 @@ const execTool = (tool: string) => {
   switch (tool) {
     case "move":
       suspend.value = false
+      activeWindow.value = ''
+      selectedStation.value = undefined
       break;
     case "settings":
     case "route":
@@ -153,6 +157,12 @@ watch(selectedStation, (newValue) => {
     ovl.locateStation(newValue.name)
   } else {
     ovl.clearLocation()
+  }
+})
+
+watch(() => global.currentWaypoint, (newValue) => {
+  if (newValue) {
+    canvasMapRef.value.locatePosition({x: newValue.tgt.x, y: newValue.tgt.y})
   }
 })
 
