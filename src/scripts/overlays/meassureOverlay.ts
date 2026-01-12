@@ -68,7 +68,12 @@ export class MeassureOverlay extends BaseOverlay {
     const scaledDist = Math.round(distance / (px2nm * this.global.zoom.factor));
     const ctx = dc.cnvCtx
     const text = degrees + "\xb0 / " + scaledDist + " NM";
-    drawTextWithBox(ctx, text, pt.x, pt.y, '16px courier-new', '#383b79', 'white');
+    let rotation = radians;
+    if (rotation > Math.PI / 2 || rotation < -Math.PI / 2) {
+      rotation += Math.PI;
+    }
+    const dy = -15; // Offset to draw above the line
+    drawTextWithBox(ctx, text, pt.x, pt.y, '16px courier-new', '#383b79', 'white', rotation, dy);
   }
 
 }

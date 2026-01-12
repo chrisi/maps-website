@@ -18,7 +18,8 @@ export function drawOutlined(ctx: CanvasRenderingContext2D,
   ctx.stroke()
 }
 
-export function drawTextWithBox(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, font: string, boxColor: string, textColor: string) {
+export function drawTextWithBox(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, font: string, boxColor: string, textColor: string, rotation: number = 0, dy: number = 0) {
+  ctx.save();
   ctx.font = font;
   const metrics = ctx.measureText(text);
   const textWidth = metrics.width;
@@ -27,10 +28,13 @@ export function drawTextWithBox(ctx: CanvasRenderingContext2D, text: string, x: 
 
   const rectWidth = textWidth + padding * 2;
   const rectHeight = actualHeight + padding * 2;
-  const rectX = x - rectWidth / 2;
-  const rectY = y - 1 - rectHeight / 2;
 
-  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+
+  const rectX = -rectWidth / 2;
+  const rectY = -1 - rectHeight / 2 + dy;
+
   ctx.globalAlpha = 0.5;
   ctx.fillStyle = boxColor;
   if (ctx.roundRect) {
@@ -40,12 +44,13 @@ export function drawTextWithBox(ctx: CanvasRenderingContext2D, text: string, x: 
   } else {
     ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
   }
-  ctx.restore();
 
+  ctx.globalAlpha = 1.0;
   ctx.fillStyle = textColor;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, x, y);
+  ctx.fillText(text, 0, dy);
+  ctx.restore();
 }
 
 export function drawTextOutlined(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, font: string, color: string = 'white') {
