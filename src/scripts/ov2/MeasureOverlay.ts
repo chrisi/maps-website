@@ -9,7 +9,7 @@ export class MeasureOverlay extends BaseOverlay {
   private from: Point | undefined
   private to: Point | undefined
 
-  private measuring = false
+  private active = false
 
   public onDraw = (cnv: Canvas) => {
     if (!this.from || !this.to) return
@@ -19,7 +19,7 @@ export class MeasureOverlay extends BaseOverlay {
   public onPointerDown(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
-    this.measuring = true
+    this.active = true
     this.from = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }
@@ -27,7 +27,7 @@ export class MeasureOverlay extends BaseOverlay {
   public onPointerUp(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
-    this.measuring = false
+    this.active = false
     this.to = undefined
     this.from = undefined
     this.redraw()
@@ -35,7 +35,7 @@ export class MeasureOverlay extends BaseOverlay {
 
   public onPointerMove(e: PointerEvent) {
     if (this.global.mode != Mode.Measure) return
-    if (!this.measuring) return
+    if (!this.active) return
     this.to = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }
@@ -70,7 +70,7 @@ export class MeasureOverlay extends BaseOverlay {
     ctx.font = '16px courier-new';
     ctx.fillRect(pos.x - 50, pos.y - 12, 115, 24);
     ctx.fillStyle = 'white';
-    ctx.fillText(degrees + "\xb0 / " + scaledDist + " NM", pos.x - 48, pos.y + 6, 100);
+    ctx.fillText(degrees + "\xb0 / " + scaledDist + " NM", pos.x - 48, pos.y + 6);
   }
 
 }

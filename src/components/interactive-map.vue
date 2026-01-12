@@ -71,8 +71,8 @@ onMounted(() => {
   const stationOverlay = new StationOverlay(overlayManager)
   new RouteOverlay(overlayManager, missionMgr)
   const locateOverlay = new LocateOverlay(overlayManager)
-  new MeasureOverlay(overlayManager)
-  new SymbolOverlay(overlayManager)
+  new SymbolOverlay(overlayManager, Mode.Symbol)
+  new MeasureOverlay(overlayManager, Mode.Measure)
 
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
   stationOverlay.addSelectStationEventHandler(station => selectedStation.value = station)

@@ -13,11 +13,11 @@ export interface Overlay {
 
   onDraw(cnv: Canvas): void
 
-  onPointerDown?(e: PointerEvent): void
+  onPointerDown?(e: PointerEvent, ownHotspots?: Hotspot[]): void
+
+  onPointerUp?(e: PointerEvent, ownHotspots?: Hotspot[], isClick?: boolean): void
 
   onPointerMove?(e: PointerEvent): void
-
-  onPointerUp?(e: PointerEvent): void
 
   onHoverHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
@@ -30,6 +30,10 @@ export interface Overlay {
   onClickOwnHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
   providesHotspots?(): Hotspot[]
+
+  setHotspots(hotspots: Hotspot[]): void
+
+  getHotspots(): Hotspot[]
 }
 
 export abstract class BaseOverlay implements Overlay {
@@ -38,7 +42,8 @@ export abstract class BaseOverlay implements Overlay {
   protected settings = useSettingsStore()
 
   protected readonly manager: OverlayManager
-  private activeMode: Mode | undefined = undefined
+  private hotspots: Hotspot[] = []
+  private readonly activeMode: Mode | undefined = undefined
   private enabled = true
 
   constructor(manager: OverlayManager, activeMode?: Mode) {
@@ -75,6 +80,24 @@ export abstract class BaseOverlay implements Overlay {
   protected toCnv(pt: Point, cnv?: Canvas): Point {
     if (!cnv) cnv = this.manager.getCanvas()
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
+  }
+
+  // implement this if your overlay provides hotspots that the mouse could interact with
+  // hotspot hits will be calculated by the OverlayManager and distributed via the pointer events
+  public providesHotspots?(): Hotspot[] {
+    return []
+  }
+
+  // is needed for ownHotspot caching by the OverlayManager exclusively
+  // do not use or override in subclasses!
+  public setHotspots(hotspots: Hotspot[]): void {
+    this.hotspots = hotspots
+  }
+
+  // is needed for ownHotspot caching by the OverlayManager exclusively
+  // do not use or override in subclasses!
+  public getHotspots(): Hotspot[] {
+    return this.hotspots
   }
 
 }
