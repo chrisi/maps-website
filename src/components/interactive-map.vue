@@ -1,33 +1,39 @@
 <script setup lang="ts">
-import CanvasMap from "@/components/canvas-map.vue";
+import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 
-import SkyvectorLogo from "@/components/skyvector-logo.vue";
+import {useGlobalStore} from "@/stores/global.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
+import {cdnUrl, findMap} from "@/data/map.ts";
+import {strLatLong} from "@/scripts/conv.ts";
+import {map2LatLong} from "@/scripts/math.ts";
+
+// Overlays
+import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
 import {RouteOverlay} from "@/scripts/ov2/RouteOverlay.ts";
 import {MeasureOverlay} from "@/scripts/ov2/MeasureOverlay.ts";
 import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
 import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
 import {HotspotOverlay} from "@/scripts/ov2/HotspotOverlay.ts";
-import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
+import {SymbolOverlay} from "@/scripts/ov2/SymbolOverlay.ts";
+//Toolwindows
+import DetailsPopup from "@/components/details-popup.vue";
+import SettingsWindow from "@/components/settings-window.vue";
+import RouteWindow from "@/components/route-window.vue";
+import SymbolsWindow from "@/components/symbols-window.vue";
+
+import {MissionManager} from "@/scripts/missionManager.ts";
+import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
+import {Mode} from "@/model/mode.ts";
+import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
 import type {Coord, Point} from "@/model/base.ts";
-import {useGlobalStore} from "@/stores/global.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
-import {strLatLong} from "@/scripts/conv.ts";
-import {map2LatLong} from "@/scripts/math.ts";
-import {cdnUrl, findMap} from "@/data/map.ts";
-import {Mode} from "@/model/mode.ts";
-import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
+import CanvasMap from "@/components/canvas-map.vue";
+import MapToolbar from "@/components/map-toolbar.vue";
+import StationSelector from "@/components/station-selector.vue";
+import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
-import StationSelector from "@/components/station-selector.vue";
-import MapToolbar from "@/components/map-toolbar.vue";
-import DetailsPopup from "@/components/details-popup.vue";
-import HotspotList from "@/components/hotspot-list.vue";
-import SettingsWindow from "@/components/settings-window.vue";
-import type {Theater} from "@/model/theater.ts";
-import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
-import {MissionManager} from "@/scripts/missionManager.ts";
-import RouteWindow from "@/components/route-window.vue";
+import SkyvectorLogo from "@/components/skyvector-logo.vue";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -66,6 +72,7 @@ onMounted(() => {
   new RouteOverlay(overlayManager, missionMgr)
   const locateOverlay = new LocateOverlay(overlayManager)
   new MeasureOverlay(overlayManager)
+  new SymbolOverlay(overlayManager)
 
   locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
   stationOverlay.addSelectStationEventHandler(station => selectedStation.value = station)
@@ -178,6 +185,7 @@ const getMapUrl = (map: Theater) => {
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
+  <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map

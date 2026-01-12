@@ -121,12 +121,12 @@ export class OverlayManager {
       if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerMove?.(e)
         if (allHs.length > 0)
-          overlay.onHoverHotspot?.(allHs)
+          overlay.onHoverHotspot?.(allHs, e)
         // calculate a sorted list of hotspots only from the current overlay
         let ownCandidates = overlay.providesHotspots?.() || [];
         const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
         if (ownHs.length > 0)
-          overlay.onHoverOwnHotspot?.(ownHs)
+          overlay.onHoverOwnHotspot?.(ownHs, e)
       }
     }
   }
@@ -141,14 +141,15 @@ export class OverlayManager {
       if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerUp?.(e)
         if (isClick) {
-          overlay.onClick?.(e)
           if (allHs.length > 0)
-            overlay.onClickHotspot?.(allHs)
+            overlay.onClickHotspot?.(allHs, e)
           // calculate a sorted list of hotspots only from the current overlay
           let ownCandidates = overlay.providesHotspots?.() || [];
           const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
           if (ownHs.length > 0)
-            overlay.onClickOwnHotspot?.(ownHs)
+            overlay.onClickOwnHotspot?.(ownHs, e)
+          // emit a standard click event with optional consumable hotspots, if any
+          overlay.onClick?.(e, ownHs)
         }
       }
     }

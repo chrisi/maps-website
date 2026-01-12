@@ -19,15 +19,15 @@ export interface Overlay {
 
   onPointerUp?(e: PointerEvent): void
 
-  onHoverHotspot?(hotspots: Hotspot[]): void
+  onHoverHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
-  onHoverOwnHotspot?(hotspots: Hotspot[]): void
+  onHoverOwnHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
-  onClick?(e: PointerEvent): void
+  onClick?(e: PointerEvent, hotspots?: Hotspot[]): void
 
-  onClickHotspot?(hotspots: Hotspot[]): void
+  onClickHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
-  onClickOwnHotspot?(hotspots: Hotspot[]): void
+  onClickOwnHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
 
   providesHotspots?(): Hotspot[]
 }
