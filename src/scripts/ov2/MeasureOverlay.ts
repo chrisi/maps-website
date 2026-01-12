@@ -3,6 +3,7 @@ import {Mode} from "@/model/mode.ts";
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import {drawTextWithBox} from "@/scripts/draw.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
@@ -66,11 +67,9 @@ export class MeasureOverlay extends BaseOverlay {
     const pos = this.toCnv(pt, cnv)
     const degrees = rad2deg(radians);
     const scaledDist = Math.round(distance / (px2nm * this.global.zoom.factor));
-    ctx.lineWidth = 1;
-    ctx.font = '16px courier-new';
-    ctx.fillRect(pos.x - 50, pos.y - 12, 115, 24);
-    ctx.fillStyle = 'white';
-    ctx.fillText(degrees + "\xb0 / " + scaledDist + " NM", pos.x - 48, pos.y + 6);
+    const text = degrees + "\xb0 / " + scaledDist + " NM";
+
+    drawTextWithBox(ctx, text, pos.x, pos.y, '14px monospace', '#383b79', 'white');
   }
 
 }

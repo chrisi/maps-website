@@ -5,9 +5,10 @@ import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {watch} from "vue";
 import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
-import {drawOutlined} from "@/scripts/draw.ts";
+import {drawOutlined, drawTextOutlined} from "@/scripts/draw.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
+import {drawTextWithBox} from "@/scripts/draw.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
@@ -67,10 +68,7 @@ export class RouteOverlay extends BaseOverlay {
 
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 2;
-      ctx.strokeText(ppt.desc, p.x - 16, p.y + 8);
-
-      ctx.fillStyle = 'orange';
-      ctx.fillText(ppt.desc, p.x - 16, p.y + 8);
+      drawTextWithBox(ctx, ppt.desc, p.x, p.y, '14px monospace', 'rgba(0, 0, 0, 0.5)', 'orange');
     });
   }
 
@@ -124,15 +122,7 @@ export class RouteOverlay extends BaseOverlay {
       }
 
       // Add Waypoint Number
-      ctx.lineWidth = 1;
-      ctx.font = '14px monospace';
-
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 3;
-      ctx.strokeText(id, waypoint.x - 16, waypoint.y + 8);
-
-      ctx.fillStyle = 'white';
-      ctx.fillText(id, waypoint.x - 16, waypoint.y + 8);
+      //drawTextOutlined(ctx, id, wp.x + 10, wp.y - 10, "14px monospace", "#0f0");
     }
   }
 
@@ -168,14 +158,7 @@ export class RouteOverlay extends BaseOverlay {
 
         // Omit distance if the route segment is too short on current scale to declutter UI
         if (vec.mag > 50) {
-          ctx.font = '14px monospace';
-
-          ctx.strokeStyle = 'black';
-          ctx.lineWidth = 2;
-          ctx.strokeText(dist, mid.x - 20, mid.y - 8, 40);
-
-          ctx.fillStyle = 'white';
-          ctx.fillText(dist, mid.x - 20, mid.y - 8, 40);
+          drawTextOutlined(ctx, dist, mid.x, mid.y - 10, "14px monospace");
         }
         // Only draw lines up to landing
         if (list[i + 1]!.action == 7) endRoute = true;

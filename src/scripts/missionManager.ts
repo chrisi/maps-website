@@ -148,7 +148,7 @@ export class MissionManager {
       y: this.global.map!.pixels - ry / res,
       z: parseFloat(data[2]!),
       radius: parseFloat(data[3]!) / res,
-      desc: data[4] ?? "threat"
+      desc: (data[4] ?? "threat").trim()
     }
     this.dataCartridge!.ppts.push(ppt);
   }
