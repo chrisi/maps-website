@@ -34,13 +34,8 @@ export class RouteOverlay extends BaseOverlay {
     })
   }
 
-  public onClickHotspot(hotspots: Hotspot[]) {
-    const wp = hotspots.find(hs => {
-      return hs.provider == 'RouteOverlay'
-    })
-    if (wp) {
-      this.global.currentWaypoint = wp.target as Waypoint
-    }
+  public onClickOwnHotspot(hotspots: Hotspot[]) {
+    this.global.currentWaypoint = hotspots[0]!.target as Waypoint
   }
 
   public onDraw(cnv: Canvas): void {

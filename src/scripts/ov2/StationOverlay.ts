@@ -22,23 +22,14 @@ export class StationOverlay extends BaseOverlay {
     })
   }
 
-  public onClickHotspot(hotspots: Hotspot[]) {
-    const sta = hotspots.find(hs => {
-      return hs.provider == 'StationOverlay'
-    })
-    if (sta) {
-      this.selectStationEventHandler.forEach(cb => cb(sta.target as Station))
-    }
+  public onClickOwnHotspot(hotspots: Hotspot[]) {
+    this.selectStationEventHandler.forEach(cb => cb(hotspots[0]!.target as Station))
   }
 
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (0.8 - cnv.scale) * 0.7
     this.stations.forEach(sta => {
-      const pt = {
-        x: (sta.pt.x - cnv.offset.x) * cnv.scale,
-        y: (sta.pt.y - cnv.offset.y) * cnv.scale
-      }
-
+      const pt = this.toCnv(sta.pt)
       if (sta.station.type === 'Airbase')
         this.drawAirbase(cnv, pt, sta.orientation, smartScale, sta.doubleRwy);
       if (sta.station.type === 'VORTAC')

@@ -61,7 +61,7 @@ let hotspotOvl: HotspotOverlay | undefined
 
 onMounted(() => {
   hotspotOvl = new HotspotOverlay(overlayManager)
-  hotspotOvl.setActive(debug.value)
+  hotspotOvl.setEnabled(debug.value)
   const stationOverlay = new StationOverlay(overlayManager)
   new RouteOverlay(overlayManager, missionMgr)
   const locateOverlay = new LocateOverlay(overlayManager)
@@ -142,7 +142,7 @@ const execTool = (tool: string) => {
 }
 
 watch(debug, (newValue) => {
-  hotspotOvl?.setActive(newValue)
+  hotspotOvl?.setEnabled(newValue)
 })
 
 watch(pos, (newPos) => {

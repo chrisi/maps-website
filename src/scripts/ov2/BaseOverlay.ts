@@ -1,12 +1,15 @@
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
+import type {Mode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 
 export interface Overlay {
-  isActive(): boolean
+  isEnabled(): boolean
+
+  getActiveMode(): Mode | undefined
 
   onDraw(cnv: Canvas): void
 
@@ -18,7 +21,13 @@ export interface Overlay {
 
   onHoverHotspot?(hotspots: Hotspot[]): void
 
+  onHoverOwnHotspot?(hotspots: Hotspot[]): void
+
+  onClick?(e: PointerEvent): void
+
   onClickHotspot?(hotspots: Hotspot[]): void
+
+  onClickOwnHotspot?(hotspots: Hotspot[]): void
 
   providesHotspots?(): Hotspot[]
 }
@@ -29,22 +38,27 @@ export abstract class BaseOverlay implements Overlay {
   protected settings = useSettingsStore()
 
   protected readonly manager: OverlayManager
+  private activeMode: Mode | undefined = undefined
+  private enabled = true
 
-  private active = true
-
-  constructor(manager: OverlayManager) {
+  constructor(manager: OverlayManager, activeMode?: Mode) {
     manager.registerOverlay(this)
     this.manager = manager
+    this.activeMode = activeMode
   }
 
-  public setActive(active: boolean): void {
-    console.log(`setting overlay '${this.constructor.name}' to ${active ? 'active' : 'inactive'}`)
-    this.active = active
+  public setEnabled(enabled: boolean): void {
+    console.log(`setting overlay '${this.constructor.name}' to ${enabled ? 'enabled' : 'disabled'}`)
+    this.enabled = enabled
     this.redraw()
   }
 
-  public isActive(): boolean {
-    return this.active
+  public isEnabled(): boolean {
+    return this.enabled
+  }
+
+  public getActiveMode(): Mode | undefined {
+    return this.activeMode
   }
 
   public abstract onDraw(cnv: Canvas): void
@@ -52,10 +66,6 @@ export abstract class BaseOverlay implements Overlay {
   protected redraw(): void {
     this.manager.redraw()
   }
-
-  // protected getCanvas(): Canvas {
-  //   return this.manager.getCanvas()
-  // }
 
   protected fromCnv(pt: Point, cnv?: Canvas): Point {
     if (!cnv) cnv = this.manager.getCanvas()

@@ -42,7 +42,7 @@ export class OverlayManager {
   public draw = (context: CanvasRenderingContext2D, offset: Point, scale: number): void => {
     for (const overlay of this.overlays) {
       try {
-        if (overlay.isActive()) {
+        if (overlay.isEnabled()) {
           this.cnv = {
             context: context,
             offset: offset,
@@ -68,20 +68,19 @@ export class OverlayManager {
     }
   }
 
-  private findHotspots(pointerPos: Point, single: boolean = false): Hotspot[] {
+  private findHotspots(pointerPos: Point, hotspotIterator: (cb: (hotspot: Hotspot) => void) => void, single: boolean = false): Hotspot[] {
     if (!this.cnv) return []
     const pt = {
       x: pointerPos.x / this.cnv.scale + this.cnv.offset.x,
       y: pointerPos.y / this.cnv.scale + this.cnv.offset.y
     }
     const res: HotspotCandidate[] = []
-    const saveScale = this.cnv?.scale ?? 1
+    const saveScale = this.cnv.scale ?? 1
     //TODO: priority management: sort overlays by priority (tbd)
     //TODO: manage exactly colocated items by trigger threshold (tbd)
-    this.forEachHotspot(hs => {
-      const dist = distance(pt, hs.pos)
-      const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spotsize configurable
-      if (dist < sz) {
+    hotspotIterator(hs => {
+      let dist = this.isNearbyHotspot(hs, pt, saveScale)
+      if (dist) {
         if (single) return [hs]
         res.push({target: hs, dist: dist})
       }
@@ -89,9 +88,15 @@ export class OverlayManager {
     return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
   }
 
+  private isNearbyHotspot(hs: Hotspot, pt: Point, saveScale: number): number | undefined {
+    const dist = distance(pt, hs.pos)
+    const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spot size configurable
+    if (dist < sz) return dist
+  }
+
   public forEachHotspot(cb: (hotspot: Hotspot) => void) {
     for (const overlay of this.overlays) {
-      if (overlay.isActive()) {
+      if (overlay.isEnabled()) {
         for (const hs of overlay.providesHotspots?.() ?? []) {
           cb(hs)
         }
@@ -102,19 +107,26 @@ export class OverlayManager {
   public onPointerDown(e: PointerEvent): void {
     this.clickPos = {x: e.pageX, y: e.pageY}
     for (const overlay of this.overlays) {
-      if (overlay.isActive()) {
+      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerDown?.(e)
       }
     }
   }
 
   public onPointerMove(e: PointerEvent): void {
-    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
-    this.global.hotspots = hs
+    // calculate a sorted list of hotspots from all overlays
+    const allHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => this.forEachHotspot(cb), false)
+    this.global.hotspots = allHs
     for (const overlay of this.overlays) {
-      if (overlay.isActive()) {
+      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerMove?.(e)
-        if (hs.length > 0) overlay.onHoverHotspot?.(hs)
+        if (allHs.length > 0)
+          overlay.onHoverHotspot?.(allHs)
+        // calculate a sorted list of hotspots only from the current overlay
+        let ownCandidates = overlay.providesHotspots?.() || [];
+        const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
+        if (ownHs.length > 0)
+          overlay.onHoverOwnHotspot?.(ownHs)
       }
     }
   }
@@ -122,12 +134,22 @@ export class OverlayManager {
   public onPointerUp(e: PointerEvent): void {
     const isClick = e.pageX === this.clickPos?.x && e.pageY === this.clickPos?.y
     this.clickPos = undefined
-    const hs = this.findHotspots({x: e.pageX, y: e.pageY}, false)
-    this.global.hotspots = hs
+    // calculate a sorted list of hotspots from all overlays
+    const allHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => this.forEachHotspot(cb), false)
+    this.global.hotspots = allHs
     for (const overlay of this.overlays) {
-      if (overlay.isActive()) {
+      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerUp?.(e)
-        if (isClick && hs.length > 0) overlay.onClickHotspot?.(hs)
+        if (isClick) {
+          overlay.onClick?.(e)
+          if (allHs.length > 0)
+            overlay.onClickHotspot?.(allHs)
+          // calculate a sorted list of hotspots only from the current overlay
+          let ownCandidates = overlay.providesHotspots?.() || [];
+          const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
+          if (ownHs.length > 0)
+            overlay.onClickOwnHotspot?.(ownHs)
+        }
       }
     }
   }
