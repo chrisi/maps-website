@@ -1,4 +1,3 @@
-import type {Point} from "@/model/base.ts";
 
 export function drawOutlined(ctx: CanvasRenderingContext2D,
                              lineColor: string, outColor: string, lineWidth: number, outWidth: number,
@@ -64,4 +63,17 @@ export function drawTextOutlined(ctx: CanvasRenderingContext2D, text: string, x:
 
   ctx.fillStyle = color;
   ctx.fillText(text, x, y);
+}
+
+export function drawArrowHead(ctx: CanvasRenderingContext2D, x: number, y: number, rotation: number, size: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-size, -size / 2);
+  ctx.lineTo(-size, size / 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }

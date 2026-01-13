@@ -61,6 +61,25 @@ export class MeasureOverlay extends BaseOverlay {
     ctx.stroke();
   }
 
+  private drawTicks(cnv: Canvas, pFrom: Point, pTo: Point) {
+    const ctx = cnv.context;
+    const vec = vector(pFrom, pTo);
+    if (vec.mag === 0) return;
+    const ux = (pTo.x - pFrom.x) / vec.mag;
+    const uy = (pTo.y - pFrom.y) / vec.mag;
+    const intPx = this.tickDist * PX2NM * cnv.scale;
+    const tCnt = Math.floor(vec.mag / intPx);
+    const tSize = 4;
+    ctx.lineWidth = 1.5;
+    for (let i = 1; i <= tCnt; i++) {
+      const tx = pFrom.x + ux * i * intPx;
+      const ty = pFrom.y + uy * i * intPx;
+      ctx.moveTo(tx + uy * tSize, ty - ux * tSize);
+      ctx.lineTo(tx - uy * tSize, ty + ux * tSize);
+    }
+    ctx.stroke();
+  }
+
   private drawMeasurement(cnv: Canvas, pt: Point, distance: number, radians: number) {
     const ctx = cnv.context
     const px2nm = 6.95; // pixel to Nm scaler
