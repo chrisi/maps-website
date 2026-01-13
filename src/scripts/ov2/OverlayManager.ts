@@ -108,33 +108,23 @@ export class OverlayManager {
 
   public onPointerDown(e: PointerEvent): void {
     this.clickPos = {x: e.pageX, y: e.pageY}
-    // calculate a sorted list of hotspots from all overlays
-    this.allHotspots = this.findHotspots({x: e.pageX, y: e.pageY}, cb => this.forEachHotspot(cb), false)
-    this.global.hotspots = this.allHotspots
+    this.calculateAllHotspots({x: e.pageX, y: e.pageY})
     for (const overlay of this.overlays) {
       if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
-        // calculate a sorted list of hotspots only from the current overlay
-        let ownCandidates = overlay.providesHotspots?.() || [];
-        const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
-        overlay.setHotspots(ownHs)
+        const ownHs = this.calculateOwnHotspots(overlay, {x: e.pageX, y: e.pageY})
         overlay.onPointerDown?.(e, ownHs)
       }
     }
   }
 
   public onPointerMove(e: PointerEvent): void {
-    // calculate a sorted list of hotspots from all overlays
-    this.allHotspots = this.findHotspots({x: e.pageX, y: e.pageY}, cb => this.forEachHotspot(cb), false)
-    this.global.hotspots = this.allHotspots
+    this.calculateAllHotspots({x: e.pageX, y: e.pageY})
     for (const overlay of this.overlays) {
       if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
-        overlay.onPointerMove?.(e)
+        overlay.onPointerMove?.(e, this.allHotspots)
         if (this.allHotspots.length > 0)
           overlay.onHoverHotspot?.(this.allHotspots, e)
-        // calculate a sorted list of hotspots only from the current overlay
-        let ownCandidates = overlay.providesHotspots?.() || [];
-        const ownHs = this.findHotspots({x: e.pageX, y: e.pageY}, cb => ownCandidates.forEach(cb), false)
-        overlay.setHotspots(ownHs)
+        const ownHs = this.calculateOwnHotspots(overlay, {x: e.pageX, y: e.pageY})
         if (ownHs.length > 0)
           overlay.onHoverOwnHotspot?.(ownHs, e)
       }
@@ -144,7 +134,6 @@ export class OverlayManager {
   public onPointerUp(e: PointerEvent): void {
     const isClick = e.pageX === this.clickPos?.x && e.pageY === this.clickPos?.y
     this.clickPos = undefined
-    this.global.hotspots = this.allHotspots
     for (const overlay of this.overlays) {
       if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
         overlay.onPointerUp?.(e, overlay.getHotspots(), isClick)
@@ -158,6 +147,18 @@ export class OverlayManager {
         }
       }
     }
+  }
+
+  private calculateAllHotspots(pt: Point): void {
+    this.allHotspots = this.findHotspots(pt, cb => this.forEachHotspot(cb), false)
+    this.global.hotspots = this.allHotspots
+  }
+
+  private calculateOwnHotspots(overlay: Overlay, pt: Point): Hotspot[] {
+    let ownCandidates = overlay.providesHotspots?.() || []
+    const ownHs = this.findHotspots(pt, cb => ownCandidates.forEach(cb), false)
+    overlay.setHotspots(ownHs)
+    return ownHs
   }
 
   private errorMessage = (overlay: Overlay, e?: Event): string => `error in overlay '${overlay.constructor.name}'${e ? ` on '${e.type}' event` : ''}`

@@ -13,21 +13,21 @@ export interface Overlay {
 
   onDraw(cnv: Canvas): void
 
-  onPointerDown?(e: PointerEvent, ownHotspots?: Hotspot[]): void
+  onPointerDown?(e: PointerEvent, ownHotspots: Hotspot[]): void
 
-  onPointerUp?(e: PointerEvent, ownHotspots?: Hotspot[], isClick?: boolean): void
+  onPointerUp?(e: PointerEvent, ownHotspots: Hotspot[], isClick: boolean): void
 
-  onPointerMove?(e: PointerEvent): void
+  onPointerMove?(e: PointerEvent, ownHotspots: Hotspot[]): void
 
-  onHoverHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
+  onHoverHotspot?(hotspots: Hotspot[], e: PointerEvent): void
 
-  onHoverOwnHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
+  onHoverOwnHotspot?(ownHotspots: Hotspot[], e: PointerEvent): void
 
-  onClick?(e: PointerEvent, hotspots?: Hotspot[]): void
+  onClick?(e: PointerEvent, hotspots: Hotspot[]): void
 
-  onClickHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
+  onClickHotspot?(hotspots: Hotspot[], e: PointerEvent): void
 
-  onClickOwnHotspot?(hotspots: Hotspot[], e?: PointerEvent): void
+  onClickOwnHotspot?(hotspots: Hotspot[], e: PointerEvent): void
 
   providesHotspots?(): Hotspot[]
 

@@ -12,8 +12,10 @@ interface Symbol {
 export class SymbolOverlay extends BaseOverlay {
 
   private symbols: Symbol[] = []
-  private iconCache: Map<string, HTMLImageElement> = new Map();
+  private iconCache: Map<string, HTMLImageElement> = new Map()
   private gid = 0
+
+  private dragSymbol: Symbol | undefined = undefined
 
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7
@@ -22,29 +24,32 @@ export class SymbolOverlay extends BaseOverlay {
     })
   }
 
-  public onClick(e: MouseEvent): void {
-    const s: Symbol = {
-      id: this.gid++,
-      sym: this.global.selectedSymbol!,
-      pt: this.fromCnv({x: e.pageX, y: e.pageY})
+  public onPointerDown(e: PointerEvent, ownHotspots: Hotspot[]): void {
+    if (e.button == 0 && ownHotspots.length > 0) {
+      this.dragSymbol = ownHotspots[0]!.target as Symbol
     }
-    this.symbols.push(s)
-    this.redraw()
-  }
-
-  public onClickOwnHotspot(hotspots: Hotspot[]): void {
-  }
-
-  public onHoverOwnHotspot(hotspots: Hotspot[]): void {
-  }
-
-  public onPointerDown(e: PointerEvent): void {
   }
 
   public onPointerMove(e: PointerEvent): void {
+    if (!this.dragSymbol) return;
+    this.dragSymbol.pt = this.fromCnv({x: e.pageX, y: e.pageY})
+    this.redraw()
   }
 
-  public onPointerUp(e: PointerEvent): void {
+  public onPointerUp(e: PointerEvent, isClick?: boolean): void {
+    if (e.button == 0) {
+      if (isClick && !this.dragSymbol) {
+        const s: Symbol = {
+          id: this.gid++,
+          sym: this.global.selectedSymbol!,
+          pt: this.fromCnv({x: e.pageX, y: e.pageY})
+        }
+        this.symbols.push(s)
+        this.redraw()
+      } else {
+        this.dragSymbol = undefined
+      }
+    }
   }
 
   public providesHotspots(): Hotspot[] {
