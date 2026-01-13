@@ -346,10 +346,13 @@ function onWheel(e: WheelEvent) {
 let pointers = new Map<number, PointerEvent>();
 let startDist = 0;
 let startScale = 1;
+let multiPointer = false;
 
 function onDown(e: PointerEvent) {
-  emit('pointerdown', e);
   pointers.set(e.pointerId, e);
+  if (pointers.size > 1) multiPointer = true;
+
+  emit('pointerdown', e);
   lastMouseX = e.clientX;
   lastMouseY = e.clientY;
   const pos = toImageCoords(e.clientX, e.clientY);
@@ -447,12 +450,16 @@ function onMove(e: PointerEvent) {
 }
 
 function onUp(e: PointerEvent) {
-  emit('pointerup', e);
+  if (!multiPointer) emit('pointerup', e);
   pointers.delete(e.pointerId);
 
-  if (props.suspend) return;
+  if (props.suspend) {
+    if (pointers.size === 0) multiPointer = false;
+    return;
+  }
 
   if (pointers.size === 0) {
+    multiPointer = false;
     if (!isAnimating && (isPanning && (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5))) {
       isAnimating = true;
       requestAnimationFrame(animate);
