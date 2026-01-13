@@ -1,9 +1,9 @@
-import type {Point} from "@/model/base.ts";
+import {midpoint, PX2NM, rad2deg, vector} from "@/scripts/math.ts";
+import {drawArrowHead, drawOutlined, drawTextWithBox} from "@/scripts/draw.ts";
 import {Mode} from "@/model/mode.ts";
-import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import {drawTextWithBox} from "@/scripts/draw.ts";
+import type {Point} from "@/model/base.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
@@ -11,6 +11,11 @@ export class MeasureOverlay extends BaseOverlay {
   private to: Point | undefined
 
   private active = false
+
+  private rulerColor = '#383b79'
+  private textColor = 'white'
+  private tickDist = 25
+  private font = '14px monospace'
 
   public onDraw = (cnv: Canvas) => {
     if (!this.from || !this.to) return
@@ -47,15 +52,18 @@ export class MeasureOverlay extends BaseOverlay {
     const vec = vector(from, to);
     const mid = midpoint(from, to);
     const ctx = cnv.context
-    ctx.strokeStyle = '#383b79';
-    ctx.fillStyle = '#383b79';
-    ctx.setLineDash([]);
-    ctx.lineWidth = 2 * this.global.zoom.factor;
-    ctx.beginPath();
+    ctx.strokeStyle = this.rulerColor;
+    ctx.fillStyle = this.rulerColor;
+    ctx.lineWidth = 2;
     ctx.fillRect(pFrom.x - 3, pFrom.y - 3, 6, 6);
-    ctx.moveTo(pFrom.x, pFrom.y);
-    ctx.lineTo(pTo.x, pTo.y);
-    ctx.stroke();
+    drawOutlined(ctx, "white", this.rulerColor, 2, 1, c => {
+      ctx.moveTo(pFrom.x, pFrom.y);
+      ctx.lineTo(pTo.x, pTo.y);
+    })
+    ctx.strokeStyle = this.rulerColor;
+    ctx.fillStyle = this.rulerColor;
+    drawArrowHead(ctx, pTo.x, pTo.y, -vec.dir + Math.PI / 2, 10);
+    this.drawTicks(cnv, pFrom, pTo);
     ctx.beginPath();
     this.drawMeasurement(cnv, mid, vec.mag, vec.dir);
     ctx.stroke();
@@ -82,18 +90,14 @@ export class MeasureOverlay extends BaseOverlay {
 
   private drawMeasurement(cnv: Canvas, pt: Point, distance: number, radians: number) {
     const ctx = cnv.context
-    const px2nm = 6.95; // pixel to Nm scaler
     const pos = this.toCnv(pt, cnv)
     const degrees = rad2deg(radians);
-    const scaledDist = Math.round(distance / (px2nm * this.global.zoom.factor));
+    const scaledDist = Math.round(distance / PX2NM);
     const text = degrees + "\xb0 / " + scaledDist + " NM";
-
-    let rotation = radians  + Math.PI / 2;
-    if (rotation > Math.PI / 2 || rotation < -Math.PI / 2) {
-      rotation += Math.PI;
-    }
+    let rotation = radians + Math.PI / 2;
+    if (rotation > Math.PI / 2 || rotation < -Math.PI / 2) rotation += Math.PI; // keep text upright
     const dy = -15; // Offset to draw above the line
-    drawTextWithBox(ctx, text, pos.x, pos.y, '14px monospace', '#383b79', 'white', -rotation, dy);
+    drawTextWithBox(ctx, text, pos.x, pos.y, this.font, this.rulerColor, this.textColor, -rotation, dy);
   }
 
 }
