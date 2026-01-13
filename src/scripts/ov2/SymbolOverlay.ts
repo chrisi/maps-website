@@ -36,7 +36,7 @@ export class SymbolOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  public onPointerUp(e: PointerEvent, isClick?: boolean): void {
+  public onPointerUp(e: PointerEvent, _: Hotspot[], isClick?: boolean): void {
     if (e.button == 0) {
       if (isClick && !this.dragSymbol) {
         const s: Symbol = {
