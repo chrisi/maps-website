@@ -1,6 +1,5 @@
-import {midpoint, PX2NM, rad2deg, vector} from "@/scripts/math.ts";
+import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {drawArrowHead, drawOutlined, drawTextWithBox} from "@/scripts/draw.ts";
-import {Mode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/ov2/Canvas.ts";
 import type {Point} from "@/model/base.ts";
@@ -23,7 +22,6 @@ export class MeasureOverlay extends BaseOverlay {
   }
 
   public onPointerDown(e: PointerEvent) {
-    if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
     this.active = true
     this.from = this.fromCnv({x: e.pageX, y: e.pageY})
@@ -31,7 +29,6 @@ export class MeasureOverlay extends BaseOverlay {
   }
 
   public onPointerUp(e: PointerEvent) {
-    if (this.global.mode != Mode.Measure) return
     if (e.button != 0) return
     this.active = false
     this.to = undefined
@@ -40,7 +37,6 @@ export class MeasureOverlay extends BaseOverlay {
   }
 
   public onPointerMove(e: PointerEvent) {
-    if (this.global.mode != Mode.Measure) return
     if (!this.active) return
     this.to = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
@@ -75,7 +71,7 @@ export class MeasureOverlay extends BaseOverlay {
     if (vec.mag === 0) return;
     const ux = (pTo.x - pFrom.x) / vec.mag;
     const uy = (pTo.y - pFrom.y) / vec.mag;
-    const intPx = this.tickDist * PX2NM * cnv.scale;
+    const intPx = this.tickDist * this.global.map!.px2nm * cnv.scale;
     const tCnt = Math.floor(vec.mag / intPx);
     const tSize = 4;
     ctx.lineWidth = 1.5;
@@ -92,7 +88,7 @@ export class MeasureOverlay extends BaseOverlay {
     const ctx = cnv.context
     const pos = this.toCnv(pt, cnv)
     const degrees = rad2deg(radians);
-    const scaledDist = Math.round(distance / PX2NM);
+    const scaledDist = Math.round(distance / this.global.map!.px2nm);
     const text = degrees + "\xb0 / " + scaledDist + " NM";
     let rotation = radians + Math.PI / 2;
     if (rotation > Math.PI / 2 || rotation < -Math.PI / 2) rotation += Math.PI; // keep text upright

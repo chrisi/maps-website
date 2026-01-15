@@ -5,7 +5,7 @@
 //
 import type {Coord, Point, Vector} from "@/model/base.ts";
 
-export const PX2NM = 6.95; // Based on 3840 for maps
+export const FtPerNM = 6076.12
 
 // Given two points return a vector with length and direction
 export function vector(point1: Point, point2: Point): Vector {

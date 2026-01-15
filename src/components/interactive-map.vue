@@ -15,6 +15,7 @@ import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
 import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
 import {HotspotOverlay} from "@/scripts/ov2/HotspotOverlay.ts";
 import {SymbolOverlay} from "@/scripts/ov2/SymbolOverlay.ts";
+import {BullseyeOverlay} from "@/scripts/ov2/BullseyeOverlay.ts";
 //Toolwindows
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";
@@ -68,6 +69,7 @@ let hotspotOvl: HotspotOverlay | undefined
 onMounted(() => {
   hotspotOvl = new HotspotOverlay(overlayManager)
   hotspotOvl.setEnabled(debug.value)
+  new BullseyeOverlay(overlayManager, Mode.Bullseye)
   const stationOverlay = new StationOverlay(overlayManager)
   new RouteOverlay(overlayManager, missionMgr)
   const locateOverlay = new LocateOverlay(overlayManager)
@@ -138,6 +140,7 @@ const execTool = (tool: string) => {
     case "settings":
     case "route":
     case "symbol":
+    case "bullseye":
     case "whiteboard":
       activeWindow.value = tool
       suspend.value = true

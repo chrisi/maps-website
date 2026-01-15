@@ -9,7 +9,7 @@ export class HotspotOverlay extends BaseOverlay {
     cnv.context.fillStyle = "rgba(255, 0, 255, 0.2)"
     cnv.context.strokeStyle = "rgba(255, 0, 255, 0.7)"
     this.manager.forEachHotspot(hs => {
-      const sz = !hs.size ? 15 : (hs.size < 0 ? -hs.size : hs.size * saveScale) // TODO 15: make global hot spotsize configurable
+      const sz = !hs.size ? 15 : (hs.size < 0 ? -hs.size : hs.size * saveScale) // TODO 15: make global hot spot size configurable
       const x = (hs.pos.x - cnv.offset.x) * cnv.scale
       const y = (hs.pos.y - cnv.offset.y) * cnv.scale
       cnv.context.beginPath()

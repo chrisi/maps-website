@@ -7,7 +7,7 @@ export interface Theater {
   feet: number
   pixels: number
   resolution: number
-  //offset: number // deprecated -> use pixels
+  px2nm: number
   folder: string
   mapFilename: string
   stations: Station[]

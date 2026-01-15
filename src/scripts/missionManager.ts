@@ -10,7 +10,7 @@ import {
 } from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import {getFlightHours, map2LatLong, PX2NM, rad2deg, vector} from "@/scripts/math.ts";
+import {getFlightHours, map2LatLong, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/common/scripts/map_radio";
 
 export class MissionManager {
@@ -104,14 +104,14 @@ export class MissionManager {
       const ptFrom = {x: tgtFrom.x, y: tgtFrom.y}
       const ptTo = {x: tgtTo.x, y: tgtTo.y}
       const leg = vector(ptFrom, ptTo)
-      const time = getFlightHours(speed, leg.mag / PX2NM)
+      const time = getFlightHours(speed, leg.mag / this.global.map!.px2nm)
       const extra = tgtFrom.duration / 60
       const waypoint: Waypoint =
         {
           no: i,
           tgt: tgtFrom,
           tos: tos,
-          dist: leg.mag / PX2NM,
+          dist: leg.mag / this.global.map!.px2nm,
           crs: rad2deg(leg.dir),
           spd: speed
         }

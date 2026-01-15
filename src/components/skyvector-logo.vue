@@ -5,7 +5,7 @@
 <template>
   <div>
     <a href="https://skyvector.com" target="_blank">
-      <img src="../../public/resources/skyvector.png" alt="SkyVector">
+      <img src="/resources/skyvector.png" alt="SkyVector">
     </a>
   </div>
 </template>
