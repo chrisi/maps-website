@@ -1,7 +1,7 @@
 import type {Point} from "@/model/base.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 
 interface Symbol {
   id: number

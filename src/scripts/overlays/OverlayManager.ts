@@ -1,8 +1,8 @@
-import type {Overlay} from "@/scripts/ov2/BaseOverlay.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import type {Overlay} from "@/scripts/overlays/BaseOverlay.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import {distance} from "@/scripts/math.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 
 interface HotspotCandidate {

@@ -1,8 +1,8 @@
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 import type {Mode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 

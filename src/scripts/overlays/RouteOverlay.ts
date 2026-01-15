@@ -1,7 +1,7 @@
-import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import type {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {MissionManager} from "@/scripts/missionManager.ts";
 import {watch} from "vue";
 import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";

@@ -1,7 +1,7 @@
 import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
-import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 
 export class LocateOverlay extends BaseOverlay {
 

@@ -8,14 +8,14 @@ import {strLatLong} from "@/scripts/conv.ts";
 import {map2LatLong} from "@/scripts/math.ts";
 
 // Overlays
-import {OverlayManager} from "@/scripts/ov2/OverlayManager.ts";
-import {RouteOverlay} from "@/scripts/ov2/RouteOverlay.ts";
-import {MeasureOverlay} from "@/scripts/ov2/MeasureOverlay.ts";
-import {StationOverlay} from "@/scripts/ov2/StationOverlay.ts";
-import {LocateOverlay} from "@/scripts/ov2/LocateOverlay.ts";
-import {HotspotOverlay} from "@/scripts/ov2/HotspotOverlay.ts";
-import {SymbolOverlay} from "@/scripts/ov2/SymbolOverlay.ts";
-import {BullseyeOverlay} from "@/scripts/ov2/BullseyeOverlay.ts";
+import {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
+import {RouteOverlay} from "@/scripts/overlays/RouteOverlay.ts";
+import {MeasureOverlay} from "@/scripts/overlays/MeasureOverlay.ts";
+import {StationOverlay} from "@/scripts/overlays/StationOverlay.ts";
+import {LocateOverlay} from "@/scripts/overlays/LocateOverlay.ts";
+import {HotspotOverlay} from "@/scripts/overlays/HotspotOverlay.ts";
+import {SymbolOverlay} from "@/scripts/overlays/SymbolOverlay.ts";
+import {BullseyeOverlay} from "@/scripts/overlays/BullseyeOverlay.ts";
 //Toolwindows
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";

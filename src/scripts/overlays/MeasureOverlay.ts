@@ -1,7 +1,7 @@
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {drawArrowHead, drawOutlined, drawTextWithBox} from "@/scripts/draw.ts";
-import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 
 export class MeasureOverlay extends BaseOverlay {

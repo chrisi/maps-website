@@ -5,7 +5,7 @@ import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point, Zoom} from "@/model/base.ts";
 import type {Waypoint} from "@/model/mission.ts";
 import type {PointerTarget} from "@/scripts/overlay.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')

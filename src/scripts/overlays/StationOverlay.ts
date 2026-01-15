@@ -1,9 +1,9 @@
-import {BaseOverlay} from "@/scripts/ov2/BaseOverlay.ts";
-import type {Canvas} from "@/scripts/ov2/Canvas.ts";
+import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import {deg2rad} from "@/scripts/math.ts";
 import type {Station} from "@/model/station.ts";
-import type {Hotspot} from "@/scripts/ov2/Hotspot.ts";
+import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 
 export class StationOverlay extends BaseOverlay {
 
