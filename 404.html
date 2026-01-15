@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Redirecting…</title>
+    <script>
+        // Preserve the full path + query + hash, and redirect to the SPA entry.
+        // We stash the intended URL in the query string so index.html can restore it.
+        var path = location.pathname;
+        var search = location.search || "";
+        var hash = location.hash || "";
+        location.replace(
+            location.origin +
+            ("/" + location.pathname.split("/")[1] + "/").replace("//", "/") +
+            "?__redirect__=" +
+            encodeURIComponent(path + search + hash)
+        );
+    </script>
+</head>
+<body></body>
+</html>
