@@ -23,14 +23,14 @@ export const maps: Theater[] = [
     name: "balkans",
     datum: {lat: 36.625, long: 11}, // this might be v1 map datum
     feet: 3359580, // theater size, 1024 km
-    pixels: 4096, // map size
-    resolution: 3359580 / 4096, // approx 820.2
-    px2nm: FtPerNM / (3359580 / 4096), // approx 6,95 pixels per NM
+    pixels: 6144, // map size
+    resolution: 3359580 / 6144, // approx 546.8
+    px2nm: FtPerNM / (3359580 / 6144), // approx 11.11 pixels per NM
     folder: "02_Balkans",
-    mapFilename: "Balkans_UI_Map_4k.png", // native 4096
+    mapFilename: "Balkans_UI_Map_6K.jpeg", // native 4096
     stations: balkanStations,
     stationMappingSize: 4096,
-    local: false
+    local: true
   }
 ]
 

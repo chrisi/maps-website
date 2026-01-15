@@ -36,6 +36,7 @@ const openLink = (url?: string) => {
   text-align: center;
   border-radius: 6px;
   border: 1px solid #bbb;
+  margin: 10px 40px;
 }
 
 .polaroid img {

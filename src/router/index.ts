@@ -9,13 +9,8 @@ const routes = [
   {
     path: '/map/:name',
     name: 'Map',
-    component: () => import('../components/bms-map.vue'),
-  },
-  {
-    path: '/map/test',
-    name: 'Test',
     component: () => import('../components/interactive-map.vue'),
-  },
+  }
 ]
 
 const router = createRouter({

@@ -20,12 +20,10 @@ import TheaterLink from "@/components/theater-link.vue";
                     name="BALKANS" sub="Rev: 26 JUNE 2023" image="02_balkans-thumb.jpeg"/>
       <theater-link link="https://maps.falcon-bms.com/03_ITO_Interactive_Map/index.html"
                     name="ISRAEL" sub="Rev: 26 JUNE 2023" image="03_ito-thumb.jpeg"/>
-      <div style="width: 163px"></div>
     </div>
     <h2>Theater Maps 4.38</h2>
     <div class="flex">
-<!--      <theater-link link="/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>-->
-      <theater-link link="/map/test" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
+      <theater-link link="/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
       <theater-link link="/map/balkans" name="BALKANS" sub="IN DEVELOPMENT" image="05_balkans-thumb.jpeg"/>
       <theater-link name="ISRAEL" sub="PLANNED" image="06_ito-thumb.jpeg"/>
       <theater-link name="HELLENIC" sub="PLANNED" image="07_hto-thumb.jpeg"/>
@@ -61,7 +59,6 @@ import TheaterLink from "@/components/theater-link.vue";
 .flex {
   flex-wrap: wrap;
   display: flex;
-  justify-content: space-evenly
 }
 
 h1, h2, h3, h4, h5, h6 {

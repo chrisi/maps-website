@@ -35,6 +35,8 @@ import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
+import WhiteboardWindow from "@/components/whiteboard-window.vue";
+import {useRoute} from "vue-router";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -59,8 +61,14 @@ dropFileHandler.onIniLoaded((filename: string, content: string) => {
   missionMgr.loadDataCartridge(filename, content)
 })
 
+const route = useRoute()
+
 onBeforeMount(() => {
-  global.map = findMap('korea')
+  const name = route.params['name']
+  const mapName = Array.isArray(name) ? name[0] : name
+  if (mapName) {
+    global.map = findMap(mapName)
+  }
   global.message = "N00°00.000',N00°00.000' | X.0,Y:0"
 })
 
@@ -190,6 +198,7 @@ const getMapUrl = (map: Theater) => {
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
+  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
