@@ -6,9 +6,11 @@ import type {Point} from "@/model/base.ts";
 export class BullseyeOverlay extends BaseOverlay {
 
   private location: Point = {x: 0, y: 0}
-
   private dragging = false;
+
+  private color = 'navy' // '#003300'
   private radialNm = 30
+  private thickness = 1.5;
 
   public onDraw(cnv: Canvas): void {
     if (!this.location) return;
@@ -25,6 +27,7 @@ export class BullseyeOverlay extends BaseOverlay {
     if (e.button != 0) return
     this.dragging = true;
     this.location = this.fromCnv({x: e.pageX, y: e.pageY})
+    this.redraw()
   }
 
   public onPointerUp(e: PointerEvent, ownHotspots: Hotspot[], isClick: boolean) {
@@ -36,13 +39,11 @@ export class BullseyeOverlay extends BaseOverlay {
     const ctx = cnv.context;
     const pt = this.toCnv(pos, cnv)
 
-    let radius = 0;
-
     // Set line properties
-    ctx.setLineDash([]);
-    ctx.strokeStyle = '#003300';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.thickness;
 
+    let radius = 0;
     // Draw Radial Circles
     for (let i = 0; i < 6; i++) {
       ctx.beginPath();
@@ -52,7 +53,7 @@ export class BullseyeOverlay extends BaseOverlay {
     }
 
     // Draw Degree Lines
-    radius += this.radialNm * cnv.scale * this.global.map!.px2nm;
+    radius += this.radialNm * cnv.scale * this.global.map!.px2nm / 2;
     let rad = 0;
     for (let i = 0; i < 12; i++) {
       ctx.beginPath();

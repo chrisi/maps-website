@@ -29,7 +29,7 @@ export class StationOverlay extends BaseOverlay {
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (0.8 - cnv.scale) * 0.7
     this.stations.forEach(sta => {
-      const pt = this.toCnv(sta.pt)
+      const pt = this.toCnv(sta.pt, cnv)
       if (sta.station.type === 'Airbase')
         this.drawAirbase(cnv, pt, sta.orientation, smartScale, sta.doubleRwy);
       if (sta.station.type === 'VORTAC')

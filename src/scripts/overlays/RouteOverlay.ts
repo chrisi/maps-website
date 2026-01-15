@@ -57,7 +57,7 @@ export class RouteOverlay extends BaseOverlay {
     ctx.setLineDash([]);
     ctx.font = '14px monospace';
     list.forEach(ppt => {
-      const p = this.toCnv(ppt);
+      const p = this.toCnv(ppt, cnv);
       ctx.strokeStyle = 'red';
       ctx.fillStyle = 'rgba(255, 0, 0, 0.08)';
       ctx.lineWidth = 2;
@@ -80,8 +80,8 @@ export class RouteOverlay extends BaseOverlay {
 
     // Go through the line list with maximum of 5 segments
     for (let i = 1; i < list.length; i++) if ((i % 6)) {
-      const p1 = this.toCnv(list[i - 1]!);
-      const p2 = this.toCnv(list[i]!);
+      const p1 = this.toCnv(list[i - 1]!, cnv);
+      const p2 = this.toCnv(list[i]!, cnv);
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
@@ -135,8 +135,8 @@ export class RouteOverlay extends BaseOverlay {
 
     // Go through the target list.
     for (let i = 0; i < list.length - 1; i++) {
-      const p1 = this.toCnv({x: list[i]!.x, y: list[i]!.y});
-      const p2 = this.toCnv({x: list[i + 1]!.x, y: list[i + 1]!.y});
+      const p1 = this.toCnv({x: list[i]!.x, y: list[i]!.y}, cnv);
+      const p2 = this.toCnv({x: list[i + 1]!.x, y: list[i + 1]!.y}, cnv);
 
       if (!endRoute) {
         const vec = vector(p1, p2);

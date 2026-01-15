@@ -69,7 +69,7 @@ export class SymbolOverlay extends BaseOverlay {
     if (img.complete && img.naturalWidth > 0) {
       const w = img.width * scale;
       const h = img.height * scale;
-      const pt = this.toCnv(pos)
+      const pt = this.toCnv(pos, cnv)
       cnv.context.drawImage(img, pt.x - w / 2, pt.y - h / 2, w, h);
     }
   }
