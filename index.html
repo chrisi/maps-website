@@ -8,6 +8,19 @@
   <script type="module" crossorigin src="/maps-website/assets/index-_bCDqoLQ.js"></script>
   <link rel="stylesheet" crossorigin href="/maps-website/assets/index-CeTYepAB.css">
 </head>
+<script>
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get("__redirect__");
+        if (redirect) {
+            params.delete("__redirect__");
+            var newUrl =
+                redirect +
+                (params.toString() ? (redirect.includes("?") ? "&" : "?") + params.toString() : "");
+            window.history.replaceState(null, "", newUrl);
+        }
+    })();
+</script>
 <body>
 <div id="app"></div>
 </body>
