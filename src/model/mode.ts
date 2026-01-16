@@ -4,7 +4,7 @@ export enum Mode {
   Bullseye = "bullseye",
   Compass = "compass",
   Measure = "measure",
-  Draw = "draw",
+  Whiteboard = "whiteboard",
   Erase = "erase",
   Write = "write",
   Symbol = "symbol"

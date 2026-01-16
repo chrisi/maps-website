@@ -16,11 +16,13 @@ import {LocateOverlay} from "@/scripts/overlays/LocateOverlay.ts";
 import {HotspotOverlay} from "@/scripts/overlays/HotspotOverlay.ts";
 import {SymbolOverlay} from "@/scripts/overlays/SymbolOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/overlays/BullseyeOverlay.ts";
+import {StylusOverlay} from "@/scripts/overlays/StylusOverlay.ts";
 //Toolwindows
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
+import WhiteboardWindow from "@/components/whiteboard-window.vue";
 
 import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
@@ -35,7 +37,6 @@ import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
-import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {useRoute} from "vue-router";
 
 const global = useGlobalStore()
@@ -90,6 +91,7 @@ onMounted(() => {
 
   overlayManager.registerOverlay(new SymbolOverlay())
   overlayManager.registerOverlay(new MeasureOverlay())
+  overlayManager.registerOverlay(new StylusOverlay())
 
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
