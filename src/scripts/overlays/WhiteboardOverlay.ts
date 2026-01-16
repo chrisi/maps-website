@@ -7,7 +7,6 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private points: Point[] = []
   private isDrawing = false
-  private lastPt: Point | undefined
 
   private cornerIndices: number[] = []
 
@@ -20,27 +19,26 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.lastPt) return;
+    if (this.points.length === 0) return;
     const ctx = cnv.context
     ctx.lineWidth = 2
     ctx.strokeStyle = 'navy'
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
 
-    const lp = this.toCnv(this.lastPt, cnv)
+    const p0_cnv = this.toCnv(this.points[0]!, cnv)
 
     ctx.beginPath()
-    ctx.moveTo(lp.x, lp.y)
+    ctx.moveTo(p0_cnv.x, p0_cnv.y)
 
     if (this.points.length < 2 || this.isDrawing) {
-      for (const pt of this.points) {
-        const p = this.toCnv(pt, cnv)
+      for (let i = 1; i < this.points.length; i++) {
+        const p = this.toCnv(this.points[i]!, cnv)
         ctx.lineTo(p.x, p.y)
       }
     } else {
       // Smooth curve passing through all points using cardinal splines (Catmull-Rom)
-      const allPts = [lp, ...this.points.map(p => this.toCnv(p, cnv))];
-      if (allPts.length < 2) return;
+      const allPts = this.points.map(p => this.toCnv(p, cnv));
 
       for (let i = 0; i < allPts.length - 1; i++) {
         const p0 = allPts[i === 0 ? i : i - 1]!;
@@ -56,8 +54,6 @@ export class WhiteboardOverlay extends BaseOverlay {
           ctx.lineTo(p2.x, p2.y);
         } else {
           // Catmull-Rom to Cubic Bezier conversion
-          // CP1 = p1 + (p2 - p0) / 6
-          // CP2 = p2 - (p3 - p1) / 6
           const cp1x = p1.x + (p2.x - p0.x) / 6;
           const cp1y = p1.y + (p2.y - p0.y) / 6;
           const cp2x = p2.x - (p3.x - p1.x) / 6;
@@ -69,12 +65,12 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
     ctx.stroke()
 
-    this.drawSupportPoint(cnv, lp)
+    this.drawSupportPoint(cnv)
   }
 
   public onPointerDown(e: PointerEvent) {
-    this.points = []
-    this.lastPt = this.fromCnv({x: e.pageX, y: e.pageY})
+    const pt = this.fromCnv({x: e.pageX, y: e.pageY})
+    this.points = [pt]
     this.isDrawing = true
   }
 
@@ -87,15 +83,14 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private detectCorners() {
     this.cornerIndices = []
-    if (this.points.length < 2 || !this.lastPt) return
+    if (this.points.length < 3) return
 
-    const allPoints = [this.lastPt, ...this.points]
     const thresholdAngle = Math.PI / 4 // 45 degrees - change in direction sharper than this is a corner
 
-    for (let i = 1; i < allPoints.length - 1; i++) {
-      const pPrev = allPoints[i - 1]!
-      const pCurr = allPoints[i]!
-      const pNext = allPoints[i + 1]!
+    for (let i = 1; i < this.points.length - 1; i++) {
+      const pPrev = this.points[i - 1]!
+      const pCurr = this.points[i]!
+      const pNext = this.points[i + 1]!
 
       const v1 = {x: pCurr.x - pPrev.x, y: pCurr.y - pPrev.y}
       const v2 = {x: pNext.x - pCurr.x, y: pNext.y - pCurr.y}
@@ -158,18 +153,16 @@ export class WhiteboardOverlay extends BaseOverlay {
     return Math.sqrt(Math.pow(pt.x - nearestX, 2) + Math.pow(pt.y - nearestY, 2))
   }
 
-  private drawSupportPoint(cnv: Canvas, pt: Point) {
+  private drawSupportPoint(cnv: Canvas) {
     const ctx = cnv.context
     ctx.lineWidth = 0.5
     ctx.strokeStyle = 'black'
     ctx.fillStyle = 'cyan'
 
     ctx.beginPath()
-    ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2)
-
     for (let i = 0; i < this.points.length; i++) {
       const p = this.toCnv(this.points[i]!, cnv)
-      ctx.moveTo(p.x + 2, p.y)
+      ctx.moveTo(p.x + 3, p.y)
       ctx.arc(p.x, p.y, 3, 0, Math.PI * 2)
     }
     ctx.fill()
