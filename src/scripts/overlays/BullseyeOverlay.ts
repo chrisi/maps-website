@@ -2,6 +2,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Point} from "@/model/base.ts";
+import {Mode} from "@/model/mode.ts";
 
 export class BullseyeOverlay extends BaseOverlay {
 
@@ -11,6 +12,10 @@ export class BullseyeOverlay extends BaseOverlay {
   private color = '#003300'
   private radialNM = 30
   private thickness = 1
+
+  public getActiveMode(): Mode | undefined {
+    return Mode.Bullseye
+  }
 
   public init() {
     const set = this.settings.settings.bullseye

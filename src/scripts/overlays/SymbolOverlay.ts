@@ -2,6 +2,7 @@ import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import {Mode} from "@/model/mode.ts";
 
 interface Symbol {
   id: number
@@ -16,6 +17,10 @@ export class SymbolOverlay extends BaseOverlay {
   private gid = 0
 
   private dragSymbol: Symbol | undefined = undefined
+
+  public getActiveMode(): Mode | undefined {
+    return Mode.Symbol
+  }
 
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7

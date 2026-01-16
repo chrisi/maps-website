@@ -3,6 +3,7 @@ import {drawArrowHead, drawOutlined, drawTextWithBox} from "@/scripts/draw.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
+import {Mode} from "@/model/mode.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
@@ -15,6 +16,10 @@ export class MeasureOverlay extends BaseOverlay {
   private textColor = 'white'
   private tickDist = 25
   private font = '14px monospace'
+
+  public getActiveMode(): Mode | undefined {
+    return Mode.Measure
+  }
 
   public onDraw = (cnv: Canvas) => {
     if (!this.from || !this.to) return

@@ -8,6 +8,7 @@ import {drawOutlined, drawTextOutlined} from "@/scripts/draw.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
 import {drawTextWithBox} from "@/scripts/draw.ts";
+import {Mode} from "@/model/mode.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
