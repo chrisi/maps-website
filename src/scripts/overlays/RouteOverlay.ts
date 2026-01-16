@@ -30,6 +30,10 @@ export class RouteOverlay extends BaseOverlay {
     })
   }
 
+  public isEnabled(): boolean {
+    return this.settings.viz.ms
+  }
+
   public providesHotspots(): Hotspot[] {
     if (!this.missionMgr.isMissionLoaded()) return []
     let idx = 1

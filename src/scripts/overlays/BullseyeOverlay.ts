@@ -3,6 +3,7 @@ import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Point} from "@/model/base.ts";
 import {Mode} from "@/model/mode.ts";
+import {watch} from "vue";
 
 export class BullseyeOverlay extends BaseOverlay {
 
@@ -13,16 +14,23 @@ export class BullseyeOverlay extends BaseOverlay {
   private radialNM = 30
   private thickness = 1
 
-  public getActiveMode(): Mode | undefined {
-    return Mode.Bullseye
-  }
-
   public init() {
     const set = this.settings.settings.bullseye
     this.location = set.pos
     this.color = set.color
     this.radialNM = set.radialNM
     this.thickness = set.thickness
+    watch(() => this.settings.viz.be, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.viz.be
+  }
+
+  public getActiveMode(): Mode | undefined {
+    return Mode.Bullseye
   }
 
   public onDraw(cnv: Canvas): void {
