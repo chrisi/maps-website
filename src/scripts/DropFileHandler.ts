@@ -1,6 +1,3 @@
-//
-// FILE PROCESSING FOR BMS FILES
-//
 export class DropFileHandler {
 
   private filename = "";

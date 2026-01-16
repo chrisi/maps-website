@@ -1,8 +1,7 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
-import type {MissionManager} from "@/scripts/missionManager.ts";
+import type {MissionManager} from "@/scripts/MissionManager.ts";
 import {watch} from "vue";
 import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
 import {drawOutlined, drawTextOutlined} from "@/scripts/draw.ts";
@@ -16,9 +15,12 @@ export class RouteOverlay extends BaseOverlay {
 
   private highlightSize = 20; //TODO: settings
 
-  constructor(manager: OverlayManager, missionMgr: MissionManager) {
-    super(manager);
+  constructor(missionMgr: MissionManager) {
+    super();
     this.missionMgr = missionMgr;
+  }
+
+  public init() {
     this.missionMgr.onDataCartridgeEvent(() => {
       this.redraw()
     })

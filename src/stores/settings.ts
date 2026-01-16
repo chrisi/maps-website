@@ -1,7 +1,6 @@
 import {reactive, ref} from "vue";
 import {defineStore} from "pinia";
-import type {Visibility} from "@/model/settings.ts";
-import type {Point} from "@/model/base.ts";
+import type {Settings, Visibility} from "@/model/settings.ts";
 
 export const useSettingsStore = defineStore('settings', () => {
   const viz = reactive<Visibility>({
@@ -12,7 +11,9 @@ export const useSettingsStore = defineStore('settings', () => {
     xy: true
   })
 
-  const bullseyePos = ref<Point>({x: -1, y: -1})
+  const settings = reactive<Settings>(
+    {bullseye: {color: 'navy', thickness: 1.5, radialNM: 30, pos: {x: -1, y: -1}}}
+  )
 
-  return {viz, bullseyePos}
+  return {viz, settings}
 })

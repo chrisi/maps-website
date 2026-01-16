@@ -13,7 +13,7 @@ import ToolSection from "@/components/forms/tool-section.vue";
 import ToolInput from "@/components/forms/tool-input.vue";
 import PureDropdown from "@/components/forms/pure-dropdown.vue";
 import ToolButton from "@/components/forms/tool-button.vue";
-import {MissionManager} from "@/scripts/missionManager.ts";
+import {MissionManager} from "@/scripts/MissionManager.ts";
 import type {Mission} from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";

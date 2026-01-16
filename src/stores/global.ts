@@ -1,10 +1,9 @@
-import {reactive, ref} from 'vue'
+import {ref} from 'vue'
 import {defineStore} from 'pinia'
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point, Zoom} from "@/model/base.ts";
 import type {Waypoint} from "@/model/mission.ts";
-import type {PointerTarget} from "@/scripts/overlay.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 
 export const useGlobalStore = defineStore('global', () => {
@@ -20,18 +19,9 @@ export const useGlobalStore = defineStore('global', () => {
 
   const currentWaypoint = ref<Waypoint>()
 
-  const pointerTargets = ref<PointerTarget[]>([])
   const hotspots = ref<Hotspot[]>([])
 
-  const zoom = reactive<Zoom>({
-    factor: 1,
-    min: 0.5,
-    max: 2.5,
-    speed: 1.1,
-    wheelRate: 20
-  })
-
-  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, pointerTargets, hotspots, zoom}
+  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, hotspots}
 }, {
   persist: false
 })

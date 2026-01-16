@@ -28,8 +28,11 @@ export class OverlayManager {
     this.redrawListeners.push(listener)
   }
 
-  public registerOverlay = (overlay: Overlay) => {
+  public registerOverlay= <T extends Overlay>(overlay: T): T => {
     this.overlays.push(overlay)
+    overlay.setOverlayManager(this)
+    overlay.init?.()
+    return overlay
   }
 
   public getOverlay = <T extends Overlay>(type: new (...args: any[]) => T): T | undefined => {

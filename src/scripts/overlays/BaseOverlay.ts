@@ -7,6 +7,10 @@ import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 
 export interface Overlay {
+  setOverlayManager(manager: OverlayManager): void
+
+  init?(): void
+
   isEnabled(): boolean
 
   getActiveMode(): Mode | undefined
@@ -41,16 +45,9 @@ export abstract class BaseOverlay implements Overlay {
   protected global = useGlobalStore()
   protected settings = useSettingsStore()
 
-  protected readonly manager: OverlayManager
+  protected manager: OverlayManager | undefined
   private hotspots: Hotspot[] = []
-  private readonly activeMode: Mode | undefined = undefined
   private enabled = true
-
-  constructor(manager: OverlayManager, activeMode?: Mode) {
-    manager.registerOverlay(this)
-    this.manager = manager
-    this.activeMode = activeMode
-  }
 
   public setEnabled(enabled: boolean): void {
     console.log(`setting overlay '${this.constructor.name}' to ${enabled ? 'enabled' : 'disabled'}`)
@@ -58,27 +55,36 @@ export abstract class BaseOverlay implements Overlay {
     this.redraw()
   }
 
+  public setOverlayManager(manager: OverlayManager): void {
+    this.manager = manager
+  }
+
+  protected getOverlayManager(): OverlayManager {
+    if (!this.manager) throw new Error("OverlayManager not set")
+    return this.manager
+  }
+
   public isEnabled(): boolean {
     return this.enabled
   }
 
   public getActiveMode(): Mode | undefined {
-    return this.activeMode
+    return undefined
   }
 
   public abstract onDraw(cnv: Canvas): void
 
   protected redraw(): void {
-    this.manager.redraw()
+    this.manager!.redraw()
   }
 
   protected fromCnv(pt: Point, cnv?: Canvas): Point {
-    if (!cnv) cnv = this.manager.getCanvas()
+    if (!cnv) cnv = this.manager!.getCanvas()
     return {x: pt.x / cnv.scale + cnv.offset.x, y: pt.y / cnv.scale + cnv.offset.y}
   }
 
   protected toCnv(pt: Point, cnv?: Canvas): Point {
-    if (!cnv) cnv = this.manager.getCanvas()
+    if (!cnv) cnv = this.manager!.getCanvas()
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }
 

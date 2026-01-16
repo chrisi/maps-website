@@ -22,8 +22,8 @@ import SettingsWindow from "@/components/settings-window.vue";
 import RouteWindow from "@/components/route-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 
-import {MissionManager} from "@/scripts/missionManager.ts";
-import {DropFileHandler} from "@/scripts/dropFileHandler.ts";
+import {MissionManager} from "@/scripts/MissionManager.ts";
+import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import {Mode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
@@ -75,17 +75,22 @@ onBeforeMount(() => {
 let hotspotOvl: HotspotOverlay | undefined
 
 onMounted(() => {
-  hotspotOvl = new HotspotOverlay(overlayManager)
+  hotspotOvl = overlayManager.registerOverlay(new HotspotOverlay())
   hotspotOvl.setEnabled(debug.value)
-  new BullseyeOverlay(overlayManager, Mode.Bullseye)
-  const stationOverlay = new StationOverlay(overlayManager)
-  new RouteOverlay(overlayManager, missionMgr)
-  const locateOverlay = new LocateOverlay(overlayManager)
-  new SymbolOverlay(overlayManager, Mode.Symbol)
-  new MeasureOverlay(overlayManager, Mode.Measure)
 
-  locateOverlay.setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
-  stationOverlay.addSelectStationEventHandler(station => selectedStation.value = station)
+  overlayManager.registerOverlay(new BullseyeOverlay())
+
+  overlayManager.registerOverlay(new StationOverlay())
+    .addSelectStationEventHandler(station => selectedStation.value = station)
+
+  overlayManager.registerOverlay(new RouteOverlay(missionMgr))
+
+  overlayManager.registerOverlay(new LocateOverlay())
+    .setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
+
+  overlayManager.registerOverlay(new SymbolOverlay())
+  overlayManager.registerOverlay(new MeasureOverlay())
+
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
 })

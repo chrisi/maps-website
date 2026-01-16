@@ -8,9 +8,17 @@ export class BullseyeOverlay extends BaseOverlay {
   private location: Point = {x: 0, y: 0}
   private dragging = false;
 
-  private color = 'navy' // '#003300'
-  private radialNm = 30
-  private thickness = 1.5;
+  private color = '#003300'
+  private radialNM = 30
+  private thickness = 1
+
+  public init() {
+    const set = this.settings.settings.bullseye
+    this.location = set.pos
+    this.color = set.color
+    this.radialNM = set.radialNM
+    this.thickness = set.thickness
+  }
 
   public onDraw(cnv: Canvas): void {
     if (!this.location) return;
@@ -32,35 +40,36 @@ export class BullseyeOverlay extends BaseOverlay {
 
   public onPointerUp(e: PointerEvent, ownHotspots: Hotspot[], isClick: boolean) {
     if (e.button != 0) return
-    this.dragging = false;
+    this.dragging = false
+    this.settings.settings.bullseye.pos = this.location
   }
 
   private drawBullseye(cnv: Canvas, pos: Point) {
-    const ctx = cnv.context;
+    const ctx = cnv.context
     const pt = this.toCnv(pos, cnv)
 
     // Set line properties
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = this.thickness;
+    ctx.strokeStyle = this.color
+    ctx.lineWidth = this.thickness
 
     let radius = 0;
     // Draw Radial Circles
     for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      radius += this.radialNm * cnv.scale * this.global.map!.px2nm;
-      ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
-      ctx.stroke();
+      ctx.beginPath()
+      radius += this.radialNM * cnv.scale * this.global.map!.px2nm
+      ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI)
+      ctx.stroke()
     }
 
     // Draw Degree Lines
-    radius += this.radialNm * cnv.scale * this.global.map!.px2nm / 2;
-    let rad = 0;
+    radius += this.radialNM * cnv.scale * this.global.map!.px2nm / 2
+    let rad = 0
     for (let i = 0; i < 12; i++) {
-      ctx.beginPath();
-      ctx.moveTo(pt.x, pt.y);
-      ctx.lineTo(pt.x + (Math.sin(rad) * radius), pt.y - (Math.cos(rad) * radius));
-      rad += (Math.PI / 6);
-      ctx.stroke();
+      ctx.beginPath()
+      ctx.moveTo(pt.x, pt.y)
+      ctx.lineTo(pt.x + (Math.sin(rad) * radius), pt.y - (Math.cos(rad) * radius))
+      rad += (Math.PI / 6)
+      ctx.stroke()
     }
   }
 }
