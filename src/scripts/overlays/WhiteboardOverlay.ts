@@ -3,7 +3,7 @@ import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import {Mode} from "@/model/mode.ts";
 
-export class StylusOverlay extends BaseOverlay {
+export class WhiteboardOverlay extends BaseOverlay {
 
   private points: Point[] = []
   private isDrawing = false
@@ -33,17 +33,17 @@ export class StylusOverlay extends BaseOverlay {
     ctx.stroke()
   }
 
-  onPointerDown(e: PointerEvent) {
+  public onPointerDown(e: PointerEvent) {
     this.points = []
     this.lastPt = this.fromCnv({x: e.pageX, y: e.pageY})
     this.isDrawing = true
   }
 
-  onPointerUp(e: PointerEvent) {
+  public onPointerUp(e: PointerEvent) {
     this.isDrawing = false
   }
 
-  onPointerMove(e: PointerEvent) {
+  public onPointerMove(e: PointerEvent) {
     if (!this.isDrawing) return;
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     this.points.push(pt)

@@ -16,7 +16,7 @@ import {LocateOverlay} from "@/scripts/overlays/LocateOverlay.ts";
 import {HotspotOverlay} from "@/scripts/overlays/HotspotOverlay.ts";
 import {SymbolOverlay} from "@/scripts/overlays/SymbolOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/overlays/BullseyeOverlay.ts";
-import {StylusOverlay} from "@/scripts/overlays/StylusOverlay.ts";
+import {WhiteboardOverlay} from "@/scripts/overlays/WhiteboardOverlay.ts";
 //Toolwindows
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";
@@ -91,7 +91,7 @@ onMounted(() => {
 
   overlayManager.registerOverlay(new SymbolOverlay())
   overlayManager.registerOverlay(new MeasureOverlay())
-  overlayManager.registerOverlay(new StylusOverlay())
+  overlayManager.registerOverlay(new WhiteboardOverlay())
 
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
