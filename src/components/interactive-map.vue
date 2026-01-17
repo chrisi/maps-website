@@ -116,7 +116,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       suspend.value = true
       break
     case '4':
-      global.mode = Mode.Draw
+      global.mode = Mode.Whiteboard
       suspend.value = true
       break
     case 'Escape':
