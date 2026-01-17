@@ -1,4 +1,40 @@
 
+import type {Point} from "@/model/base.ts";
+
+export function drawSmoothLine(ctx: CanvasRenderingContext2D,
+                               points: Point[],
+                               cornerIndices: number[],
+                               toCnv: (p: Point) => Point) {
+  if (points.length < 2) return;
+
+  const allPts = points.map(p => toCnv(p));
+  const pStart = allPts[0]!;
+  ctx.moveTo(pStart.x, pStart.y);
+
+  for (let i = 0; i < allPts.length - 1; i++) {
+    const p0 = allPts[i === 0 ? i : i - 1]!;
+    const p1 = allPts[i]!;
+    const p2 = allPts[i + 1]!;
+    const p3 = i + 2 < allPts.length ? allPts[i + 2]! : p2;
+
+    const isCorner = cornerIndices.includes(i);
+    const nextIsCorner = cornerIndices.includes(i + 1);
+
+    if (isCorner || nextIsCorner) {
+      // Sharp line if either end of the segment is a corner
+      ctx.lineTo(p2.x, p2.y);
+    } else {
+      // Catmull-Rom to Cubic Bezier conversion
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+  }
+}
+
 export function drawOutlined(ctx: CanvasRenderingContext2D,
                              lineColor: string, outColor: string, lineWidth: number, outWidth: number,
                              cb: (ctx: CanvasRenderingContext2D) => void) {
