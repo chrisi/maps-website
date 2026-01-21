@@ -510,10 +510,8 @@ function animate() {
     constrain();
     emit('update:zoom', scale);
     changed = true;
-  }
-
-  // Clear targets once reached
-  if (!isZooming && !isMovingToTarget) {
+  } else {
+    // Clear targets once reached
     targetOffsetX = null;
     targetOffsetY = null;
   }
