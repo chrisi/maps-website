@@ -15,13 +15,15 @@ export const useGlobalStore = defineStore('global', () => {
   const pos = ref<Point>({x: 0, y: 0})
   const coord = ref<Coord>({lat: 0, long: 0})
 
+  const connected = ref(false)
+
   const selectedSymbol = ref<string>()
 
   const currentWaypoint = ref<Waypoint>()
 
   const hotspots = ref<Hotspot[]>([])
 
-  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, hotspots}
+  return {message, mode, map, pos, coord, selectedSymbol, currentWaypoint, hotspots, connected}
 }, {
   persist: false
 })

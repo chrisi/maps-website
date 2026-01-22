@@ -3,11 +3,14 @@ import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 import type {Mode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
+import type {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 
 export interface Overlay {
   setOverlayManager(manager: OverlayManager): void
+
+  setImcsClient(imcsClient: ImcsClient): void
 
   init?(): void
 
@@ -46,6 +49,7 @@ export abstract class BaseOverlay implements Overlay {
   protected settings = useSettingsStore()
 
   protected manager: OverlayManager | undefined
+  protected imcsClient: ImcsClient | undefined
   private hotspots: Hotspot[] = []
   private enabled = true
 
@@ -57,6 +61,10 @@ export abstract class BaseOverlay implements Overlay {
 
   public setOverlayManager(manager: OverlayManager): void {
     this.manager = manager
+  }
+
+  public setImcsClient(imcsClient: ImcsClient): void {
+    this.imcsClient = imcsClient
   }
 
   protected getOverlayManager(): OverlayManager {

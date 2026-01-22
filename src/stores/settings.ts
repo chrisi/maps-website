@@ -12,7 +12,10 @@ export const useSettingsStore = defineStore('settings', () => {
   })
 
   const settings = reactive<Settings>(
-    {bullseye: {color: 'navy', thickness: 1.5, radialNM: 30, pos: {x: -1, y: -1}}}
+    {
+      bullseye: {color: 'navy', thickness: 1.5, radialNM: 30, pos: {x: -1, y: -1}},
+      collab: {secure: false, callsign: "Joker", session: "47df", host: "localhost", port: 4848}
+    }
   )
 
   return {viz, settings}

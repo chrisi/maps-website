@@ -13,8 +13,10 @@ import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {reactive, ref} from "vue";
 import {useSettingsStore} from "@/stores/settings.ts";
+import {useGlobalStore} from "@/stores/global.ts";
 
-const settings = useSettingsStore();
+const settings = useSettingsStore()
+const global = useGlobalStore()
 
 defineProps({
   visible: {
@@ -23,10 +25,10 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'btnClick'])
 
 function btnClick(sender: string) {
-  console.log(`btnClick: ${sender}`)
+  emit('btnClick', sender)
 }
 
 function changeChartConfig(sender: string, value: string) {
@@ -38,22 +40,6 @@ const imperialUnits = ref(true)
 const windAltitudes = ref("4")
 const weather = ref("2")
 const mapFilter = ref("3")
-
-interface CollabConfig {
-  secure: boolean;
-  callsign: string;
-  session: string;
-  host: string;
-  port: string;
-}
-
-const collab = reactive<CollabConfig>({
-  secure: true,
-  callsign: "Joker",
-  session: "12:00:00",
-  host: "collab.falcon-bms.com",
-  port: "443"
-})
 
 interface GFSConfig {
   date: string;
@@ -138,17 +124,17 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 
       <template #Connectivity>
         <tool-section name="Collaboration"/>
-        <tool-checkbox id="imcs-secure" name="imcs-secure" label="Secure Connection" v-model="collab.secure"/>
+        <tool-checkbox id="imcs-secure" name="imcs-secure" label="Secure Connection" v-model="settings.settings.collab.secure"/>
 
         <tool-spacer/>
-        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" v-model="collab.callsign"/>
-        <tool-textfield id="imcs-session" name="session" label="Session" v-model="collab.session" :regexp="timeRegex"/>
-        <tool-textfield id="imcs-host" name="host" label="Host" v-model="collab.host"/>
-        <tool-numberfield id="imcs-port" name="port" label="Port" v-model="collab.port" width="60px"/>
+        <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" v-model="settings.settings.collab.callsign"/>
+        <tool-textfield id="imcs-session" name="session" label="Session" v-model="settings.settings.collab.session" :regexp="timeRegex"/>
+        <tool-textfield id="imcs-host" name="host" label="Host" v-model="settings.settings.collab.host"/>
+        <tool-numberfield id="imcs-port" name="port" label="Port" v-model="settings.settings.collab.port" width="60px"/>
         <tool-spacer/>
         <tool-row>
           <div style="text-align: end; width: 100%;">
-            <tool-button id="imcs-connection" text="Join" @click="btnClick"/>
+            <tool-button id="imcs-connection" :text="global.connected ? 'Disconnect' : 'Connect'" @click="btnClick"/>
           </div>
         </tool-row>
 

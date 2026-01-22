@@ -1,9 +1,10 @@
+import {useGlobalStore} from "@/stores/global.ts";
+import {distance} from "@/scripts/math.ts";
 import type {Overlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
-import {distance} from "@/scripts/math.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
-import {useGlobalStore} from "@/stores/global.ts";
+import type {ImcsClient} from "@/scripts/ImcsClient.ts";
 
 interface HotspotCandidate {
   dist: number, // distance to the pointer at hit detection
@@ -24,13 +25,20 @@ export class OverlayManager {
 
   private allHotspots: Hotspot[] = []
 
+  private readonly imcsClient: ImcsClient
+
+  constructor(imcsClient: ImcsClient) {
+    this.imcsClient = imcsClient
+  }
+
   public addRedrawEventListener(listener: () => void): void {
     this.redrawListeners.push(listener)
   }
 
-  public registerOverlay= <T extends Overlay>(overlay: T): T => {
+  public registerOverlay = <T extends Overlay>(overlay: T): T => {
     this.overlays.push(overlay)
     overlay.setOverlayManager(this)
+    overlay.setImcsClient(this.imcsClient)
     overlay.init?.()
     return overlay
   }

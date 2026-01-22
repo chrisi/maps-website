@@ -1,24 +1,29 @@
+import {Mode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
-import {Mode} from "@/model/mode.ts";
+import type {LineSegment} from "@/model/overlays.ts";
 import {drawSmoothLine} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 
-
-interface Segment {
-  points: Point[]
-  cornerIndices: number[]
-}
-
 export class WhiteboardOverlay extends BaseOverlay {
 
-  private segments: Segment[] = []
+  private segments: LineSegment[] = []
 
   private line: Point[] = []
   private cornerIndices: number[] = []
 
   private isDrawing = false
+
+  private currentColor = 'navy'
+  private currentWidth = 2
+
+  public init() {
+    this.imcsClient?.onDrawEvent((segments: LineSegment[]) => {
+      console.log("Received draw event", segments)
+      this.addSegment(segments[0]!)
+    })
+  }
 
   public isEnabled(): boolean {
     return this.settings.viz.wb
@@ -65,9 +70,21 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.isDrawing = false
     this.line = simplifyPoints(this.line, this.manager?.getCanvas().scale || 1)
     this.cornerIndices = detectCorners(this.line)
-    this.segments.push({points: this.line, cornerIndices: this.cornerIndices})
+    const seg: LineSegment = {
+      points: this.line,
+      cornerIndices: this.cornerIndices,
+      color: this.currentColor,
+      width: this.currentWidth
+    }
+    this.addSegment(seg)
+    this.imcsClient!.msgSendDraw([seg])
     this.line = []
     this.cornerIndices = []
+    this.redraw()
+  }
+
+  public addSegment(seg: LineSegment) {
+    this.segments.push(seg)
     this.redraw()
   }
 

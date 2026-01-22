@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
+import {useRoute} from "vue-router";
 
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
@@ -24,6 +25,7 @@ import RouteWindow from "@/components/route-window.vue";
 import SymbolsWindow from "@/components/symbols-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
 
+import {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import {Mode} from "@/model/mode.ts";
@@ -37,7 +39,7 @@ import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
-import {useRoute} from "vue-router";
+import type {CollabSettings} from "@/model/settings.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -53,7 +55,9 @@ const suspend = ref(false)
 const selectedStation = ref<Station | undefined>()
 const activeWindow = ref('')
 
-const overlayManager = new OverlayManager()
+const imcsClient = new ImcsClient()
+
+const overlayManager = new OverlayManager(imcsClient)
 
 const dropFileHandler = new DropFileHandler()
 const missionMgr = new MissionManager()
@@ -125,8 +129,20 @@ const handleKeyDown = (e: KeyboardEvent) => {
       selectedStation.value = undefined
       suspend.value = false
       break
-    case 'd':
+    case '^':
       debug.value = !debug.value
+      break
+    case 'c':
+      imcsClient.connect({
+        host: "localhost",
+        port: 4848,
+        secure: false,
+        callsign: "Debug",
+        session: "47df"
+      } as CollabSettings)
+      break
+    case 'd':
+      imcsClient.disconnect()
       break
   }
 }
@@ -191,6 +207,16 @@ watch(() => global.currentWaypoint, (newValue) => {
   }
 })
 
+const settingsClick = (sender: string) => {
+  if (sender == "imcs-connection") {
+    if (global.connected) {
+      imcsClient.disconnect()
+    } else {
+      imcsClient.connect(settings.settings.collab)
+    }
+  }
+}
+
 const getMapUrl = (map: Theater) => {
   const baseUrl = import.meta.env.BASE_URL
   if (map.local)
@@ -204,7 +230,7 @@ const getMapUrl = (map: Theater) => {
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
-  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''"/>
+  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map

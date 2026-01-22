@@ -15,6 +15,15 @@ export interface BullseyeSettings {
   pos: Point;
 }
 
+export interface CollabSettings {
+  secure: boolean;
+  callsign: string;
+  session: string;
+  host: string;
+  port: number;
+}
+
 export interface Settings {
   bullseye: BullseyeSettings;
+  collab: CollabSettings;
 }
