@@ -18,6 +18,18 @@ export class SymbolOverlay extends BaseOverlay {
 
   private dragSymbol: Symbol | undefined = undefined
 
+  public init() {
+    this.imcsClient?.onSymbolEvent((pos: Point, sym: string) => {
+      const s: Symbol = {
+        id: this.gid++, //TODO: this needs to be synced to be client-id save to avoid conflicts when deleting symbols
+        sym: sym,
+        pt: pos
+      }
+      this.symbols.push(s)
+      this.redraw()
+    })
+  }
+
   public getActiveMode(): Mode | undefined {
     return Mode.Symbol
   }
@@ -50,6 +62,7 @@ export class SymbolOverlay extends BaseOverlay {
           pt: this.fromCnv({x: e.pageX, y: e.pageY})
         }
         this.symbols.push(s)
+        this.imcsClient!.msgSendSymbol(s.pt, s.sym)
         this.redraw()
       } else {
         this.dragSymbol = undefined
@@ -67,6 +80,10 @@ export class SymbolOverlay extends BaseOverlay {
     let img = this.iconCache.get(symbol);
     if (!img) {
       img = new Image();
+      img.onload = () => this.redraw()
+      img.onerror = () => {
+        console.warn(`Failed to load icon for ${symbol}`)
+      }
       img.src = `../common/assets/${symbol}.ico`;
       this.iconCache.set(symbol, img);
     }

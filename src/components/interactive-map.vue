@@ -136,11 +136,20 @@ const handleKeyDown = (e: KeyboardEvent) => {
       break
     case 'c':
       imcsClient.connect({
-        host: "localhost",
-        port: 4848,
-        secure: false,
-        callsign: "Debug",
-        session: "47df"
+        host: settings.settings.collab.host ?? "localhost",
+        port: settings.settings.collab.port ?? 8080,
+        secure: settings.settings.collab.secure,
+        callsign: "Debug1",
+        session: settings.settings.collab.session ?? "47df",
+      } as CollabSettings)
+      break
+    case 'C':
+      imcsClient.connect({
+        host: settings.settings.collab.host ?? "localhost",
+        port: settings.settings.collab.port ?? 8080,
+        secure: settings.settings.collab.secure,
+        callsign: "Debug2",
+        session: settings.settings.collab.session ?? "47df",
       } as CollabSettings)
       break
     case 'd':

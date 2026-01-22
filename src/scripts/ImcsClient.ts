@@ -69,6 +69,12 @@ export class ImcsClient {
     this.bullseyePosEventHandler.push(cb);
   }
 
+  private symbolEventHandler: ((pt: Point, sym: string) => void)[] = [];
+
+  public onSymbolEvent(cb: ((pt: Point, sym: string) => void)) {
+    this.symbolEventHandler.push(cb);
+  }
+
   private global = useGlobalStore()
 
   private IMCS_DEBUG = true;
@@ -114,6 +120,11 @@ export class ImcsClient {
 
   public msgSendPointer(pos?: Point) {
     const msg: ImcsMsgPos = {id: ImcsMsgId.Pointer, client: this.client, pos: pos}
+    this.send(msg)
+  }
+
+  public msgSendSymbol(pos: Point, sym: string) {
+    const msg: ImcsMsgSymbol = {id: ImcsMsgId.Symbol, client: this.client, pos: pos, sym: sym}
     this.send(msg)
   }
 
@@ -170,9 +181,9 @@ export class ImcsClient {
       case ImcsMsgId.Bullseye:
         this.msgReceivedBullseyePos(msg);
         break;
-      // case 2:
-      //   imcsMsgSymbolRcvd(msg);
-      //   break;
+      case ImcsMsgId.Symbol:
+        this.msgReceivedSymbol(msg);
+        break;
       // case 3:
       //   imcsMsgLineRcvd(msg);
       //   break;
@@ -226,6 +237,10 @@ export class ImcsClient {
 
   private msgReceivedPointer(msg: ImcsMsgPos) {
     this.pointerEventHandler.forEach(cb => cb(msg.pos))
+  }
+
+  private msgReceivedSymbol(msg: ImcsMsgSymbol) {
+    this.symbolEventHandler.forEach(cb => cb(msg.pos, msg.sym))
   }
 
   private msgReceivedBullseyePos(msg: ImcsMsgPos) {
