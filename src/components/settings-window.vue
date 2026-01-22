@@ -91,9 +91,6 @@ const cycles: ValueCaptionPair[] = [
   {value: "18", caption: "1800Z"}
 ]
 
-// 24h time format: HH:MM:SS
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
-
 </script>
 
 <template>
@@ -128,7 +125,7 @@ const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 
         <tool-spacer/>
         <tool-textfield id="imcs-callsign" name="callsign" label="Callsign" v-model="settings.settings.collab.callsign"/>
-        <tool-textfield id="imcs-session" name="session" label="Session" v-model="settings.settings.collab.session" :regexp="timeRegex"/>
+        <tool-textfield id="imcs-session" name="session" label="Session" v-model="settings.settings.collab.session"/>
         <tool-textfield id="imcs-host" name="host" label="Host" v-model="settings.settings.collab.host"/>
         <tool-numberfield id="imcs-port" name="port" label="Port" v-model="settings.settings.collab.port" width="60px"/>
         <tool-spacer/>
