@@ -3,8 +3,23 @@ import type {Point} from "@/model/base.ts";
 import type {LineSegment} from "@/model/overlays.ts";
 import type {CollabSettings} from "@/model/settings.ts";
 
+enum ImcsMsgId {
+  Auth = 0,
+  Bullseye = 1,
+  Symbol = 2,
+  Line = 3,
+  Ellipse = 4,
+  Marker = 5,
+  Text = 6,
+  Erase = 7,
+  Whiteboard = 8,
+  Pointer = 9,
+  Ping = 10,
+  Draw = 11,
+}
+
 interface ImcsMsg {
-  id: number;
+  id: ImcsMsgId;
   client: number;
 }
 
@@ -22,8 +37,8 @@ export interface ImcsMsgSymbol extends ImcsMsg {
   sym: string
 }
 
-export interface ImcsMsgPointer extends ImcsMsg {
-  pos: Point
+export interface ImcsMsgPos extends ImcsMsg {
+  pos?: Point
 }
 
 export interface ImcsMsgDraw extends ImcsMsg {
@@ -42,10 +57,16 @@ export class ImcsClient {
     this.drawEventHandler.push(cb);
   }
 
-  private pointerEventHandler: ((pt: Point) => void)[] = [];
+  private pointerEventHandler: ((pt?: Point) => void)[] = [];
 
-  public onPointerEvent(cb: ((pt: Point) => void)) {
+  public onPointerEvent(cb: ((pt?: Point) => void)) {
     this.pointerEventHandler.push(cb);
+  }
+
+  private bullseyePosEventHandler: ((pt: Point) => void)[] = [];
+
+  public onBullseyePosEvent(cb: ((pt: Point) => void)) {
+    this.bullseyePosEventHandler.push(cb);
   }
 
   private global = useGlobalStore()
@@ -81,17 +102,28 @@ export class ImcsClient {
 
   private send(msg: ImcsMsg) {
     if (!this.socket || this.client < 0) return;
-    this.socket.send(JSON.stringify(msg));
+    const raw = JSON.stringify(msg)
+    this.socket.send(raw);
   }
 
   public msgSendWhiteboard(canvas: HTMLCanvasElement) {
     const data = canvas.toDataURL('image/png')
-    const msg: ImcsMsgWhiteboard = {id: 8, client: this.client, dataUrl: data}
+    const msg: ImcsMsgWhiteboard = {id: ImcsMsgId.Whiteboard, client: this.client, dataUrl: data}
+    this.send(msg)
+  }
+
+  public msgSendPointer(pos?: Point) {
+    const msg: ImcsMsgPos = {id: ImcsMsgId.Pointer, client: this.client, pos: pos}
+    this.send(msg)
+  }
+
+  public msgSendBullseyePos(pos: Point) {
+    const msg: ImcsMsgPos = {id: ImcsMsgId.Bullseye, client: this.client, pos: pos}
     this.send(msg)
   }
 
   public msgSendDraw(segments: LineSegment[]) {
-    const msg: ImcsMsgDraw = {id: 11, client: this.client, segments: segments}
+    const msg: ImcsMsgDraw = {id: ImcsMsgId.Draw, client: this.client, segments: segments}
     this.send(msg)
   }
 
@@ -116,29 +148,28 @@ export class ImcsClient {
   }
 
   private imcsMsgAuthSend() {
-    if (!this.socket) return;
-    const msg: ImcsMsgAuthRequest = {id: 0, client: -1, session: this.session, callsign: this.callsign}
+    if (!this.socket) return
+    const msg: ImcsMsgAuthRequest = {id: ImcsMsgId.Auth, client: -1, session: this.session, callsign: this.callsign}
     this.socket.send(JSON.stringify(msg))
   }
 
   private errorHandler = (e: Event) => {
-    console.log("failed to connect to IMCS: " + e);
+    console.log("failed to connect to IMCS")
   }
 
   private messageHandler = (e: MessageEvent) => {
     const msg = JSON.parse(e.data);
 
     if (e.data instanceof Blob) {
-      this.imcsDebug("received whiteboard");
+      this.imcsDebug("received whiteboard")
     }
-
     switch (msg.id) {
-      case 0:
+      case ImcsMsgId.Auth:
         this.msgReceivedAuth(msg);
         break;
-      // case 1:
-      //   imcsMsgBullseyeRcvd(msg);
-      //   break;
+      case ImcsMsgId.Bullseye:
+        this.msgReceivedBullseyePos(msg);
+        break;
       // case 2:
       //   imcsMsgSymbolRcvd(msg);
       //   break;
@@ -157,13 +188,13 @@ export class ImcsClient {
       // case 7:
       //   imcsMsgEraseRcvd(msg);
       //   break;
-      case 8:
+      case ImcsMsgId.Whiteboard:
         this.msgReceivedWhiteboard(msg);
         break;
-      case 9:
+      case ImcsMsgId.Pointer:
         this.msgReceivedPointer(msg);
         break;
-      case 11:
+      case ImcsMsgId.Draw:
         this.msgReceivedDraw(msg);
         break;
       default:
@@ -175,7 +206,6 @@ export class ImcsClient {
     if (this.IMCS_DEBUG) args.forEach(arg => console.log(arg));
   }
 
-
   private msgReceivedAuth(msg: ImcsMsgAuthResult) {
     this.imcsDebug("Message: Auth");
     if (msg.result == -1) {
@@ -184,7 +214,7 @@ export class ImcsClient {
     } else {
       this.client = msg.result;
       this.timer = setInterval(() => {
-        const ping: ImcsMsg = {id: 10, client: this.client}
+        const ping: ImcsMsg = {id: ImcsMsgId.Ping, client: this.client}
         this.send(ping)
       }, 30000)
     }
@@ -194,8 +224,12 @@ export class ImcsClient {
     this.drawEventHandler.forEach(cb => cb(msg.segments))
   }
 
-  private msgReceivedPointer(msg: ImcsMsgPointer) {
+  private msgReceivedPointer(msg: ImcsMsgPos) {
     this.pointerEventHandler.forEach(cb => cb(msg.pos))
+  }
+
+  private msgReceivedBullseyePos(msg: ImcsMsgPos) {
+    this.bullseyePosEventHandler.forEach(cb => cb(msg.pos!))
   }
 
   private msgReceivedWhiteboard(msg: ImcsMsgWhiteboard) {

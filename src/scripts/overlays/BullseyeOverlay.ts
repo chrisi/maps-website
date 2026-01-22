@@ -23,6 +23,11 @@ export class BullseyeOverlay extends BaseOverlay {
     watch(() => this.settings.viz.be, () => {
       this.redraw()
     })
+    this.imcsClient?.onBullseyePosEvent((pos: Point) => {
+      this.location = pos
+      this.settings.settings.bullseye.pos = this.location
+      this.redraw()
+    })
   }
 
   public isEnabled(): boolean {
@@ -54,6 +59,7 @@ export class BullseyeOverlay extends BaseOverlay {
   public onPointerUp(e: PointerEvent, ownHotspots: Hotspot[], isClick: boolean) {
     if (e.button != 0) return
     this.dragging = false
+    this.imcsClient!.msgSendBullseyePos(this.location)
     this.settings.settings.bullseye.pos = this.location
   }
 
