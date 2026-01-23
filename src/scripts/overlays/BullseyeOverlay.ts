@@ -70,6 +70,7 @@ export class BullseyeOverlay extends BaseOverlay {
     // Set line properties
     ctx.strokeStyle = this.lineColor
     ctx.lineWidth = this.lineWidth
+    ctx.setLineDash([])
 
     let radius = 0;
     // Draw Radial Circles
