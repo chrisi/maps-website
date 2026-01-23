@@ -5,4 +5,5 @@ export interface LineSegment {
   cornerIndices: number[]
   color: string
   width: number
+  dash: number[]
 }

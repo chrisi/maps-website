@@ -5,12 +5,15 @@ export function drawSmoothLine(ctx: CanvasRenderingContext2D,
                                cornerIndices: number[],
                                lineColor: string,
                                lineWidth: number,
+                               lineDash: number[],
                                toCnv: (p: Point) => Point) {
   if (points.length < 2) return;
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
   ctx.strokeStyle = lineColor
   ctx.lineWidth = lineWidth
+  ctx.lineDashOffset = 0
+  ctx.setLineDash(lineDash)
   ctx.beginPath()
   const allPts = points.map(p => toCnv(p));
   const pStart = allPts[0]!;
@@ -140,4 +143,8 @@ export function colorWithAlpha(color: string, opacity: number): string {
   const b = parseInt(full.slice(4, 6), 16)
 
   return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
+export function dashStyle(width: number, style: string = 'dashed'): number[] {
+  return style === 'dashed' ? [6 * width, 3 * width] : style === 'dotted' ? [width, 2.5 * width] : []
 }
