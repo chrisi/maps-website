@@ -1,6 +1,6 @@
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import type {LineSegment} from "@/model/overlays.ts";
+import type {LineSegment, MilSymbol} from "@/model/overlays.ts";
 import type {CollabSettings} from "@/model/settings.ts";
 
 enum ImcsMsgId {
@@ -32,13 +32,12 @@ export interface ImcsMsgAuthResult extends ImcsMsg {
   result: number
 }
 
-export interface ImcsMsgSymbol extends ImcsMsg {
-  pos: Point
-  sym: string
-}
-
 export interface ImcsMsgPos extends ImcsMsg {
   pos?: Point
+}
+
+export interface ImcsMsgSymbol extends ImcsMsg {
+  symbols: MilSymbol[]
 }
 
 export interface ImcsMsgDraw extends ImcsMsg {
@@ -57,6 +56,12 @@ export class ImcsClient {
     this.drawEventHandler.push(cb);
   }
 
+  private symbolEventHandler: ((symbols: MilSymbol[]) => void)[] = [];
+
+  public onSymbolEvent(cb: ((symbols: MilSymbol[]) => void)) {
+    this.symbolEventHandler.push(cb);
+  }
+
   private pointerEventHandler: ((pt?: Point) => void)[] = [];
 
   public onPointerEvent(cb: ((pt?: Point) => void)) {
@@ -67,12 +72,6 @@ export class ImcsClient {
 
   public onBullseyePosEvent(cb: ((pt: Point) => void)) {
     this.bullseyePosEventHandler.push(cb);
-  }
-
-  private symbolEventHandler: ((pt: Point, sym: string) => void)[] = [];
-
-  public onSymbolEvent(cb: ((pt: Point, sym: string) => void)) {
-    this.symbolEventHandler.push(cb);
   }
 
   private global = useGlobalStore()
@@ -123,13 +122,13 @@ export class ImcsClient {
     this.send(msg)
   }
 
-  public msgSendSymbol(pos: Point, sym: string) {
-    const msg: ImcsMsgSymbol = {id: ImcsMsgId.Symbol, client: this.client, pos: pos, sym: sym}
+  public msgSendBullseyePos(pos: Point) {
+    const msg: ImcsMsgPos = {id: ImcsMsgId.Bullseye, client: this.client, pos: pos}
     this.send(msg)
   }
 
-  public msgSendBullseyePos(pos: Point) {
-    const msg: ImcsMsgPos = {id: ImcsMsgId.Bullseye, client: this.client, pos: pos}
+  public msgSendSymbol(symbols: MilSymbol[]) {
+    const msg: ImcsMsgSymbol = {id: ImcsMsgId.Symbol, client: this.client, symbols: symbols}
     this.send(msg)
   }
 
@@ -235,12 +234,12 @@ export class ImcsClient {
     this.drawEventHandler.forEach(cb => cb(msg.segments))
   }
 
-  private msgReceivedPointer(msg: ImcsMsgPos) {
-    this.pointerEventHandler.forEach(cb => cb(msg.pos))
+  private msgReceivedSymbol(msg: ImcsMsgSymbol) {
+    this.symbolEventHandler.forEach(cb => cb(msg.symbols))
   }
 
-  private msgReceivedSymbol(msg: ImcsMsgSymbol) {
-    this.symbolEventHandler.forEach(cb => cb(msg.pos, msg.sym))
+  private msgReceivedPointer(msg: ImcsMsgPos) {
+    this.pointerEventHandler.forEach(cb => cb(msg.pos))
   }
 
   private msgReceivedBullseyePos(msg: ImcsMsgPos) {

@@ -1,31 +1,28 @@
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import type {MilSymbol} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {Mode} from "@/model/mode.ts";
-
-interface Symbol {
-  id: number
-  pt: Point
-  sym: string
-}
+import {generateGuid} from "@/scripts/utils.ts";
 
 export class SymbolOverlay extends BaseOverlay {
 
-  private symbols: Symbol[] = []
+  private symbols: MilSymbol[] = []
   private iconCache: Map<string, HTMLImageElement> = new Map()
-  private gid = 0
 
-  private dragSymbol: Symbol | undefined = undefined
+  private dragSymbol: MilSymbol | undefined = undefined
 
   public init() {
-    this.imcsClient?.onSymbolEvent((pos: Point, sym: string) => {
-      const s: Symbol = {
-        id: this.gid++, //TODO: this needs to be synced to be client-id save to avoid conflicts when deleting symbols
-        sym: sym,
-        pt: pos
+    this.imcsClient?.onSymbolEvent((symbols: MilSymbol[]) => {
+      const incoming = symbols[0]!
+      const existing = this.symbols.find(s => s.guid === incoming.guid)
+      if (existing) {
+        existing.pos = incoming.pos
+        existing.sym = incoming.sym
+      } else {
+        this.symbols.push(incoming)
       }
-      this.symbols.push(s)
       this.redraw()
     })
   }
@@ -37,34 +34,35 @@ export class SymbolOverlay extends BaseOverlay {
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7
     this.symbols.forEach(sym => {
-      this.drawSymbol(cnv, sym.pt, smartScale, sym.sym);
+      this.drawSymbol(cnv, sym.pos, smartScale, sym.sym);
     })
   }
 
   public onPointerDown(e: PointerEvent, ownHotspots: Hotspot[]): void {
     if (e.button == 0 && ownHotspots.length > 0) {
-      this.dragSymbol = ownHotspots[0]!.target as Symbol
+      this.dragSymbol = ownHotspots[0]!.target as MilSymbol
     }
   }
 
   public onPointerMove(e: PointerEvent): void {
     if (!this.dragSymbol) return;
-    this.dragSymbol.pt = this.fromCnv({x: e.pageX, y: e.pageY})
+    this.dragSymbol.pos = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }
 
   public onPointerUp(e: PointerEvent, _: Hotspot[], isClick?: boolean): void {
     if (e.button == 0) {
       if (isClick && !this.dragSymbol) {
-        const s: Symbol = {
-          id: this.gid++,
+        const s: MilSymbol = {
+          guid: generateGuid(),
           sym: this.global.selectedSymbol!,
-          pt: this.fromCnv({x: e.pageX, y: e.pageY})
+          pos: this.fromCnv({x: e.pageX, y: e.pageY})
         }
         this.symbols.push(s)
-        this.imcsClient!.msgSendSymbol(s.pt, s.sym)
+        this.imcsClient!.msgSendSymbol([s])
         this.redraw()
       } else {
+        this.imcsClient!.msgSendSymbol([this.dragSymbol!])
         this.dragSymbol = undefined
       }
     }
@@ -72,7 +70,7 @@ export class SymbolOverlay extends BaseOverlay {
 
   public providesHotspots(): Hotspot[] {
     return this.symbols.map(s => {
-      return {pos: s.pt, size: 15, target: s, name: s.sym, provider: 'SymbolOverlay', type: 'Mil-Symbol'}
+      return {pos: s.pos, size: 15, target: s, name: s.sym, provider: 'SymbolOverlay', type: 'Mil-Symbol'}
     })
   }
 

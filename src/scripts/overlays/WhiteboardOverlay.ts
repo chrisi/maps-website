@@ -5,6 +5,7 @@ import type {Point} from "@/model/base.ts";
 import type {LineSegment} from "@/model/overlays.ts";
 import {colorWithAlpha, dashStyle, drawSmoothLine} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
+import {generateGuid} from "@/scripts/utils.ts";
 
 export class WhiteboardOverlay extends BaseOverlay {
 
@@ -69,6 +70,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.line = simplifyPoints(this.line, this.manager?.getCanvas().scale || 1)
     this.cornerIndices = detectCorners(this.line)
     const seg: LineSegment = {
+      guid: generateGuid(),
       points: this.line,
       cornerIndices: this.cornerIndices,
       color: colorWithAlpha(this.settings.settings.whiteboard.lineColor, this.settings.settings.whiteboard.opacity),
@@ -82,7 +84,16 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public addSegment(seg: LineSegment) {
-    this.segments.push(seg)
+    const existing = this.segments.find(s => s.guid === seg.guid)
+    if (existing) {
+      existing.points = seg.points
+      existing.cornerIndices = seg.cornerIndices
+      existing.color = seg.color
+      existing.width = seg.width
+      existing.dash = seg.dash
+    } else {
+      this.segments.push(seg)
+    }
     this.redraw()
   }
 
