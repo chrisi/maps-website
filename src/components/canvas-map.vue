@@ -2,6 +2,7 @@
 
 import {onMounted, ref, watch} from "vue";
 import type {Point} from "@/model/base.ts";
+import {isWheelDown} from "@/scripts/utils.ts";
 
 const props = withDefaults(defineProps<{
   src: string
@@ -358,7 +359,8 @@ function onDown(e: PointerEvent) {
   const pos = toImageCoords(e.clientX, e.clientY);
   emit('update:pos', pos);
 
-  if (props.suspend) return;
+  // allow mouse-wheel down even in suspend
+  if (props.suspend && e.button != 1) return;
 
   if (pointers.size === 1) {
     isPanning = true;
@@ -386,11 +388,11 @@ function onMove(e: PointerEvent) {
   const pos = toImageCoords(e.clientX, e.clientY);
   emit('update:pos', pos);
 
-  if (props.suspend) return;
+  // allow mouse-wheel down even in suspend
+  if (props.suspend && (e.buttons & 4) == 0) return;
 
   if (!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, e);
-
   if (pointers.size === 1 && isPanning) {
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
@@ -453,8 +455,10 @@ function onUp(e: PointerEvent) {
   if (!multiPointer) emit('pointerup', e);
   pointers.delete(e.pointerId);
 
-  if (props.suspend) {
-    if (pointers.size === 0) multiPointer = false;
+  // allow mouse-wheel down even in suspend
+  if (props.suspend && e.button != 1) {
+    if (pointers.size === 0)
+      multiPointer = false;
     return;
   }
 

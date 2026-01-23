@@ -64,6 +64,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerDown(e: PointerEvent) {
+    if (e.button != 0) return // only allow left click currently, TODO: right click for delete
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     this.line = [pt]
     this.isDrawing = true
