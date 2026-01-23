@@ -131,7 +131,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       selectedStation.value = undefined
       suspend.value = false
       break
-    case '^':
+    case '#':
       debug.value = !debug.value
       break
     case 'c':

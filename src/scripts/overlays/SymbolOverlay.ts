@@ -70,7 +70,8 @@ export class SymbolOverlay extends BaseOverlay {
         this.imcsClient!.msgSendSymbol([s])
         this.redraw()
       } else {
-        this.imcsClient!.msgSendSymbol([this.dragSymbol!])
+        if (this.dragSymbol)
+          this.imcsClient!.msgSendSymbol([this.dragSymbol!])
         this.dragSymbol = undefined
       }
     }
