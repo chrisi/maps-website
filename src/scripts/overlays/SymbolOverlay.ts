@@ -5,6 +5,7 @@ import type {MilSymbol} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {Mode} from "@/model/mode.ts";
 import {generateGuid} from "@/scripts/utils.ts";
+import {watch} from "vue";
 
 export class SymbolOverlay extends BaseOverlay {
 
@@ -25,6 +26,13 @@ export class SymbolOverlay extends BaseOverlay {
       }
       this.redraw()
     })
+    watch(() => this.settings.viz.wb, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.viz.wb
   }
 
   public getActiveMode(): Mode | undefined {

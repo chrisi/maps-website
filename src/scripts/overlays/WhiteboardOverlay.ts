@@ -6,6 +6,7 @@ import type {LineSegment} from "@/model/overlays.ts";
 import {colorWithAlpha, dashStyle, drawSmoothLine} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 import {generateGuid} from "@/scripts/utils.ts";
+import {watch} from "vue";
 
 export class WhiteboardOverlay extends BaseOverlay {
 
@@ -19,6 +20,9 @@ export class WhiteboardOverlay extends BaseOverlay {
   public init() {
     this.imcsClient?.onDrawEvent((segments: LineSegment[]) => {
       this.addSegment(segments[0]!)
+    })
+    watch(() => this.settings.viz.wb, () => {
+      this.redraw()
     })
   }
 
