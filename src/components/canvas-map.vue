@@ -2,7 +2,6 @@
 
 import {onMounted, ref, watch} from "vue";
 import type {Point} from "@/model/base.ts";
-import {isWheelDown} from "@/scripts/utils.ts";
 
 const props = withDefaults(defineProps<{
   src: string
@@ -160,6 +159,7 @@ onMounted(() => {
   mapRef.value.addEventListener("pointerup", onUp);
   mapRef.value.addEventListener("pointercancel", onUp);
   mapRef.value.addEventListener("wheel", onWheel, {passive: false});
+  mapRef.value.addEventListener("contextmenu", onContextMenu);
 })
 
 function resize() {
@@ -550,6 +550,12 @@ function animate() {
   } else {
     isAnimating = false;
   }
+}
+
+function onContextMenu(e: MouseEvent) {
+  // Prevent the system/browser context menu on right-click.
+  // Right-click still produces pointerdown/up, which you already emit via onDown/onUp.
+  e.preventDefault();
 }
 
 </script>
