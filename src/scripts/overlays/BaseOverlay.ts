@@ -54,7 +54,6 @@ export abstract class BaseOverlay implements Overlay {
   private enabled = true
 
   public setEnabled(enabled: boolean): void {
-    console.log(`setting overlay '${this.constructor.name}' to ${enabled ? 'enabled' : 'disabled'}`)
     this.enabled = enabled
     this.redraw()
   }

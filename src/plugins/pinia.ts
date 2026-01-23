@@ -12,7 +12,7 @@ export function persistPlugin({store, options}: PiniaPluginContext) {
   store.$subscribe((_, state) => {
     if (options.persist === false)
       return
-    console.log(`storing locally '${store.$id}': `, state)
+    //console.log(`storing locally '${store.$id}': `, state)
     localStorage.setItem(store.$id, JSON.stringify(state))
   })
 }

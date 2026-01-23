@@ -17,7 +17,6 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public init() {
     this.imcsClient?.onDrawEvent((segments: LineSegment[]) => {
-      console.log("Received draw event", segments)
       this.addSegment(segments[0]!)
     })
   }
