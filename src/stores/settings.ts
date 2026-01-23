@@ -13,8 +13,28 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const settings = reactive<Settings>(
     {
-      bullseye: {color: 'navy', thickness: 1.5, radialNM: 30, pos: {x: -1, y: -1}},
-      collab: {secure: false, callsign: "Joker", session: "47df", host: "localhost", port: 4848}
+      bullseye: {
+        lineColor: 'navy',
+        lineWidth: 1.5,
+        radialNM: 30,
+        pos: {x: -1, y: -1}
+      },
+      collab: {
+        secure: false,
+        callsign: 'Joker',
+        session: '47df',
+        host: 'localhost',
+        port: 4848
+      },
+      whiteboard: {
+        lineStyle: 'solid',
+        lineColor: '#ff0000',
+        lineWidth: 3,
+        fillStyle: 'none',
+        fillColor: '#ffffff',
+        opacity: 40,
+        eraserSize: 10
+      },
     }
   )
 

@@ -1,16 +1,20 @@
-
 import type {Point} from "@/model/base.ts";
 
 export function drawSmoothLine(ctx: CanvasRenderingContext2D,
                                points: Point[],
                                cornerIndices: number[],
+                               lineColor: string,
+                               lineWidth: number,
                                toCnv: (p: Point) => Point) {
   if (points.length < 2) return;
-
+  ctx.lineJoin = 'round'
+  ctx.lineCap = 'round'
+  ctx.strokeStyle = lineColor
+  ctx.lineWidth = lineWidth
+  ctx.beginPath()
   const allPts = points.map(p => toCnv(p));
   const pStart = allPts[0]!;
   ctx.moveTo(pStart.x, pStart.y);
-
   for (let i = 0; i < allPts.length - 1; i++) {
     const p0 = allPts[i === 0 ? i : i - 1]!;
     const p1 = allPts[i]!;
@@ -33,12 +37,13 @@ export function drawSmoothLine(ctx: CanvasRenderingContext2D,
       ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
     }
   }
+  ctx.stroke()
 }
 
 export function drawOutlined(ctx: CanvasRenderingContext2D,
                              lineColor: string, outColor: string, lineWidth: number, outWidth: number,
                              cb: (ctx: CanvasRenderingContext2D) => void) {
-  ctx.lineJoin = "round"
+  ctx.lineJoin = 'round'
   ctx.beginPath()
   ctx.strokeStyle = outColor
   ctx.lineWidth = lineWidth + outWidth * 2
@@ -112,4 +117,27 @@ export function drawArrowHead(ctx: CanvasRenderingContext2D, x: number, y: numbe
   ctx.closePath();
   ctx.fill();
   ctx.restore();
+}
+
+export function colorWithAlpha(color: string, opacity: number): string {
+  const a = Math.min(1, Math.max(0, opacity / 100))
+
+  // Support #RGB and #RRGGBB. If it's not hex, just return the color unchanged.
+  const hex = color.trim()
+  if (!hex.startsWith('#')) return color
+
+  const raw = hex.slice(1)
+  const full = raw.length === 3
+    ? raw.split('').map(ch => ch + ch).join('')
+    : raw.length === 6
+      ? raw
+      : null
+
+  if (!full) return color
+
+  const r = parseInt(full.slice(0, 2), 16)
+  const g = parseInt(full.slice(2, 4), 16)
+  const b = parseInt(full.slice(4, 6), 16)
+
+  return `rgba(${r}, ${g}, ${b}, ${a})`
 }

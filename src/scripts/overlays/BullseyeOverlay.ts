@@ -10,16 +10,16 @@ export class BullseyeOverlay extends BaseOverlay {
   private location: Point = {x: 0, y: 0}
   private dragging = false;
 
-  private color = '#003300'
+  private lineColor = '#003300'
   private radialNM = 30
-  private thickness = 1
+  private lineWidth = 1
 
   public init() {
     const set = this.settings.settings.bullseye
     this.location = set.pos
-    this.color = set.color
+    this.lineColor = set.lineColor
     this.radialNM = set.radialNM
-    this.thickness = set.thickness
+    this.lineWidth = set.lineWidth
     watch(() => this.settings.viz.be, () => {
       this.redraw()
     })
@@ -68,8 +68,8 @@ export class BullseyeOverlay extends BaseOverlay {
     const pt = this.toCnv(pos, cnv)
 
     // Set line properties
-    ctx.strokeStyle = this.color
-    ctx.lineWidth = this.thickness
+    ctx.strokeStyle = this.lineColor
+    ctx.lineWidth = this.lineWidth
 
     let radius = 0;
     // Draw Radial Circles

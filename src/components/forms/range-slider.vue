@@ -21,7 +21,7 @@ const emit = defineEmits<{
 
 <template>
   <input type="range" :id="id" :name="name" :min="min" :max="max" :step="step" :style="{ width: width }" class="suspend-prevent"
-         :value="modelValue"  @input="event => emit('update:modelValue', (event.target as HTMLInputElement).value)">
+         :value="modelValue"  @input="event => emit('update:modelValue', (event.target as HTMLInputElement).valueAsNumber)">
 </template>
 
 <style scoped>

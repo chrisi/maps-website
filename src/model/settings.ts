@@ -9,8 +9,8 @@ export interface Visibility {
 }
 
 export interface BullseyeSettings {
-  color: string;
-  thickness: number;
+  lineColor: string;
+  lineWidth: number;
   radialNM: number;
   pos: Point;
 }
@@ -23,7 +23,18 @@ export interface CollabSettings {
   port: number;
 }
 
+export interface WhiteboardSettings {
+  lineStyle: string;
+  lineColor: string;
+  lineWidth: number;
+  fillStyle: string;
+  fillColor: string;
+  opacity: number;
+  eraserSize: number;
+}
+
 export interface Settings {
   bullseye: BullseyeSettings;
   collab: CollabSettings;
+  whiteboard: WhiteboardSettings;
 }

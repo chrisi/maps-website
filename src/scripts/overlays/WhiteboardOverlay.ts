@@ -3,7 +3,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import type {LineSegment} from "@/model/overlays.ts";
-import {drawSmoothLine} from "@/scripts/draw.ts";
+import {colorWithAlpha, drawSmoothLine} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 
 export class WhiteboardOverlay extends BaseOverlay {
@@ -14,9 +14,6 @@ export class WhiteboardOverlay extends BaseOverlay {
   private cornerIndices: number[] = []
 
   private isDrawing = false
-
-  private currentColor = 'navy'
-  private currentWidth = 2
 
   public init() {
     this.imcsClient?.onDrawEvent((segments: LineSegment[]) => {
@@ -36,23 +33,24 @@ export class WhiteboardOverlay extends BaseOverlay {
   public onDraw(cnv: Canvas): void {
     if (this.line.length === 0 && this.segments.length === 0) return;
     const ctx = cnv.context
-    ctx.lineWidth = 2
-    ctx.strokeStyle = 'navy'
-    ctx.lineJoin = 'round'
-    ctx.lineCap = 'round'
 
-    ctx.beginPath()
     if (this.line.length > 1) {
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
+      ctx.strokeStyle = colorWithAlpha(this.settings.settings.whiteboard.lineColor, this.settings.settings.whiteboard.opacity)
+      ctx.lineWidth = this.settings.settings.whiteboard.lineWidth
+      ctx.beginPath()
       const ps = this.toCnv(this.line[0]!, cnv)
       ctx.moveTo(ps.x, ps.y)
       for (let i = 1; i < this.line.length; i++) {
         const p = this.toCnv(this.line[i]!, cnv)
         ctx.lineTo(p.x, p.y)
       }
+      ctx.stroke()
     }
 
     this.segments.forEach(seg => {
-      drawSmoothLine(ctx, seg.points, seg.cornerIndices, (p) => this.toCnv(p, cnv))
+      drawSmoothLine(ctx, seg.points, seg.cornerIndices, seg.color, seg.width, (p) => this.toCnv(p, cnv))
     })
 
     ctx.stroke()
@@ -73,8 +71,8 @@ export class WhiteboardOverlay extends BaseOverlay {
     const seg: LineSegment = {
       points: this.line,
       cornerIndices: this.cornerIndices,
-      color: this.currentColor,
-      width: this.currentWidth
+      color: colorWithAlpha(this.settings.settings.whiteboard.lineColor, this.settings.settings.whiteboard.opacity),
+      width: this.settings.settings.whiteboard.lineWidth,
     }
     this.addSegment(seg)
     this.imcsClient!.msgSendDraw([seg])
