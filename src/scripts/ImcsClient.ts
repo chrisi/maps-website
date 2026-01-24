@@ -16,6 +16,7 @@ enum ImcsMsgId {
   Pointer = 9,
   Ping = 10,
   Draw = 11,
+  Mission = 12,
 }
 
 interface ImcsMsg {
@@ -44,11 +45,21 @@ export interface ImcsMsgDraw extends ImcsMsg {
   parts: WbDraw[]
 }
 
+export interface ImcsMsgMission extends ImcsMsg {
+  ini: string[]
+}
+
 export interface ImcsMsgWhiteboard extends ImcsMsg {
   dataUrl: string
 }
 
 export class ImcsClient {
+
+  private missionEventHandler: ((ini: string[]) => void)[] = [];
+
+  public onMissionEvent(cb: ((ini: string[]) => void)) {
+    this.missionEventHandler.push(cb);
+  }
 
   private drawEventHandler: ((parts: WbDraw[]) => void)[] = [];
 
@@ -137,6 +148,11 @@ export class ImcsClient {
     this.send(msg)
   }
 
+  public msgSendMission(ini: string[]) {
+    const msg: ImcsMsgMission = {id: ImcsMsgId.Mission, client: this.client, ini: ini}
+    this.send(msg)
+  }
+
   private connectionHandler = (e: Event) => {
     if (this.socket?.readyState == WebSocket.OPEN) {
       this.imcsDebug("connected to IMCS");
@@ -178,10 +194,10 @@ export class ImcsClient {
         this.msgReceivedAuth(msg);
         break;
       case ImcsMsgId.Bullseye:
-        this.msgReceivedBullseyePos(msg);
+        this.bullseyePosEventHandler.forEach(cb => cb(msg.pos!))
         break;
       case ImcsMsgId.Symbol:
-        this.msgReceivedSymbol(msg);
+        this.symbolEventHandler.forEach(cb => cb(msg.symbols))
         break;
       // case 3:
       //   imcsMsgLineRcvd(msg);
@@ -202,10 +218,13 @@ export class ImcsClient {
         this.msgReceivedWhiteboard(msg);
         break;
       case ImcsMsgId.Pointer:
-        this.msgReceivedPointer(msg);
+        this.pointerEventHandler.forEach(cb => cb(msg.pos))
         break;
       case ImcsMsgId.Draw:
-        this.msgReceivedDraw(msg);
+        this.drawEventHandler.forEach(cb => cb(msg.parts))
+        break;
+      case ImcsMsgId.Mission:
+        this.missionEventHandler.forEach(cb => cb(msg.ini))
         break;
       default:
       // Ignore unknown Messages or Ping
@@ -230,22 +249,6 @@ export class ImcsClient {
     }
   }
 
-  private msgReceivedDraw(msg: ImcsMsgDraw) {
-    this.drawEventHandler.forEach(cb => cb(msg.parts))
-  }
-
-  private msgReceivedSymbol(msg: ImcsMsgSymbol) {
-    this.symbolEventHandler.forEach(cb => cb(msg.symbols))
-  }
-
-  private msgReceivedPointer(msg: ImcsMsgPos) {
-    this.pointerEventHandler.forEach(cb => cb(msg.pos))
-  }
-
-  private msgReceivedBullseyePos(msg: ImcsMsgPos) {
-    this.bullseyePosEventHandler.forEach(cb => cb(msg.pos!))
-  }
-
   private msgReceivedWhiteboard(msg: ImcsMsgWhiteboard) {
     this.imcsDebug("Message: Whiteboard: " + msg.dataUrl.length)
     const img = new Image(this.global.map!.pixels, this.global.map!.pixels)
@@ -257,6 +260,4 @@ export class ImcsClient {
       // refreshCanvas();
     };
   }
-
-
 }
