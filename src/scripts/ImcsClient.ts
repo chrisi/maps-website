@@ -1,6 +1,6 @@
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import type {LineSegment, MilSymbol} from "@/model/overlays.ts";
+import type {MilSymbol, WbDraw} from "@/model/overlays.ts";
 import type {CollabSettings} from "@/model/settings.ts";
 
 enum ImcsMsgId {
@@ -41,7 +41,7 @@ export interface ImcsMsgSymbol extends ImcsMsg {
 }
 
 export interface ImcsMsgDraw extends ImcsMsg {
-  segments: LineSegment[]
+  parts: WbDraw[]
 }
 
 export interface ImcsMsgWhiteboard extends ImcsMsg {
@@ -50,9 +50,9 @@ export interface ImcsMsgWhiteboard extends ImcsMsg {
 
 export class ImcsClient {
 
-  private drawEventHandler: ((segments: LineSegment[]) => void)[] = [];
+  private drawEventHandler: ((parts: WbDraw[]) => void)[] = [];
 
-  public onDrawEvent(cb: ((segments: LineSegment[]) => void)) {
+  public onDrawEvent(cb: ((parts: WbDraw[]) => void)) {
     this.drawEventHandler.push(cb);
   }
 
@@ -132,8 +132,8 @@ export class ImcsClient {
     this.send(msg)
   }
 
-  public msgSendDraw(segments: LineSegment[]) {
-    const msg: ImcsMsgDraw = {id: ImcsMsgId.Draw, client: this.client, segments: segments}
+  public msgSendDraw(parts: WbDraw[]) {
+    const msg: ImcsMsgDraw = {id: ImcsMsgId.Draw, client: this.client, parts: parts}
     this.send(msg)
   }
 
@@ -231,7 +231,7 @@ export class ImcsClient {
   }
 
   private msgReceivedDraw(msg: ImcsMsgDraw) {
-    this.drawEventHandler.forEach(cb => cb(msg.segments))
+    this.drawEventHandler.forEach(cb => cb(msg.parts))
   }
 
   private msgReceivedSymbol(msg: ImcsMsgSymbol) {

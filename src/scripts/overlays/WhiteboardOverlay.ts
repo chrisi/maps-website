@@ -2,7 +2,7 @@ import {Mode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
-import type {LineSegment} from "@/model/overlays.ts";
+import type {WbDrawType, WbDraw, WbFreehand} from "@/model/overlays.ts";
 import {colorWithAlpha, dashStyle, drawSmoothLine} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 import {generateGuid} from "@/scripts/utils.ts";
@@ -10,7 +10,7 @@ import {watch} from "vue";
 
 export class WhiteboardOverlay extends BaseOverlay {
 
-  private segments: LineSegment[] = []
+  private freehands: WbFreehand[] = []
 
   private line: Point[] = []
   private cornerIndices: number[] = []
@@ -18,8 +18,8 @@ export class WhiteboardOverlay extends BaseOverlay {
   private isDrawing = false
 
   public init() {
-    this.imcsClient?.onDrawEvent((segments: LineSegment[]) => {
-      this.addSegment(segments[0]!)
+    this.imcsClient?.onDrawEvent((parts: WbDraw[]) => {
+      this.addFreehand(parts[0]! as WbFreehand)
     })
     watch(() => this.settings.viz.wb, () => {
       this.redraw()
@@ -35,7 +35,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (this.line.length === 0 && this.segments.length === 0) return;
+    if (this.line.length === 0 && this.freehands.length === 0) return;
     const ctx = cnv.context
 
     if (this.isDrawing && this.line.length > 1) {
@@ -56,8 +56,8 @@ export class WhiteboardOverlay extends BaseOverlay {
       ctx.stroke()
     }
 
-    this.segments.forEach(seg => {
-      drawSmoothLine(ctx, seg.points, seg.cornerIndices, seg.color, seg.width, seg.dash, (p) => this.toCnv(p, cnv))
+    this.freehands.forEach(fh => {
+      drawSmoothLine(ctx, fh.points, fh.cornerIndices, fh.color, fh.width, fh.dash, (p) => this.toCnv(p, cnv))
     })
 
     this.drawSupportPoints(cnv)
@@ -74,7 +74,8 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.isDrawing = false
     this.line = simplifyPoints(this.line, this.manager?.getCanvas().scale || 1)
     this.cornerIndices = detectCorners(this.line)
-    const seg: LineSegment = {
+    const fh: WbFreehand = {
+      type: 'freehand',
       guid: generateGuid(),
       points: this.line,
       cornerIndices: this.cornerIndices,
@@ -82,22 +83,22 @@ export class WhiteboardOverlay extends BaseOverlay {
       width: this.settings.settings.whiteboard.lineWidth,
       dash: dashStyle(this.settings.settings.whiteboard.lineWidth, this.settings.settings.whiteboard.lineStyle)
     }
-    this.addSegment(seg)
-    this.imcsClient!.msgSendDraw([seg])
+    this.addFreehand(fh)
+    this.imcsClient!.msgSendDraw([fh])
     this.line = []
     this.cornerIndices = []
   }
 
-  public addSegment(seg: LineSegment) {
-    const existing = this.segments.find(s => s.guid === seg.guid)
+  public addFreehand(fh: WbFreehand) {
+    const existing = this.freehands.find(fhs => fhs.guid === fh.guid)
     if (existing) {
-      existing.points = seg.points
-      existing.cornerIndices = seg.cornerIndices
-      existing.color = seg.color
-      existing.width = seg.width
-      existing.dash = seg.dash
+      existing.points = fh.points
+      existing.cornerIndices = fh.cornerIndices
+      existing.color = fh.color
+      existing.width = fh.width
+      existing.dash = fh.dash
     } else {
-      this.segments.push(seg)
+      this.freehands.push(fh)
     }
     this.redraw()
   }
@@ -107,7 +108,6 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.lineWidth = 0.5
     ctx.strokeStyle = 'black'
     ctx.fillStyle = 'cyan'
-
     ctx.beginPath()
     for (let i = 0; i < this.line.length; i++) {
       const p = this.toCnv(this.line[i]!, cnv)
