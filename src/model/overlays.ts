@@ -6,33 +6,33 @@ export interface MilSymbol {
   sym: string
 }
 
-export type WbDrawType = 'freehand' | 'line' | 'circle' | 'rect'
+export type WbShapeType = 'freehand' | 'line' | 'circle' | 'rect'
 
-export interface WbDraw {
-  type: WbDrawType
+export interface WbShape {
+  type: WbShapeType
   guid: string
   color: string
   width: number
   dash: number[]
 }
 
-export interface WbFreehand extends WbDraw {
+export interface WbFreehand extends WbShape {
   points: Point[]
   cornerIndices: number[]
 }
 
-export interface WbLine extends WbDraw {
+export interface WbLine extends WbShape {
   p1: Point
   p2: Point
 }
 
-export interface WbCircle extends WbDraw {
+export interface WbCircle extends WbShape {
   center: Point
   radius: number
   fillColor: string
 }
 
-export interface WbRect extends WbDraw {
+export interface WbRect extends WbShape {
   p1: Point
   p2: Point
   rotation: number

@@ -1,6 +1,6 @@
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import type {MilSymbol, WbDraw} from "@/model/overlays.ts";
+import type {MilSymbol, WbShape} from "@/model/overlays.ts";
 import type {CollabSettings} from "@/model/settings.ts";
 
 enum ImcsMsgId {
@@ -42,7 +42,7 @@ export interface ImcsMsgSymbol extends ImcsMsg {
 }
 
 export interface ImcsMsgDraw extends ImcsMsg {
-  parts: WbDraw[]
+  parts: WbShape[]
 }
 
 export interface ImcsMsgMission extends ImcsMsg {
@@ -61,9 +61,9 @@ export class ImcsClient {
     this.missionEventHandler.push(cb);
   }
 
-  private drawEventHandler: ((parts: WbDraw[]) => void)[] = [];
+  private drawEventHandler: ((parts: WbShape[]) => void)[] = [];
 
-  public onDrawEvent(cb: ((parts: WbDraw[]) => void)) {
+  public onDrawEvent(cb: ((parts: WbShape[]) => void)) {
     this.drawEventHandler.push(cb);
   }
 
@@ -143,7 +143,7 @@ export class ImcsClient {
     this.send(msg)
   }
 
-  public msgSendDraw(parts: WbDraw[]) {
+  public msgSendDraw(parts: WbShape[]) {
     const msg: ImcsMsgDraw = {id: ImcsMsgId.Draw, client: this.client, parts: parts}
     this.send(msg)
   }

@@ -26,12 +26,9 @@ export class SplinePainter {
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }
 
-  public optimize(scale: number) {
+  public stopDrawing(paintConfig: WhiteboardSettings, scale: number): WbFreehand {
     this.line = simplifyPoints(this.line, scale)
     this.cornerIndices = detectCorners(this.line)
-  }
-
-  public stopDrawing(paintConfig: WhiteboardSettings): WbFreehand {
     const fh: WbFreehand = {
       type: 'freehand',
       guid: generateGuid(),
