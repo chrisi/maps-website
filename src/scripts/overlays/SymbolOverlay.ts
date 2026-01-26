@@ -53,7 +53,7 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public onPointerMove(e: PointerEvent): void {
-    if (!this.dragSymbol) return;
+    if (!this.dragSymbol) return
     this.dragSymbol.pos = this.fromCnv({x: e.pageX, y: e.pageY})
     this.redraw()
   }

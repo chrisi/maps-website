@@ -12,6 +12,7 @@ import ToolSection from "@/components/forms/tool-section.vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import RangeSlider from "@/components/forms/range-slider.vue";
 import {useSettingsStore} from "@/stores/settings.ts";
+import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 
 const settings = useSettingsStore()
 
@@ -86,6 +87,8 @@ const variant = ref("d")
         </div>
       </div>
     </tool-input>
+    <tool-section name="Debug"/>
+    <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
   </tool-window>
 </template>
 

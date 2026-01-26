@@ -33,7 +33,8 @@ export const useSettingsStore = defineStore('settings', () => {
         fillStyle: 'none',
         fillColor: '#ffffff',
         opacity: 40,
-        eraserSize: 10
+        eraserSize: 10,
+        supportPoints: true
       },
     }
   )

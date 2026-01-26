@@ -1,4 +1,5 @@
 import type {Point} from "@/model/base.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 
 export function drawSmoothLine(ctx: CanvasRenderingContext2D,
                                points: Point[],
