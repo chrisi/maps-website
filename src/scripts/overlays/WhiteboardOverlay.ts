@@ -5,7 +5,7 @@ import type {WbCircle, WbShape, WbFreehand} from "@/model/overlays.ts";
 import {colorWithAlpha, dashStyle, drawSmoothLine} from "@/scripts/draw.ts";
 import {watch} from "vue";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
-import {generateGuid} from "@/scripts/utils.ts";
+import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import type {Point} from "@/model/base.ts";
 import {distance} from "@/scripts/math.ts";
 
@@ -130,7 +130,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       default:
     }
 
-    this.drawMode = DrawMode.Freehand
+    this.drawMode = DrawMode.None
   }
 
   public onPointerMove(e: PointerEvent) {
@@ -179,10 +179,11 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.stroke()
   }
 
+  //we cannot use ctrl as a modifier for left-click since firefox handles this as right-click on Mac
   private determineDrawMode(e: PointerEvent): DrawMode {
-    if (e.shiftKey) return DrawMode.Line
-    if (e.ctrlKey) return DrawMode.Circle
-    if (e.altKey) return DrawMode.Rect
+    if (getModMask(e) == Mod.Shift) return DrawMode.Line
+    if (getModMask(e) == Mod.Shift + Mod.Alt) return DrawMode.Rect
+    if (getModMask(e) == Mod.Alt) return DrawMode.Circle
     return DrawMode.Freehand
   }
 }

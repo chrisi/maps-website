@@ -10,3 +10,18 @@ export const generateGuid = (): string => {
     return v.toString(16);
   });
 };
+
+export enum Mod {
+  None  = 0,
+  Shift = 1 << 0,
+  Alt   = 1 << 1,
+  Ctrl  = 1 << 2,
+  Meta  = 1 << 3,
+}
+
+export function getModMask(e: PointerEvent): Mod {
+  return (e.shiftKey ? Mod.Shift : Mod.None)
+    | (e.altKey ? Mod.Alt : Mod.None)
+    | (e.ctrlKey ? Mod.Ctrl : Mod.None)
+    | (e.metaKey ? Mod.Meta : Mod.None)
+}
