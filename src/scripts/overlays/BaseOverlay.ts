@@ -96,9 +96,9 @@ export abstract class BaseOverlay implements Overlay {
   }
 
   /**
-   * transforms world coordinates to screen coordinates for every
-   * drawing operation performed in the call back. line width has to be
-   * scaled back if line thickness needs to be constant in screen space.
+   * transforms world coordinates to screen coordinates for every drawing operation
+   * performed in the call back. line width has to be scaled back manually
+   * if line thickness needs to be constant in screen space during zoom operations.
    * @param cb
    * @param cnv
    * @protected

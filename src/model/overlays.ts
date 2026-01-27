@@ -19,6 +19,7 @@ export interface WbShape {
 export interface WbFreehand extends WbShape {
   points: Point[]
   cornerIndices: number[]
+  path?: Path2D // cache property; will be omitted for websocket transmission
 }
 
 export interface WbLine extends WbShape {

@@ -2,7 +2,7 @@ import {Mode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {WbCircle, WbShape, WbFreehand} from "@/model/overlays.ts";
-import {colorWithAlpha, dashStyle, drawSmoothLine} from "@/scripts/draw.ts";
+import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
 import {watch} from "vue";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
@@ -74,10 +74,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       this.shapes.forEach(s => {
         switch (s.type) {
           case 'freehand':
-            const fh = s as WbFreehand
-            drawSmoothLine(cnv.context, fh.points, fh.cornerIndices, fh.color, fh.width / cnv.scale, fh.dash)
-            if (this.settings.settings.whiteboard.supportPoints)
-              this.splinePainter.drawSupportPoints(cnv, fh.points)
+            this.drawWbFreehand(cnv, s as WbFreehand)
             break
           case 'circle':
             this.drawWbCircle(cnv, s as WbCircle)
@@ -109,7 +106,6 @@ export class WhiteboardOverlay extends BaseOverlay {
     const colFill = colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4)
     const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
     const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
-
     switch (this.drawMode) {
       case DrawMode.Circle:
         const c: WbCircle = {
@@ -154,6 +150,19 @@ export class WhiteboardOverlay extends BaseOverlay {
   public addShape(fh: WbShape) {
     this.shapes.push(fh)
     this.redraw()
+  }
+
+  private drawWbFreehand(cnv: Canvas, fh: WbFreehand) {
+    if (!fh.path) fh.path = buildFreehandPath(fh.points, fh.cornerIndices)
+    const ctx = cnv.context
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    ctx.strokeStyle = fh.color
+    ctx.lineWidth = fh.width / cnv.scale
+    ctx.setLineDash(fh.dash)
+    ctx.stroke(fh.path!)
+    if (this.settings.settings.whiteboard.supportPoints)
+      this.splinePainter.drawSupportPoints(cnv, fh.points)
   }
 
   private drawWbCircle(cnv: Canvas, c: WbCircle) {
