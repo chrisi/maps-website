@@ -123,8 +123,10 @@ export class WhiteboardOverlay extends BaseOverlay {
         break
       case DrawMode.Freehand:
         const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.manager?.getCanvas().scale || 1);
-        this.addShape(fh)
-        this.imcsClient!.msgSendDraw([fh])
+        if (fh) {
+          this.addShape(fh)
+          this.imcsClient!.msgSendDraw([fh])
+        }
         break
       default:
     }

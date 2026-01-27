@@ -23,7 +23,8 @@ export class SplinePainter {
     this.line = [pt]
   }
 
-  public stopDrawing(paintConfig: WhiteboardSettings, scale: number): WbFreehand {
+  public stopDrawing(paintConfig: WhiteboardSettings, scale: number): WbFreehand | undefined {
+    this.isDrawing = false
     this.line = simplifyPoints(this.line, scale)
     this.cornerIndices = detectCorners(this.line)
     const fh: WbFreehand = {
@@ -37,8 +38,7 @@ export class SplinePainter {
     }
     this.line = []
     this.cornerIndices = []
-    this.isDrawing = false
-    return fh
+    return fh.points.length > 2 ? fh : undefined
   }
 
   public addPoint(point: Point) {
