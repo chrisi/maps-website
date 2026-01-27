@@ -12,6 +12,7 @@ export class SplinePainter {
   private cornerIndices: number[] = []
 
   private isDrawing = false
+  private supportPointSize = 3
 
   public isDrawingSpline(): boolean {
     return this.isDrawing
@@ -20,10 +21,6 @@ export class SplinePainter {
   public startDrawing(pt: Point) {
     this.isDrawing = true
     this.line = [pt]
-  }
-
-  private toCnv(pt: Point, cnv: Canvas): Point {
-    return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }
 
   public stopDrawing(paintConfig: WhiteboardSettings, scale: number): WbFreehand {
@@ -55,16 +52,16 @@ export class SplinePainter {
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
     ctx.strokeStyle = colorWithAlpha(paintConfig.lineColor, paintConfig.opacity)
-    ctx.lineWidth = paintConfig.lineWidth
+    ctx.lineWidth = paintConfig.lineWidth / cnv.scale
     ctx.lineDashOffset = 0
     const dash = dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
     ctx.setLineDash(dash)
     ctx.beginPath()
-    const ps = this.toCnv(this.line[0]!, cnv)
-    ctx.moveTo(ps.x, ps.y)
+    const p0 = this.line[0]!
+    ctx.moveTo(p0.x, p0.y)
     for (let i = 1; i < this.line.length; i++) {
-      const p = this.toCnv(this.line[i]!, cnv)
-      ctx.lineTo(p.x, p.y)
+      const pi = this.line[i]!
+      ctx.lineTo(pi.x, pi.y)
     }
     ctx.stroke()
     if (paintConfig.supportPoints)
@@ -73,15 +70,14 @@ export class SplinePainter {
 
   public drawSupportPoints(cnv: Canvas, pts: Point[] = this.line) {
     const ctx = cnv.context
-    ctx.lineWidth = 0.5
+    ctx.lineWidth = 0.5 / cnv.scale
     ctx.strokeStyle = 'black'
     ctx.fillStyle = 'cyan'
     ctx.beginPath()
-    for (let i = 0; i < pts.length; i++) {
-      const p = this.toCnv(pts[i]!, cnv)
-      ctx.moveTo(p.x + 3, p.y)
-      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2)
-    }
+    pts.forEach(p => {
+      ctx.moveTo(p.x + this.supportPointSize / cnv.scale, p.y)
+      ctx.arc(p.x, p.y, this.supportPointSize / cnv.scale, 0, Math.PI * 2)
+    })
     ctx.fill()
     ctx.stroke()
   }

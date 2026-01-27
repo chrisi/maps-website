@@ -6,8 +6,7 @@ export function drawSmoothLine(ctx: CanvasRenderingContext2D,
                                cornerIndices: number[],
                                lineColor: string,
                                lineWidth: number,
-                               lineDash: number[],
-                               toCnv: (p: Point) => Point) {
+                               lineDash: number[]) {
   if (points.length < 2) return;
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
@@ -16,14 +15,13 @@ export function drawSmoothLine(ctx: CanvasRenderingContext2D,
   ctx.lineDashOffset = 0
   ctx.setLineDash(lineDash)
   ctx.beginPath()
-  const allPts = points.map(p => toCnv(p));
-  const pStart = allPts[0]!;
+  const pStart = points[0]!;
   ctx.moveTo(pStart.x, pStart.y);
-  for (let i = 0; i < allPts.length - 1; i++) {
-    const p0 = allPts[i === 0 ? i : i - 1]!;
-    const p1 = allPts[i]!;
-    const p2 = allPts[i + 1]!;
-    const p3 = i + 2 < allPts.length ? allPts[i + 2]! : p2;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i === 0 ? i : i - 1]!;
+    const p1 = points[i]!;
+    const p2 = points[i + 1]!;
+    const p3 = i + 2 < points.length ? points[i + 2]! : p2;
 
     const isCorner = cornerIndices.includes(i);
     const nextIsCorner = cornerIndices.includes(i + 1);

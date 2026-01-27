@@ -95,6 +95,23 @@ export abstract class BaseOverlay implements Overlay {
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }
 
+  /**
+   * transforms world coordinates to screen coordinates for every
+   * drawing operation performed in the call back. line width has to be
+   * scaled back if line thickness needs to be constant in screen space.
+   * @param cb
+   * @param cnv
+   * @protected
+   */
+  protected drawWorldInScreenSpace(cb: () => void, cnv?: Canvas): void {
+    if (!cnv) cnv = this.manager!.getCanvas()
+    cnv.context.save()
+    cnv.context.scale(cnv.scale, cnv.scale)
+    cnv.context.translate(-cnv.offset.x, -cnv.offset.y)
+    cb()
+    cnv.context.restore()
+  }
+
   // implement this if your overlay provides hotspots that the mouse could interact with
   // hotspot hits will be calculated by the OverlayManager and distributed via the pointer events
   public providesHotspots?(): Hotspot[] {

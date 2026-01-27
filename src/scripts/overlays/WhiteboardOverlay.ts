@@ -51,7 +51,9 @@ export class WhiteboardOverlay extends BaseOverlay {
   public onDraw(cnv: Canvas): void {
     switch (this.drawMode) {
       case DrawMode.Freehand:
-        this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
+        this.drawWorldInScreenSpace(() => {
+          this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
+        })
         break
       case DrawMode.Circle:
         if (this.startPoint && this.cursorPoint) {
@@ -68,19 +70,20 @@ export class WhiteboardOverlay extends BaseOverlay {
         }
         break
     }
-
-    this.shapes.forEach(s => {
-      switch (s.type) {
-        case 'freehand':
-          const fh = s as WbFreehand
-          drawSmoothLine(cnv.context, fh.points, fh.cornerIndices, fh.color, fh.width, fh.dash, (p) => this.toCnv(p, cnv))
-          if (this.settings.settings.whiteboard.supportPoints)
-            this.splinePainter.drawSupportPoints(cnv, fh.points)
-          break
-        case 'circle':
-          this.drawWbCircle(cnv, s as WbCircle)
-          break
-      }
+    this.drawWorldInScreenSpace(() => {
+      this.shapes.forEach(s => {
+        switch (s.type) {
+          case 'freehand':
+            const fh = s as WbFreehand
+            drawSmoothLine(cnv.context, fh.points, fh.cornerIndices, fh.color, fh.width / cnv.scale, fh.dash)
+            if (this.settings.settings.whiteboard.supportPoints)
+              this.splinePainter.drawSupportPoints(cnv, fh.points)
+            break
+          case 'circle':
+            this.drawWbCircle(cnv, s as WbCircle)
+            break
+        }
+      })
     })
   }
 
@@ -155,12 +158,11 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private drawWbCircle(cnv: Canvas, c: WbCircle) {
     const ctx = cnv.context
-    const p = this.toCnv(c.center, cnv)
     ctx.strokeStyle = c.color
     ctx.fillStyle = c.fillColor
-    ctx.lineWidth = c.width
+    ctx.lineWidth = c.width / cnv.scale
     ctx.setLineDash(c.dash)
-    this.drawCircle(cnv, p, c.radius * cnv.scale)
+    this.drawCircle(cnv, c.center, c.radius)
     ctx.fill()
   }
 
