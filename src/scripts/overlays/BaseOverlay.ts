@@ -95,6 +95,10 @@ export abstract class BaseOverlay implements Overlay {
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }
 
+  protected getCanvas(): Canvas {
+    return this.manager!.getCanvas()
+  }
+
   /**
    * transforms world coordinates to screen coordinates for every drawing operation
    * performed in the call back. line width has to be scaled back manually

@@ -1,13 +1,13 @@
+import {watch} from "vue";
 import {Mode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {WbCircle, WbShape, WbFreehand} from "@/model/overlays.ts";
-import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
-import {watch} from "vue";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
-import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import type {Point} from "@/model/base.ts";
-import {distance} from "@/scripts/math.ts";
+import type {Canvas} from "@/scripts/overlays/Canvas.ts";
+import type {WbCircle, WbShape, WbFreehand, WbLine} from "@/model/overlays.ts";
+import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
+import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
+import {distance, isPointOnCircle, isPointOnLine} from "@/scripts/math.ts";
 
 enum DrawMode {
   None = 0,
@@ -50,10 +50,17 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     switch (this.drawMode) {
-      case DrawMode.Freehand:
-        this.drawWorldInScreenSpace(() => {
-          this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
-        })
+      case DrawMode.Line:
+        if (this.startPoint && this.cursorPoint) {
+          // TODO: tmp
+          const p1 = this.toCnv(this.startPoint)
+          const p2 = this.toCnv(this.cursorPoint)
+          const ctx = cnv.context
+          ctx.lineWidth = 1.5
+          ctx.strokeStyle = 'black'
+          ctx.setLineDash([1, 3])
+          this.drawLine(cnv, p1, p2)
+        }
         break
       case DrawMode.Circle:
         if (this.startPoint && this.cursorPoint) {
@@ -69,15 +76,23 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.drawLine(cnv, ctr, cur)
         }
         break
+      case DrawMode.Freehand:
+        this.drawWorldInScreenSpace(() => {
+          this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
+        })
+        break
     }
     this.drawWorldInScreenSpace(() => {
       this.shapes.forEach(s => {
         switch (s.type) {
-          case 'freehand':
-            this.drawWbFreehand(cnv, s as WbFreehand)
+          case 'line':
+            this.drawWbLine(cnv, s as WbLine)
             break
           case 'circle':
             this.drawWbCircle(cnv, s as WbCircle)
+            break
+          case 'freehand':
+            this.drawWbFreehand(cnv, s as WbFreehand)
             break
         }
       })
@@ -89,11 +104,12 @@ export class WhiteboardOverlay extends BaseOverlay {
       this.drawMode = this.determineDrawMode(e)
       const pt = this.fromCnv({x: e.pageX, y: e.pageY})
       switch (this.drawMode) {
-        case DrawMode.Freehand:
-          this.splinePainter.startDrawing(pt)
-          break
+        case DrawMode.Line:
         case DrawMode.Circle:
           this.startPoint = pt
+          break
+        case DrawMode.Freehand:
+          this.splinePainter.startDrawing(pt)
           break
         default:
       }
@@ -108,6 +124,19 @@ export class WhiteboardOverlay extends BaseOverlay {
       const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
       const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
       switch (this.drawMode) {
+        case DrawMode.Line:
+          const l: WbLine = {
+            type: 'line',
+            guid: generateGuid(),
+            p1: this.startPoint!,
+            p2: pt,
+            color: colLine,
+            width: cfg.lineWidth,
+            dash: dash
+          }
+          this.addShape(l)
+          this.imcsClient!.msgSendDraw([l])
+          break
         case DrawMode.Circle:
           const c: WbCircle = {
             type: 'circle',
@@ -123,7 +152,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.imcsClient!.msgSendDraw([c])
           break
         case DrawMode.Freehand:
-          const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.manager?.getCanvas().scale || 1);
+          const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.getCanvas().scale || 1);
           if (fh) {
             this.addShape(fh)
             this.imcsClient!.msgSendDraw([fh])
@@ -135,24 +164,35 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
 
     if (e.button == 2) {
-      this.shapes.filter(s => s.type == 'freehand').forEach(s => {
-        if (this.hitTestFreehand(this.manager?.getCanvas()!, s as WbFreehand, pt, 5)) {
-          s.color = 'red'
-          this.redraw()
+      this.shapes = this.shapes.filter(s => {
+        switch (s.type) {
+          case 'line':
+            const l = s as WbLine
+            return !isPointOnLine(l.p1, l.p2, pt, 5 / this.getCanvas().scale)
+          case 'circle':
+            const c = s as WbCircle
+            return !isPointOnCircle(c.center, c.radius, pt, 5 / this.getCanvas().scale)
+          case 'freehand':
+            return !this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
+          default:
         }
+        return true
       })
     }
+
+    this.redraw()
   }
 
   public onPointerMove(e: PointerEvent) {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     switch (this.drawMode) {
+      case DrawMode.Line:
+      case DrawMode.Circle:
+        this.cursorPoint = pt
+        break
       case DrawMode.Freehand:
         if (!this.splinePainter.isDrawingSpline()) return
         this.splinePainter.addPoint(pt)
-        break
-      case DrawMode.Circle:
-        this.cursorPoint = pt
         break
       default:
     }
@@ -192,6 +232,15 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.beginPath()
     ctx.arc(ctr.x, ctr.y, rad, 0, 2 * Math.PI)
     ctx.stroke()
+  }
+
+  private drawWbLine(cnv: Canvas, l: WbLine) {
+    const ctx = cnv.context
+    ctx.strokeStyle = l.color
+    ctx.lineWidth = l.width / cnv.scale
+    ctx.setLineDash(l.dash)
+    this.drawLine(cnv, l.p1, l.p2)
+    ctx.fill()
   }
 
   private drawLine(cnv: Canvas, p1: Point, p2: Point) {

@@ -150,3 +150,41 @@ export function tas2mach(tas: number, oat: number): number {
   const a = Math.sqrt(1.4 * 287.053 * temp);
   return (spd / a);
 }
+
+export function isPointOnLine(p1: Point, p2: Point, p: Point, threshold: number): boolean {
+  const t2 = threshold * threshold
+
+  const abx = p2.x - p1.x
+  const aby = p2.y - p1.y
+  const apx = p.x - p1.x
+  const apy = p.y - p1.y
+
+  const abLen2 = abx * abx + aby * aby
+
+  // Degenerate segment (p1 === b): treat as "near the point p1"
+  if (abLen2 === 0) {
+    const dx = p.x - p1.x
+    const dy = p.y - p1.y
+    return dx * dx + dy * dy <= t2
+  }
+
+  // Project p onto the segment, clamped to [0, 1]
+  let t = (apx * abx + apy * aby) / abLen2
+  if (t < 0) t = 0
+  else if (t > 1) t = 1
+
+  const closestX = p1.x + t * abx
+  const closestY = p1.y + t * aby
+
+  const dx = p.x - closestX
+  const dy = p.y - closestY
+  return dx * dx + dy * dy <= t2
+}
+
+export function isPointOnCircle(ctr: Point, rad: number, p: Point, threshold: number): boolean {
+  const r = Math.abs(rad)
+  const dx = p.x - ctr.x
+  const dy = p.y - ctr.y
+  const d = Math.sqrt(dx * dx + dy * dy)
+  return Math.abs(d - r) <= Math.abs(threshold)
+}
