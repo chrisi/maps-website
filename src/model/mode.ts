@@ -9,3 +9,11 @@ export enum Mode {
   Write = "write",
   Symbol = "symbol"
 }
+
+export enum DrawMode {
+  Freehand = "freehand",
+  Line = "line",
+  Circle = "circle",
+  Rect = "rect",
+  Delete = "delete"
+}

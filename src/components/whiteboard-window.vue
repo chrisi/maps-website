@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolInput from "@/components/forms/tool-input.vue";
@@ -9,12 +9,16 @@ import PureDropdown from "@/components/forms/pure-dropdown.vue";
 import PureNumberfield from "@/components/forms/pure-numberfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
-import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import RangeSlider from "@/components/forms/range-slider.vue";
 import {useSettingsStore} from "@/stores/settings.ts";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
+import ToolButton from "@/components/forms/tool-button.vue";
+import {useGlobalStore} from "@/stores/global.ts";
+import {DrawMode} from "@/model/mode.ts";
+import ToolOutput from "@/components/forms/tool-output.vue";
 
 const settings = useSettingsStore()
+const global = useGlobalStore()
 
 defineProps({
   visible: {
@@ -26,6 +30,33 @@ defineProps({
 const emit = defineEmits(['close'])
 
 const variant = ref("d")
+
+
+watch(() => global.drawMode, value => {
+  // TODO placeholder
+  console.log(`drawMode changed to ${value}`)
+})
+
+const btnDrawModeClick = (sender: string) => {
+  switch (sender) {
+    case "drawMode_freehand":
+      global.drawMode = DrawMode.Freehand
+      break
+    case "drawMode_line":
+      global.drawMode = DrawMode.Line
+      break
+    case "drawMode_circle":
+      global.drawMode = DrawMode.Circle
+      break
+    case "drawMode_rect":
+      global.drawMode = DrawMode.Rect
+      break
+    case "drawMode_delete":
+      global.drawMode = DrawMode.Delete
+      break
+    default:
+  }
+}
 
 </script>
 
@@ -76,6 +107,14 @@ const variant = ref("d")
       </div>
     </tool-input>
     <tool-spacer/>
+    <tool-section name="Shapes"/>
+    <tool-button id="drawMode_freehand" icon="/common/icons/freehand.png" @click="btnDrawModeClick"/>
+    <tool-button id="drawMode_line" icon="/common/icons/line.png" @click="btnDrawModeClick"/>
+    <tool-button id="drawMode_circle" icon="/common/icons/circle.png" @click="btnDrawModeClick"/>
+    <tool-button id="drawMode_rect" icon="/common/icons/rect.png" @click="btnDrawModeClick"/>
+    <tool-button id="drawMode_delete" icon="/common/icons/delete.png" @click="btnDrawModeClick"/>
+    <tool-output label="Mode" :value="global.drawMode"/>
+    <tool-spacer/>
     <tool-section name="Eraser"/>
     <tool-input :variant="variant" label="Size" for="eraser-size">
       <div style="display: flex; width: 95%; gap: 8px;">
@@ -87,6 +126,7 @@ const variant = ref("d")
         </div>
       </div>
     </tool-input>
+    <tool-spacer/>
     <tool-section name="Debug"/>
     <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
   </tool-window>

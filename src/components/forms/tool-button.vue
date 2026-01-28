@@ -25,5 +25,11 @@ const baseUrl = import.meta.env.BASE_URL
 <style scoped>
 button {
   margin: 4px;
+  padding: 2px;
+  display: inline-block;
+}
+img {
+  display: block;
+  background-color: lightgreen;
 }
 </style>
