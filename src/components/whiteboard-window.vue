@@ -108,12 +108,16 @@ const btnDrawModeClick = (sender: string) => {
     </tool-input>
     <tool-spacer/>
     <tool-section name="Shapes"/>
-    <tool-button id="drawMode_freehand" icon="/common/icons/freehand.png" @click="btnDrawModeClick"/>
-    <tool-button id="drawMode_line" icon="/common/icons/line.png" @click="btnDrawModeClick"/>
-    <tool-button id="drawMode_circle" icon="/common/icons/circle.png" @click="btnDrawModeClick"/>
-    <tool-button id="drawMode_rect" icon="/common/icons/rect.png" @click="btnDrawModeClick"/>
-    <tool-button id="drawMode_delete" icon="/common/icons/delete.png" @click="btnDrawModeClick"/>
-    <tool-output label="Mode" :value="global.drawMode"/>
+    <tool-button id="drawMode_freehand" icon="/common/icons/freehand.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Freehand"/>
+    <tool-button id="drawMode_line" icon="/common/icons/line.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Line"/>
+    <tool-button id="drawMode_circle" icon="/common/icons/circle.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Circle"/>
+    <tool-button id="drawMode_rect" icon="/common/icons/rect.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Rect"/>
+    <tool-button id="drawMode_delete" icon="/common/icons/delete.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Delete"/>
     <tool-spacer/>
     <tool-section name="Eraser"/>
     <tool-input :variant="variant" label="Size" for="eraser-size">

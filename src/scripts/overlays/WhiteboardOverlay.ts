@@ -163,7 +163,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       this.drawMode = DrawMode.None
     }
 
-    if (e.button == 2) {
+    if (e.button == 2 || this.global.drawMode == "delete") {
       const del = this.shapes.find(s => {
         switch (s.type) {
           case 'line':
@@ -270,10 +270,26 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   //we cannot use ctrl as a modifier for left-click since firefox handles this as right-click on Mac
   private determineDrawMode(e: PointerEvent): DrawMode {
+    let mode = DrawMode.None
+    switch (this.global.drawMode) {
+      case "line":
+        mode = DrawMode.Line
+        break
+      case "circle":
+        mode = DrawMode.Circle
+        break
+      case "rect":
+        mode = DrawMode.Rect
+        break
+      case "freehand":
+        mode = DrawMode.Freehand
+        break
+    }
+    // quickly override mode with modifiers
     if (getModMask(e) == Mod.Shift) return DrawMode.Line
     if (getModMask(e) == Mod.Shift + Mod.Alt) return DrawMode.Rect
     if (getModMask(e) == Mod.Alt) return DrawMode.Circle
-    return DrawMode.Freehand
+    return mode
   }
 
   private hitTestFreehand(cnv: Canvas, fh: WbFreehand, pt: Point, tol: number): boolean {

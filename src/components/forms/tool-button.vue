@@ -3,6 +3,7 @@ defineProps<{
   id: string
   text?: string
   icon?: string
+  active?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -15,7 +16,7 @@ const baseUrl = import.meta.env.BASE_URL
 
 <template>
   <template v-if="icon && !text">
-    <button><img :id="id" :src="`${baseUrl}${icon}`" width="32" height="32" :alt="id" @click="emit('click',id)"></button>
+    <button><img :id="id" :src="`${baseUrl}${icon}`" width="32" height="32" :alt="id" :class="{ active }" @click="emit('click',id)"></button>
   </template>
   <template v-if="text && !icon">
     <button :id="id" @click="emit('click',id)">{{ text }}</button>
@@ -30,6 +31,8 @@ button {
 }
 img {
   display: block;
+}
+img.active {
   background-color: lightgreen;
 }
 </style>
