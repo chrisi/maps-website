@@ -85,53 +85,71 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerDown(e: PointerEvent) {
-    if (e.button != 0) return // only allow left click currently, TODO: right click for delete
-    this.drawMode = this.determineDrawMode(e)
-    const pt = this.fromCnv({x: e.pageX, y: e.pageY})
-    switch (this.drawMode) {
-      case DrawMode.Freehand:
-        this.splinePainter.startDrawing(pt)
-        break
-      case DrawMode.Circle:
-        this.startPoint = pt
-        break
-      default:
+    if (e.button == 0) {
+      this.drawMode = this.determineDrawMode(e)
+      const pt = this.fromCnv({x: e.pageX, y: e.pageY})
+      switch (this.drawMode) {
+        case DrawMode.Freehand:
+          this.splinePainter.startDrawing(pt)
+          break
+        case DrawMode.Circle:
+          this.startPoint = pt
+          break
+        default:
+      }
     }
   }
 
   public onPointerUp(e: PointerEvent) {
-    if (e.button != 0) return // only allow left click currently, TODO: right click for delete
-
-    const cfg = this.settings.settings.whiteboard
-    const colFill = colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4)
-    const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
-    const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
-    switch (this.drawMode) {
-      case DrawMode.Circle:
-        const c: WbCircle = {
-          type: 'circle',
-          guid: generateGuid(),
-          center: this.startPoint!,
-          radius: distance(this.startPoint!, this.fromCnv({x: e.pageX, y: e.pageY})),
-          color: colLine,
-          width: cfg.lineWidth,
-          fillColor: colFill,
-          dash: dash
-        }
-        this.addShape(c)
-        this.imcsClient!.msgSendDraw([c])
-        break
-      case DrawMode.Freehand:
-        const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.manager?.getCanvas().scale || 1);
-        if (fh) {
-          this.addShape(fh)
-          this.imcsClient!.msgSendDraw([fh])
-        }
-        break
-      default:
+    const ps = this.fromCnv({x: e.pageX, y: e.pageY})
+    const pw = {x: e.pageX, y: e.pageY}
+    console.log(`World  : ${pw.x.toFixed(2)}, ${pw.y.toFixed(2)}`)
+    console.log(`Screen : ${ps.x.toFixed(2)}, ${ps.y.toFixed(2)}`)
+    if (e.button == 0) {
+      const cfg = this.settings.settings.whiteboard
+      const colFill = colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4)
+      const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
+      const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
+      switch (this.drawMode) {
+        case DrawMode.Circle:
+          const c: WbCircle = {
+            type: 'circle',
+            guid: generateGuid(),
+            center: this.startPoint!,
+            radius: distance(this.startPoint!, pw),
+            color: colLine,
+            width: cfg.lineWidth,
+            fillColor: colFill,
+            dash: dash
+          }
+          this.addShape(c)
+          this.imcsClient!.msgSendDraw([c])
+          break
+        case DrawMode.Freehand:
+          const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.manager?.getCanvas().scale || 1);
+          if (fh) {
+            this.addShape(fh)
+            this.imcsClient!.msgSendDraw([fh])
+          }
+          break
+        default:
+      }
+      this.drawMode = DrawMode.None
     }
 
-    this.drawMode = DrawMode.None
+    if (e.button == 2) {
+      console.log('hit test')
+      this.shapes.filter(s => s.type == 'freehand').forEach(s => {
+        console.log('freehand')
+        this.drawWorldInScreenSpace(() => {
+          if (this.hitTestFreehand(this.manager?.getCanvas()!, s as WbFreehand, ps, 5)) {
+            console.log('hit')
+            s.color = 'red'
+            this.redraw()
+          }
+        })
+      })
+    }
   }
 
   public onPointerMove(e: PointerEvent) {
@@ -198,5 +216,26 @@ export class WhiteboardOverlay extends BaseOverlay {
     if (getModMask(e) == Mod.Shift + Mod.Alt) return DrawMode.Rect
     if (getModMask(e) == Mod.Alt) return DrawMode.Circle
     return DrawMode.Freehand
+  }
+
+  private hitTestFreehand(cnv: Canvas, fh: WbFreehand, pt: Point, tol: number): boolean {
+    const ctx = cnv.context
+    let hit = false
+    this.drawWorldInScreenSpace(() => {
+        ctx.lineJoin = "round"
+        ctx.lineCap = "round"
+        ctx.lineWidth = fh.width / cnv.scale + tol / cnv.scale
+        ctx.setLineDash([])
+        console.log("Width: " + ctx.lineWidth)
+        fh.points.forEach(p => console.log("Dist: " + distance(pt, p)))
+        ctx.stroke(fh.path!)
+        ctx.strokeStyle = '#ff0000'
+        ctx.lineWidth = 2 / cnv.scale
+        hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
+      }
+    )
+    this.drawCircle(cnv, pt, 3 / cnv.scale)
+
+    return hit
   }
 }
