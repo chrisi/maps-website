@@ -120,7 +120,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     if (e.button == 0) {
       const cfg = this.settings.settings.whiteboard
-      const colFill = colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4)
+      const colFill = cfg.fillStyle == 'solid' ? colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4) : ''
       const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
       const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
       switch (this.drawMode) {
@@ -235,11 +235,13 @@ export class WhiteboardOverlay extends BaseOverlay {
   private drawWbCircle(cnv: Canvas, c: WbCircle) {
     const ctx = cnv.context
     ctx.strokeStyle = c.color
-    ctx.fillStyle = c.fillColor
     ctx.lineWidth = c.width / cnv.scale
     ctx.setLineDash(c.dash)
     this.drawCircle(cnv, c.center, c.radius)
-    ctx.fill()
+    if (c.fillColor != '') {
+      ctx.fillStyle = c.fillColor
+      ctx.fill()
+    }
   }
 
   private drawCircle(cnv: Canvas, ctr: Point, rad: number) {
