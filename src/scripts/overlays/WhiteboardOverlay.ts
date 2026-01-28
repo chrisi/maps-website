@@ -29,7 +29,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   public init() {
     this.imcsClient?.onDrawEvent((shapes: WbShape[]) => {
       shapes.forEach(p => {
-        this.addShape(p)
+        this.receiveShape(p)
       })
     })
     watch(() => this.settings.viz.wb, () => {
@@ -134,7 +134,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             width: cfg.lineWidth,
             dash: dash
           }
-          this.addShape(l)
+          this.receiveShape(l)
           this.imcsClient!.msgSendDraw([l])
           break
         case DrawMode.Circle:
@@ -148,13 +148,13 @@ export class WhiteboardOverlay extends BaseOverlay {
             fillColor: colFill,
             dash: dash
           }
-          this.addShape(c)
+          this.receiveShape(c)
           this.imcsClient!.msgSendDraw([c])
           break
         case DrawMode.Freehand:
           const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.getCanvas().scale || 1);
           if (fh) {
-            this.addShape(fh)
+            this.receiveShape(fh)
             this.imcsClient!.msgSendDraw([fh])
           }
           break
@@ -164,20 +164,25 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
 
     if (e.button == 2) {
-      this.shapes = this.shapes.filter(s => {
+      const del = this.shapes.find(s => {
         switch (s.type) {
           case 'line':
             const l = s as WbLine
-            return !isPointOnLine(l.p1, l.p2, pt, 5 / this.getCanvas().scale)
+            return isPointOnLine(l.p1, l.p2, pt, 5 / this.getCanvas().scale)
           case 'circle':
             const c = s as WbCircle
-            return !isPointOnCircle(c.center, c.radius, pt, 5 / this.getCanvas().scale)
+            return isPointOnCircle(c.center, c.radius, pt, 5 / this.getCanvas().scale)
           case 'freehand':
-            return !this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
+            return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
           default:
         }
         return true
       })
+      if (del) {
+        del.deleted = true
+        this.imcsClient!.msgSendDraw([del])
+        this.receiveShape(del)
+      }
     }
 
     this.redraw()
@@ -199,8 +204,18 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  public addShape(fh: WbShape) {
-    this.shapes.push(fh)
+  public receiveShape(rs: WbShape) {
+    // normalize empty path cache
+    if (rs.type == 'freehand') {
+      const fh = rs as WbFreehand
+      fh.path = undefined
+    }
+    if (rs.deleted) {
+      // atm re-transmission only happens on delete
+      const idx = this.shapes.findIndex(fs => fs.guid === rs.guid)
+      if (idx >= 0) this.shapes.splice(idx, 1)
+    } else
+      this.shapes.push(rs)
     this.redraw()
   }
 

@@ -14,6 +14,7 @@ export interface WbShape {
   color: string
   width: number
   dash: number[]
+  deleted?: boolean
 }
 
 export interface WbFreehand extends WbShape {

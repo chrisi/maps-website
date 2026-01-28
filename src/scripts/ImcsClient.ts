@@ -184,7 +184,7 @@ export class ImcsClient {
   }
 
   private messageHandler = (e: MessageEvent) => {
-    const msg = JSON.parse(e.data);
+    const msg = JSON.parse(e.data)
 
     if (e.data instanceof Blob) {
       this.imcsDebug("received whiteboard")
