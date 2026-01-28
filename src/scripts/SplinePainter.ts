@@ -38,7 +38,7 @@ export class SplinePainter {
     }
     this.line = []
     this.cornerIndices = []
-    return fh.points.length > 2 ? fh : undefined
+    return fh.points.length > 1 ? fh : undefined
   }
 
   public addPoint(point: Point) {

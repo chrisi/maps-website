@@ -101,10 +101,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerUp(e: PointerEvent) {
-    const ps = this.fromCnv({x: e.pageX, y: e.pageY})
-    const pw = {x: e.pageX, y: e.pageY}
-    console.log(`World  : ${pw.x.toFixed(2)}, ${pw.y.toFixed(2)}`)
-    console.log(`Screen : ${ps.x.toFixed(2)}, ${ps.y.toFixed(2)}`)
+    const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     if (e.button == 0) {
       const cfg = this.settings.settings.whiteboard
       const colFill = colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4)
@@ -116,7 +113,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             type: 'circle',
             guid: generateGuid(),
             center: this.startPoint!,
-            radius: distance(this.startPoint!, pw),
+            radius: distance(this.startPoint!, pt),
             color: colLine,
             width: cfg.lineWidth,
             fillColor: colFill,
@@ -138,16 +135,11 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
 
     if (e.button == 2) {
-      console.log('hit test')
       this.shapes.filter(s => s.type == 'freehand').forEach(s => {
-        console.log('freehand')
-        this.drawWorldInScreenSpace(() => {
-          if (this.hitTestFreehand(this.manager?.getCanvas()!, s as WbFreehand, ps, 5)) {
-            console.log('hit')
-            s.color = 'red'
-            this.redraw()
-          }
-        })
+        if (this.hitTestFreehand(this.manager?.getCanvas()!, s as WbFreehand, pt, 5)) {
+          s.color = 'red'
+          this.redraw()
+        }
       })
     }
   }
@@ -220,22 +212,13 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private hitTestFreehand(cnv: Canvas, fh: WbFreehand, pt: Point, tol: number): boolean {
     const ctx = cnv.context
-    let hit = false
-    this.drawWorldInScreenSpace(() => {
-        ctx.lineJoin = "round"
-        ctx.lineCap = "round"
-        ctx.lineWidth = fh.width / cnv.scale + tol / cnv.scale
-        ctx.setLineDash([])
-        console.log("Width: " + ctx.lineWidth)
-        fh.points.forEach(p => console.log("Dist: " + distance(pt, p)))
-        ctx.stroke(fh.path!)
-        ctx.strokeStyle = '#ff0000'
-        ctx.lineWidth = 2 / cnv.scale
-        hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
-      }
-    )
-    this.drawCircle(cnv, pt, 3 / cnv.scale)
-
+    ctx.save()
+    // ensure identity transform to make isPointInStroke work correctly for world space coordinates (removed dpr transform)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.lineWidth = (fh.width + tol) / cnv.scale
+    ctx.setLineDash([])
+    const hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
+    ctx.restore()
     return hit
   }
 }
