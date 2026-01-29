@@ -28,12 +28,20 @@ const tools: Tool[] = ([
     desc: "Move the map view around the map."
   },
   {
-    name: "zoom1", caption: "Zoom-Out", activeIcon: "icon_zoom1.png",
-    desc: "Zoom out of the map view."
+    name: "connect", caption: "Connect", activeIcon: "connect.png", icons: ["connect.png", "connect.png"],
+    desc: "Quickly connect to collaboration server."
   },
+  // {
+  //   name: "zoom1", caption: "Zoom-Out", activeIcon: "icon_zoom1.png",
+  //   desc: "Zoom out of the map view."
+  // },
+  // {
+  //   name: "zoom2", caption: "Zoom-In", activeIcon: "icon_zoom2.png",
+  //   desc: "Zoom in to the map view."
+  // },
   {
-    name: "zoom2", caption: "Zoom-In", activeIcon: "icon_zoom2.png",
-    desc: "Zoom in to the map view."
+    name: "zoomRoute", caption: "Route", activeIcon: "route.png", icons: ["route.png", "route.png"],
+    desc: "Center the Mission route on the map."
   },
   {
     name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
@@ -55,14 +63,14 @@ const tools: Tool[] = ([
     name: "whiteboard", caption: "Whiteboard", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
     desc: "Draw lines on the map."
   },
-  {
-    name: "text", caption: "Text", activeIcon: "icon_text.png", icons: ["icon_text.png", "icon_text1.png"],
-    desc: "Write text on the map."
-  },
-  {
-    name: "eraser", caption: "Eraser", activeIcon: "icon_eraser.png", icons: ["icon_eraser.png", "icon_eraser1.png"],
-    desc: "Erase symbols and texts from the map."
-  },
+  // {
+  //   name: "text", caption: "Text", activeIcon: "icon_text.png", icons: ["icon_text.png", "icon_text1.png"],
+  //   desc: "Write text on the map."
+  // },
+  // {
+  //   name: "eraser", caption: "Eraser", activeIcon: "icon_eraser.png", icons: ["icon_eraser.png", "icon_eraser1.png"],
+  //   desc: "Erase symbols and texts from the map."
+  // },
   {
     name: "settings", caption: "Settings", activeIcon: "icon_menu.png",
     desc: "Change the map view settings."
