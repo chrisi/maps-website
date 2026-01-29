@@ -46,6 +46,7 @@ export interface ImcsMsgDraw extends ImcsMsg {
 }
 
 export interface ImcsMsgMission extends ImcsMsg {
+  title: string
   ini: string[]
 }
 
@@ -55,9 +56,9 @@ export interface ImcsMsgWhiteboard extends ImcsMsg {
 
 export class ImcsClient {
 
-  private missionEventHandler: ((ini: string[]) => void)[] = [];
+  private missionEventHandler: ((title: string, ini: string[]) => void)[] = [];
 
-  public onMissionEvent(cb: ((ini: string[]) => void)) {
+  public onMissionEvent(cb: ((title: string, ini: string[]) => void)) {
     this.missionEventHandler.push(cb);
   }
 
@@ -148,8 +149,8 @@ export class ImcsClient {
     this.send(msg)
   }
 
-  public msgSendMission(ini: string[]) {
-    const msg: ImcsMsgMission = {id: ImcsMsgId.Mission, client: this.client, ini: ini}
+  public msgSendMission(title: string, ini: string[]) {
+    const msg: ImcsMsgMission = {id: ImcsMsgId.Mission, client: this.client, title: title, ini: ini}
     this.send(msg)
   }
 
@@ -224,7 +225,7 @@ export class ImcsClient {
         this.drawEventHandler.forEach(cb => cb(msg.parts))
         break;
       case ImcsMsgId.Mission:
-        this.missionEventHandler.forEach(cb => cb(msg.ini))
+        this.missionEventHandler.forEach(cb => cb(msg.title, msg.ini))
         break;
       default:
       // Ignore unknown Messages or Ping

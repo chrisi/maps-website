@@ -63,8 +63,12 @@ const overlayManager = new OverlayManager(imcsClient)
 const dropFileHandler = new DropFileHandler()
 const missionMgr = new MissionManager()
 
-dropFileHandler.onIniLoaded((filename: string, content: string) => {
-  missionMgr.loadDataCartridge(filename, content)
+dropFileHandler.onIniLoaded((filename, content) => {
+  missionMgr.loadDataCartridge(filename, content.split("\n"))
+  imcsClient.msgSendMission(filename, content.split("\n"))
+})
+imcsClient.onMissionEvent((title, ini) => {
+  missionMgr.loadDataCartridge(title, ini)
 })
 
 const route = useRoute()

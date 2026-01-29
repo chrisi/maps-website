@@ -27,7 +27,7 @@ export class MissionManager {
     this.dataCartridgeEventHandler.push(cb);
   }
 
-  public loadDataCartridge(title: string, data: string) {
+  public loadDataCartridge(title: string, ini: string[]) {
     this.dataCartridge = {
       targets: [],
       ppts: [],
@@ -51,9 +51,7 @@ export class MissionManager {
       changed: false
     }
 
-    const lines = data.split("\n")
-
-    lines.forEach(line => {
+    ini.forEach(line => {
         if (line.startsWith('title')) this.addTitle(line)
         if (line.startsWith('ppt_')) this.addPrePlannedThreat(line);
         if (line.startsWith('lineSTPT_')) this.addLineSteerPoint(line);
@@ -92,7 +90,7 @@ export class MissionManager {
     return this.mission!;
   }
 
-  public getDatacardridge(): DataCardridge {
+  public getDatacartridge(): DataCardridge {
     return this.dataCartridge!;
   }
 

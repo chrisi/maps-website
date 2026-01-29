@@ -46,15 +46,15 @@ export class RouteOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.missionMgr.isMissionLoaded()) return;
-    const crd = this.missionMgr.getDatacardridge()
-    this.drawLineSteerPoints(cnv, crd.lines);
-    this.drawPrePlannedThreats(cnv, crd.ppts);
-    this.drawRoute(cnv, crd.targets);
+    if (!this.missionMgr.isMissionLoaded()) return
+    const crd = this.missionMgr.getDatacartridge()
+    this.drawLineSteerPoints(cnv, crd.lines)
+    this.drawPrePlannedThreats(cnv, crd.ppts)
+    this.drawRoute(cnv, crd.targets)
 
     if (this.global.currentWaypoint) {
       const pos = this.toCnv(this.global.currentWaypoint.tgt, cnv)
-      drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize);
+      drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize)
     }
   }
 
