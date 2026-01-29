@@ -4,17 +4,18 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {WbCircle, WbShape, WbFreehand, WbLine} from "@/model/overlays.ts";
+import type {WbCircle, WbShape, WbFreehand, WbLine, WbEllipse} from "@/model/overlays.ts";
 import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
-import {distance, isPointOnCircle, isPointOnLine} from "@/scripts/math.ts";
+import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine} from "@/scripts/math.ts";
 
 enum DrawMode {
   None = 0,
   Freehand = 1,
   Line = 2,
   Circle = 3,
-  Rect = 4
+  Rect = 4,
+  Ellipse = 5
 }
 
 export class WhiteboardOverlay extends BaseOverlay {
@@ -76,6 +77,20 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.drawLine(cnv, ctr, cur)
         }
         break
+      case DrawMode.Ellipse:
+        if (this.startPoint && this.cursorPoint) {
+          // TODO: tmp
+          const ctr = this.toCnv(this.startPoint)
+          const cur = this.toCnv(this.cursorPoint)
+          const dist = distance(ctr, cur)
+          const ctx = cnv.context
+          ctx.lineWidth = 1.5
+          ctx.strokeStyle = 'black'
+          ctx.setLineDash([1, 3])
+          this.drawEllipse(cnv, ctr, dist, dist / 2, 20)
+          this.drawLine(cnv, ctr, cur)
+        }
+        break
       case DrawMode.Freehand:
         this.drawWorldInScreenSpace(() => {
           this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
@@ -90,6 +105,9 @@ export class WhiteboardOverlay extends BaseOverlay {
             break
           case 'circle':
             this.drawWbCircle(cnv, s as WbCircle)
+            break
+          case 'ellipse':
+            this.drawWbEllipse(cnv, s as WbEllipse)
             break
           case 'freehand':
             this.drawWbFreehand(cnv, s as WbFreehand)
@@ -106,6 +124,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       switch (this.drawMode) {
         case DrawMode.Line:
         case DrawMode.Circle:
+        case DrawMode.Ellipse:
           this.startPoint = pt
           break
         case DrawMode.Freehand:
@@ -151,6 +170,22 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.receiveShape(c)
           this.imcsClient!.msgSendDraw([c])
           break
+        case DrawMode.Ellipse:
+          const e: WbEllipse = {
+            type: 'ellipse',
+            guid: generateGuid(),
+            center: this.startPoint!,
+            majorRad: distance(this.startPoint!, pt),
+            minorRad: distance(this.startPoint!, pt) / 2,
+            rotation: 20,
+            color: colLine,
+            width: cfg.lineWidth,
+            fillColor: colFill,
+            dash: dash
+          }
+          this.receiveShape(e)
+          this.imcsClient!.msgSendDraw([e])
+          break
         case DrawMode.Freehand:
           const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.getCanvas().scale || 1);
           if (fh) {
@@ -172,6 +207,9 @@ export class WhiteboardOverlay extends BaseOverlay {
           case 'circle':
             const c = s as WbCircle
             return isPointOnCircle(c.center, c.radius, pt, 5 / this.getCanvas().scale)
+          case 'ellipse':
+            const e = s as WbEllipse
+            return isPointOnEllipse(e.center, e.majorRad, e.minorRad, e.rotation, pt, 5 / this.getCanvas().scale)
           case 'freehand':
             return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
           default:
@@ -193,6 +231,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     switch (this.drawMode) {
       case DrawMode.Line:
       case DrawMode.Circle:
+      case DrawMode.Ellipse:
         this.cursorPoint = pt
         break
       case DrawMode.Freehand:
@@ -251,6 +290,37 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.stroke()
   }
 
+  private drawWbEllipse(cnv: Canvas, c: WbEllipse) {
+    const ctx = cnv.context
+    ctx.strokeStyle = c.color
+    ctx.lineWidth = c.width / cnv.scale
+    ctx.setLineDash(c.dash)
+    this.drawEllipse(cnv, c.center, c.majorRad, c.minorRad, c.rotation)
+    if (c.fillColor != '') {
+      ctx.fillStyle = c.fillColor
+      ctx.fill()
+    }
+  }
+
+  private drawEllipse(cnv: Canvas, ctr: Point, majorRad: number, minorRad: number, rot: number) {
+    const rotation = deg2rad(rot)
+    const ctx = cnv.context
+
+    ctx.save()
+    ctx.beginPath()
+
+    // Move origin to center, rotate axes, then scale a unit circle into an ellipse
+    ctx.translate(ctr.x, ctr.y)
+    ctx.rotate(rotation)
+    ctx.scale(majorRad, minorRad)
+
+    // unit circle -> scaled into ellipse
+    ctx.arc(0, 0, 1, 0, 2 * Math.PI)
+
+    ctx.restore()
+    ctx.stroke()
+  }
+
   private drawWbLine(cnv: Canvas, l: WbLine) {
     const ctx = cnv.context
     ctx.strokeStyle = l.color
@@ -276,7 +346,8 @@ export class WhiteboardOverlay extends BaseOverlay {
         mode = DrawMode.Line
         break
       case "circle":
-        mode = DrawMode.Circle
+        // mode = DrawMode.Circle
+        mode = DrawMode.Ellipse
         break
       case "rect":
         mode = DrawMode.Rect

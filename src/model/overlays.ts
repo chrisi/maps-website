@@ -6,7 +6,7 @@ export interface MilSymbol {
   sym: string
 }
 
-export type WbShapeType = 'freehand' | 'line' | 'circle' | 'rect'
+export type WbShapeType = 'freehand' | 'line' | 'circle' | 'rect' | 'ellipse'
 
 export interface WbShape {
   type: WbShapeType
@@ -31,6 +31,14 @@ export interface WbLine extends WbShape {
 export interface WbCircle extends WbShape {
   center: Point
   radius: number
+  fillColor: string
+}
+
+export interface WbEllipse extends WbShape {
+  center: Point
+  majorRad: number
+  minorRad: number
+  rotation: number
   fillColor: string
 }
 

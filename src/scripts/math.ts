@@ -188,3 +188,57 @@ export function isPointOnCircle(ctr: Point, rad: number, p: Point, threshold: nu
   const d = Math.sqrt(dx * dx + dy * dy)
   return Math.abs(d - r) <= Math.abs(threshold)
 }
+
+/**
+ * Checks whether point `p` is within `threshold` distance from the perimeter of a rotated ellipse.
+ *
+ * Ellipse is defined by:
+ *  - center `ctr`
+ *  - major radius `majorRad` (semi-major axis length)
+ *  - minor radius `minorRad` (semi-minor axis length)
+ *  - rotation `rotation` (radians, counter-clockwise), applied to the ellipse axes
+ *
+ * Uses an implicit-curve distance approximation:
+ *   F(x,y) = x^2/a^2 + y^2/b^2 - 1
+ *   distance ≈ |F| / |∇F|
+ */
+export function isPointOnEllipse(ctr: Point, majorRad: number, minorRad: number, rot: number, p: Point, threshold: number): boolean {
+  const rotation = deg2rad(rot)
+  const a = Math.abs(majorRad)
+  const b = Math.abs(minorRad)
+  const t = Math.abs(threshold)
+
+  // Degenerate ellipse: treat as "near the center"
+  if (a === 0 || b === 0) {
+    const dx0 = p.x - ctr.x
+    const dy0 = p.y - ctr.y
+    return Math.sqrt(dx0 * dx0 + dy0 * dy0) <= t
+  }
+
+  // Translate into ellipse-centered coordinates
+  const dx = p.x - ctr.x
+  const dy = p.y - ctr.y
+
+  // Un-rotate the point (equivalent to rotating the ellipse by +rotation)
+  const c = Math.cos(-rotation)
+  const s = Math.sin(-rotation)
+  const x = dx * c - dy * s
+  const y = dx * s + dy * c
+
+  const a2 = a * a
+  const b2 = b * b
+
+  // Implicit function value: 0 on the ellipse
+  const F = (x * x) / a2 + (y * y) / b2 - 1
+
+  // Gradient magnitude for distance approximation
+  const gx = (2 * x) / a2
+  const gy = (2 * y) / b2
+  const grad = Math.sqrt(gx * gx + gy * gy)
+
+  // Very close to center (or numerical edge case)
+  if (grad === 0) return false
+
+  const approxDist = Math.abs(F) / grad
+  return approxDist <= t
+}
