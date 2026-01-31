@@ -99,18 +99,20 @@ export class StationOverlay extends BaseOverlay {
     const tabLen = hexRad * 0.5;    // Length of the rectangular tabs
     const circleRad = hexRad * 0.3; // Radius of the center circle
     const apothem = hexRad * Math.sqrt(3) / 2; // Distance from center to side midpoint
-    const strokeW = 0.8 * scale;
+    const lineWidth = 0.8 * scale;
 
     ctx.save();
     ctx.translate(pt.x, pt.y);
 
-    if (isTac) {
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = 'black';
+    ctx.setLineDash([]);
 
-      // Angles for the 3 tabs (Bottom, Top-Left, Top-Right in Canvas coordinates)
+    if (isTac) {
       const tabAngles = [Math.PI / 2, (7 * Math.PI) / 6, (11 * Math.PI) / 6]; // 90, 210, 330 degrees
 
-      // 1. Draw the 3 Black Tabs
-      ctx.fillStyle = '#000000';
+      // draw the 3 Black Tabs
+      ctx.fillStyle = 'black';
       tabAngles.forEach(function (angle) {
         ctx.save();
         ctx.rotate(angle);
@@ -126,21 +128,16 @@ export class StationOverlay extends BaseOverlay {
         ctx.restore();
       })
     } else {
-
-
-      // 1. Draw DME Box
+      // draw DME Box
       ctx.beginPath();
       ctx.rect(-hexRad * 1.1, -hexRad * 0.9, hexRad * 2.2, hexRad * 1.8);
       ctx.fillStyle = 'white';
       ctx.fill();
-      ctx.lineWidth = strokeW;
-      ctx.strokeStyle = 'black';
       ctx.stroke();
     }
 
-    // 2. Draw White Hexagon
+    // flat-topped hexagon vertices at 0, 60, 120, etc.
     ctx.beginPath();
-    // Flat-topped hexagon vertices at 0, 60, 120, etc.
     for (let i = 0; i < 6; i++) {
       const angle = i * Math.PI / 3; // 0, 60, 120...
       const hx = hexRad * Math.cos(angle);
@@ -148,16 +145,12 @@ export class StationOverlay extends BaseOverlay {
       if (i === 0) ctx.moveTo(hx, hy);
       else ctx.lineTo(hx, hy);
     }
-
-
     ctx.closePath();
     ctx.fillStyle = 'white';
     ctx.fill();
-    ctx.lineWidth = strokeW;
-    ctx.strokeStyle = 'black';
     ctx.stroke();
 
-    // 3. Draw Center Circle
+    // draw center circle
     ctx.beginPath();
     ctx.arc(0, 0, circleRad, 0, 2 * Math.PI);
     ctx.fillStyle = 'black';
@@ -170,18 +163,18 @@ export class StationOverlay extends BaseOverlay {
     const ctx = cnv.context;
 
     const ringRad = 8 * scale;
-    const strokeW = 1.7 * scale;
+    const lineWidth = 1.7 * scale;
     const crossSize = 11 * scale;
 
-    this.drawCircle(cnv, pt, ringRad, strokeW, 'black', 'white');
-    this.drawCircle(cnv, pt, ringRad * 0.6, strokeW, 'black');
+    this.drawCircle(cnv, pt, ringRad, lineWidth, 'black', 'white');
+    this.drawCircle(cnv, pt, ringRad * 0.6, lineWidth, 'black');
 
-    // 1. Draw Center Cross
     ctx.save()
     ctx.translate(pt.x, pt.y)
-    ctx.lineCap = "butt"
-    ctx.lineWidth = strokeW
-    ctx.strokeStyle = "black"
+    ctx.lineCap = 'butt'
+    ctx.lineWidth = lineWidth
+    ctx.strokeStyle = 'black'
+    ctx.setLineDash([])
     ctx.beginPath()
     ctx.moveTo(-crossSize, 0)
     ctx.lineTo(crossSize, 0)
@@ -194,6 +187,7 @@ export class StationOverlay extends BaseOverlay {
   private drawCircle(cnv: Canvas, pt: Point, rad: number,
                      borderWidth: number = 1, strokeColor: string, fillColor?: string) {
     const ctx = cnv.context;
+    ctx.setLineDash([])
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI, false);
     if (fillColor) {
