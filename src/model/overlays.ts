@@ -12,7 +12,7 @@ export interface WbShape {
   type: WbShapeType
   guid: string
   color: string
-  width: number
+  lineWidth: number
   dash: number[]
   deleted?: boolean
 }
@@ -43,8 +43,9 @@ export interface WbEllipse extends WbShape {
 }
 
 export interface WbRect extends WbShape {
-  p1: Point
-  p2: Point
+  center: Point
+  width: number
+  height: number
   rotation: number
   fillColor: string
 }

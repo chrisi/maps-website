@@ -4,10 +4,10 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {WbCircle, WbShape, WbFreehand, WbLine, WbEllipse} from "@/model/overlays.ts";
+import type {WbCircle, WbShape, WbFreehand, WbLine, WbEllipse, WbRect} from "@/model/overlays.ts";
 import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
-import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine} from "@/scripts/math.ts";
+import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
 
 enum DrawMode {
   None = 0,
@@ -23,6 +23,8 @@ export class WhiteboardOverlay extends BaseOverlay {
   private shapes: WbShape[] = []
 
   private drawMode: DrawMode = DrawMode.None
+  private drawStep = 0
+  private rotation = 0
   private splinePainter: SplinePainter = new SplinePainter()
   private startPoint: Point | undefined = undefined
   private cursorPoint: Point | undefined = undefined
@@ -87,7 +89,25 @@ export class WhiteboardOverlay extends BaseOverlay {
           ctx.lineWidth = 1.5
           ctx.strokeStyle = 'black'
           ctx.setLineDash([1, 3])
-          this.drawEllipse(cnv, ctr, dist, dist / 2, 20)
+          this.drawEllipse(cnv, ctr, dist, dist / 2, this.rotation)
+          this.drawLine(cnv, ctr, cur)
+        }
+        break
+      case DrawMode.Rect:
+        if (this.startPoint && this.cursorPoint) {
+          // TODO: tmp
+          const ctr = this.toCnv(this.startPoint)
+          const cur = this.toCnv(this.cursorPoint)
+
+          // define rect by center + width/height (derived from cursor while previewing)
+          const w = Math.abs(cur.x - ctr.x) * 2
+          const h = Math.abs(cur.y - ctr.y) * 2
+
+          const ctx = cnv.context
+          ctx.lineWidth = 1.5
+          ctx.strokeStyle = 'black'
+          ctx.setLineDash([1, 3])
+          this.drawRect(cnv, ctr, w, h, this.rotation)
           this.drawLine(cnv, ctr, cur)
         }
         break
@@ -109,6 +129,9 @@ export class WhiteboardOverlay extends BaseOverlay {
           case 'ellipse':
             this.drawWbEllipse(cnv, s as WbEllipse)
             break
+          case 'rect':
+            this.drawWbRect(cnv, s as WbRect)
+            break
           case 'freehand':
             this.drawWbFreehand(cnv, s as WbFreehand)
             break
@@ -125,7 +148,9 @@ export class WhiteboardOverlay extends BaseOverlay {
         case DrawMode.Line:
         case DrawMode.Circle:
         case DrawMode.Ellipse:
+        case DrawMode.Rect:
           this.startPoint = pt
+          this.rotation = 0
           break
         case DrawMode.Freehand:
           this.splinePainter.startDrawing(pt)
@@ -150,7 +175,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             p1: this.startPoint!,
             p2: pt,
             color: colLine,
-            width: cfg.lineWidth,
+            lineWidth: cfg.lineWidth,
             dash: dash
           }
           this.receiveShape(l)
@@ -163,7 +188,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             center: this.startPoint!,
             radius: distance(this.startPoint!, pt),
             color: colLine,
-            width: cfg.lineWidth,
+            lineWidth: cfg.lineWidth,
             fillColor: colFill,
             dash: dash
           }
@@ -177,15 +202,35 @@ export class WhiteboardOverlay extends BaseOverlay {
             center: this.startPoint!,
             majorRad: distance(this.startPoint!, pt),
             minorRad: distance(this.startPoint!, pt) / 2,
-            rotation: 20,
+            rotation: this.rotation,
             color: colLine,
-            width: cfg.lineWidth,
+            lineWidth: cfg.lineWidth,
             fillColor: colFill,
             dash: dash
           }
           this.receiveShape(e)
           this.imcsClient!.msgSendDraw([e])
           break
+        case DrawMode.Rect: {
+          const ctr = this.startPoint!
+          const w = Math.abs(pt.x - ctr.x) * 2
+          const h = Math.abs(pt.y - ctr.y) * 2
+          const r: WbRect = {
+            type: 'rect',
+            guid: generateGuid(),
+            center: ctr,
+            width: w,
+            height: h,
+            rotation: this.rotation,
+            color: colLine,
+            lineWidth: cfg.lineWidth,
+            fillColor: colFill,
+            dash: dash
+          }
+          this.receiveShape(r)
+          this.imcsClient!.msgSendDraw([r])
+          break
+        }
         case DrawMode.Freehand:
           const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.getCanvas().scale || 1);
           if (fh) {
@@ -210,11 +255,14 @@ export class WhiteboardOverlay extends BaseOverlay {
           case 'ellipse':
             const e = s as WbEllipse
             return isPointOnEllipse(e.center, e.majorRad, e.minorRad, e.rotation, pt, 5 / this.getCanvas().scale)
+          case 'rect':
+            const r = s as WbRect
+            return isPointOnRect(r.center, r.width, r.height, r.rotation, pt, 5 / this.getCanvas().scale)
           case 'freehand':
             return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
           default:
         }
-        return true
+        return false
       })
       if (del) {
         del.deleted = true
@@ -227,12 +275,17 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerMove(e: PointerEvent) {
+    this.drawStep = this.determineDrawStep(e)
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     switch (this.drawMode) {
       case DrawMode.Line:
       case DrawMode.Circle:
       case DrawMode.Ellipse:
+      case DrawMode.Rect:
         this.cursorPoint = pt
+        if (this.drawStep == 1) {
+          this.rotation = rad2deg(vector(this.startPoint!, pt).dir)
+        }
         break
       case DrawMode.Freehand:
         if (!this.splinePainter.isDrawingSpline()) return
@@ -264,7 +317,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
     ctx.strokeStyle = fh.color
-    ctx.lineWidth = fh.width / cnv.scale
+    ctx.lineWidth = fh.lineWidth / cnv.scale
     ctx.setLineDash(fh.dash)
     ctx.stroke(fh.path!)
     if (this.settings.settings.whiteboard.supportPoints)
@@ -274,7 +327,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   private drawWbCircle(cnv: Canvas, c: WbCircle) {
     const ctx = cnv.context
     ctx.strokeStyle = c.color
-    ctx.lineWidth = c.width / cnv.scale
+    ctx.lineWidth = c.lineWidth / cnv.scale
     ctx.setLineDash(c.dash)
     this.drawCircle(cnv, c.center, c.radius)
     if (c.fillColor != '') {
@@ -293,7 +346,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   private drawWbEllipse(cnv: Canvas, c: WbEllipse) {
     const ctx = cnv.context
     ctx.strokeStyle = c.color
-    ctx.lineWidth = c.width / cnv.scale
+    ctx.lineWidth = c.lineWidth / cnv.scale
     ctx.setLineDash(c.dash)
     this.drawEllipse(cnv, c.center, c.majorRad, c.minorRad, c.rotation)
     if (c.fillColor != '') {
@@ -321,10 +374,41 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.stroke()
   }
 
+  private drawWbRect(cnv: Canvas, r: WbRect) {
+    const ctx = cnv.context
+    ctx.strokeStyle = r.color
+    ctx.lineWidth = r.lineWidth / cnv.scale
+    ctx.setLineDash(r.dash)
+    this.drawRect(cnv, r.center, r.width, r.height, r.rotation)
+    if (r.fillColor != '') {
+      ctx.fillStyle = r.fillColor
+      ctx.fill()
+    }
+  }
+
+  private drawRect(cnv: Canvas, ctr: Point, width: number, height: number, rot: number) {
+    const rotation = deg2rad(rot)
+    const ctx = cnv.context
+
+    const halfW = width / 2
+    const halfH = height / 2
+
+    ctx.save()
+    ctx.beginPath()
+
+    // rotate around center, then draw rect centered at origin
+    ctx.translate(ctr.x, ctr.y)
+    ctx.rotate(rotation)
+    ctx.rect(-halfW, -halfH, width, height)
+
+    ctx.restore()
+    ctx.stroke()
+  }
+
   private drawWbLine(cnv: Canvas, l: WbLine) {
     const ctx = cnv.context
     ctx.strokeStyle = l.color
-    ctx.lineWidth = l.width / cnv.scale
+    ctx.lineWidth = l.lineWidth / cnv.scale
     ctx.setLineDash(l.dash)
     this.drawLine(cnv, l.p1, l.p2)
     ctx.fill()
@@ -338,8 +422,16 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.stroke()
   }
 
+  private determineDrawStep(e: PointerEvent): number {
+    if (this.drawMode == DrawMode.None) return 0
+    if (getModMask(e) == Mod.Alt) return 1
+    return 0
+  }
+
   //we cannot use ctrl as a modifier for left-click since firefox handles this as right-click on Mac
   private determineDrawMode(e: PointerEvent): DrawMode {
+    if (this.drawMode != DrawMode.None)
+      return this.drawMode
     let mode = DrawMode.None
     switch (this.global.drawMode) {
       case "line":
@@ -368,7 +460,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.save()
     // ensure identity transform to make isPointInStroke work correctly for world space coordinates (removed dpr transform)
     ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.lineWidth = (fh.width + tol) / cnv.scale
+    ctx.lineWidth = (fh.lineWidth + tol) / cnv.scale
     ctx.setLineDash([])
     const hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
     ctx.restore()

@@ -33,7 +33,7 @@ export class SplinePainter {
       points: this.line,
       cornerIndices: this.cornerIndices,
       color: colorWithAlpha(paintConfig.lineColor, paintConfig.opacity),
-      width: paintConfig.lineWidth,
+      lineWidth: paintConfig.lineWidth,
       dash: dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
     }
     this.line = []

@@ -242,3 +242,24 @@ export function isPointOnEllipse(ctr: Point, majorRad: number, minorRad: number,
   const approxDist = Math.abs(F) / grad
   return approxDist <= t
 }
+
+export function isPointOnRect(ctr: Point, width: number, height: number, rot: number, p: Point, threshold: number): boolean {
+  const pts = rectCornersFromCenter(ctr, width, height, rot)
+  return isPointOnLine(pts[0], pts[1], p, threshold) ||
+    isPointOnLine(pts[1], pts[2], p, threshold) ||
+    isPointOnLine(pts[2], pts[3], p, threshold) ||
+    isPointOnLine(pts[3], pts[0], p, threshold);
+}
+
+function rectCornersFromCenter(ctr: Point, width: number, height: number, rot: number): [Point, Point, Point, Point] {
+  const hw = width / 2
+  const hh = height / 2
+  const local: [Point, Point, Point, Point] = [{x: -hw, y: -hh}, {x: hw, y: -hh}, {x: hw, y: hh}, {x: -hw, y: hh}]
+  const rad = deg2rad(rot)
+  const c = Math.cos(rad)
+  const s = Math.sin(rad)
+  return local.map(({x, y}) => ({
+    x: ctr.x + x * c - y * s,
+    y: ctr.y + x * s + y * c,
+  })) as [Point, Point, Point, Point];
+}
