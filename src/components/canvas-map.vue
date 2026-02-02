@@ -163,31 +163,21 @@ onMounted(() => {
 })
 
 function resize() {
-  if (mapRef.value) {
-    const dpr = window.devicePixelRatio || 1;
+  const dpr = window.devicePixelRatio || 1;
+  console.log(dpr)
+  if (mapRef.value && ctx) {
     mapRef.value.width = window.innerWidth * dpr;
     mapRef.value.height = window.innerHeight * dpr;
     mapRef.value.style.width = window.innerWidth + 'px';
     mapRef.value.style.height = window.innerHeight + 'px';
-
-    ctx = mapRef.value.getContext("2d");
-    if (ctx) {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  if (overlayRef.value) {
-    const dpr = window.devicePixelRatio || 1;
+  if (overlayRef.value && ovlCtx) {
     overlayRef.value.width = window.innerWidth * dpr;
     overlayRef.value.height = window.innerHeight * dpr;
     overlayRef.value.style.width = window.innerWidth + 'px';
     overlayRef.value.style.height = window.innerHeight + 'px';
-
-    const oCtx = overlayRef.value.getContext("2d");
-    if (oCtx) {
-      oCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+    ovlCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   constrain();
   redraw();
@@ -198,8 +188,6 @@ function constrain() {
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const mw = mapImage.width * scale;
-  const mh = mapImage.height * scale;
 
   // 1. Constrain Scale (Min scale: fill viewport)
   const minScale = Math.max(vw / mapImage.width, vh / mapImage.height);
