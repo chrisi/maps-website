@@ -257,7 +257,7 @@ export class WhiteboardOverlay extends BaseOverlay {
         break;
       case DrawMode.Ellipse:
       case DrawMode.Rect:
-        this.lockAspectRatio = (getModMask(e) & Mod.Shift) > 0
+        this.lockAspectRatio = (getModMask(e) & Mod.Alt) > 0
         switch (this.drawStep) {
           case 1:
             if (this.drawStep != this.oldDrawStep)
@@ -404,7 +404,7 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private determineDrawStep(e: PointerEvent): number {
     if (this.drawMode == DrawMode.None) return 0
-    if (getModMask(e) == Mod.Alt) return 1
+    if ((getModMask(e) & Mod.Shift) > 0) return 1
     return 0
   }
 
@@ -431,7 +431,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     // quickly override mode with modifiers
     if (getModMask(e) == Mod.Shift) return DrawMode.Line
     if (getModMask(e) == Mod.Shift + Mod.Alt) return DrawMode.Rect
-    if (getModMask(e) == Mod.Alt) return DrawMode.Circle
+    if (getModMask(e) == Mod.Alt) return DrawMode.Ellipse
     return mode
   }
 
