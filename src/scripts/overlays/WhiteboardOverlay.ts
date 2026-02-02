@@ -24,7 +24,9 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private drawMode: DrawMode = DrawMode.None
   private drawStep = 0
+  private oldDrawStep = -1
   private rotation = 0
+  private startRotation = 0
   private splinePainter: SplinePainter = new SplinePainter()
   private startPoint: Point | undefined = undefined
   private cursorPoint: Point | undefined = undefined
@@ -98,16 +100,12 @@ export class WhiteboardOverlay extends BaseOverlay {
           // TODO: tmp
           const ctr = this.toCnv(this.startPoint)
           const cur = this.toCnv(this.cursorPoint)
-
-          // define rect by center + width/height (derived from cursor while previewing)
-          const w = Math.abs(cur.x - ctr.x) * 2
-          const h = Math.abs(cur.y - ctr.y) * 2
-
+          const rr = this.getRotatedRectDimensions(ctr, cur)
           const ctx = cnv.context
           ctx.lineWidth = 1.5
           ctx.strokeStyle = 'black'
           ctx.setLineDash([1, 3])
-          this.drawRect(cnv, ctr, w, h, this.rotation)
+          this.drawRect(cnv, ctr, rr.w, rr.h, this.rotation)
           this.drawLine(cnv, ctr, cur)
         }
         break
@@ -147,6 +145,8 @@ export class WhiteboardOverlay extends BaseOverlay {
       switch (this.drawMode) {
         case DrawMode.Line:
         case DrawMode.Circle:
+          this.startPoint = pt
+          break
         case DrawMode.Ellipse:
         case DrawMode.Rect:
           this.startPoint = pt
@@ -213,14 +213,13 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         case DrawMode.Rect: {
           const ctr = this.startPoint!
-          const w = Math.abs(pt.x - ctr.x) * 2
-          const h = Math.abs(pt.y - ctr.y) * 2
+          const rr = this.getRotatedRectDimensions(ctr, pt)
           const r: WbRect = {
             type: WbShapeType.Rect,
             guid: generateGuid(),
             center: ctr,
-            width: w,
-            height: h,
+            width: rr.w,
+            height: rr.h,
             rotation: this.rotation,
             color: colLine,
             lineWidth: cfg.lineWidth,
@@ -280,11 +279,17 @@ export class WhiteboardOverlay extends BaseOverlay {
     switch (this.drawMode) {
       case DrawMode.Line:
       case DrawMode.Circle:
+        this.cursorPoint = pt
+        break;
       case DrawMode.Ellipse:
       case DrawMode.Rect:
         this.cursorPoint = pt
-        if (this.drawStep == 1) {
-          this.rotation = rad2deg(vector(this.startPoint!, pt).dir)
+        switch (this.drawStep) {
+          case 1:
+            if (this.drawStep != this.oldDrawStep)
+              this.startRotation = rad2deg(vector(this.startPoint!, pt).dir)
+            this.rotation = rad2deg(vector(this.startPoint!, pt).dir) - this.startRotation
+            break
         }
         break
       case DrawMode.Freehand:
@@ -293,6 +298,7 @@ export class WhiteboardOverlay extends BaseOverlay {
         break
       default:
     }
+    this.oldDrawStep = this.drawStep
     this.redraw()
   }
 
@@ -465,5 +471,14 @@ export class WhiteboardOverlay extends BaseOverlay {
     const hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
     ctx.restore()
     return hit
+  }
+
+  private getRotatedRectDimensions(ctr: Point, cur: Point): { w: number, h: number } {
+    const rot = deg2rad(this.rotation)
+    const dx = cur.x - ctr.x
+    const dy = cur.y - ctr.y
+    const localX = dx * Math.cos(rot) + dy * Math.sin(rot)
+    const localY = -dx * Math.sin(rot) + dy * Math.cos(rot)
+    return {w: Math.abs(localX) * 2, h: Math.abs(localY) * 2}
   }
 }
