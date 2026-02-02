@@ -3,7 +3,7 @@ import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 import {generateGuid} from "@/scripts/utils.ts";
-import type {WbFreehand} from "@/model/overlays.ts";
+import {type WbFreehand, WbShapeType} from "@/model/overlays.ts";
 import type {WhiteboardSettings} from "@/model/settings.ts";
 
 export class SplinePainter {
@@ -28,7 +28,7 @@ export class SplinePainter {
     this.line = simplifyPoints(this.line, scale)
     this.cornerIndices = detectCorners(this.line)
     const fh: WbFreehand = {
-      type: 'freehand',
+      type: WbShapeType.Freehand,
       guid: generateGuid(),
       points: this.line,
       cornerIndices: this.cornerIndices,

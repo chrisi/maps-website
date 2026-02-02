@@ -4,7 +4,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {WbCircle, WbShape, WbFreehand, WbLine, WbEllipse, WbRect} from "@/model/overlays.ts";
+import {type WbCircle, type WbEllipse, type WbFreehand, type WbLine, type WbRect, type WbShape, WbShapeType} from "@/model/overlays.ts";
 import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
@@ -120,19 +120,19 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.drawWorldInScreenSpace(() => {
       this.shapes.forEach(s => {
         switch (s.type) {
-          case 'line':
+          case WbShapeType.Line:
             this.drawWbLine(cnv, s as WbLine)
             break
-          case 'circle':
+          case WbShapeType.Circle:
             this.drawWbCircle(cnv, s as WbCircle)
             break
-          case 'ellipse':
+          case WbShapeType.Ellipse:
             this.drawWbEllipse(cnv, s as WbEllipse)
             break
-          case 'rect':
+          case WbShapeType.Rect:
             this.drawWbRect(cnv, s as WbRect)
             break
-          case 'freehand':
+          case WbShapeType.Freehand:
             this.drawWbFreehand(cnv, s as WbFreehand)
             break
         }
@@ -170,7 +170,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       switch (this.drawMode) {
         case DrawMode.Line:
           const l: WbLine = {
-            type: 'line',
+            type: WbShapeType.Line,
             guid: generateGuid(),
             p1: this.startPoint!,
             p2: pt,
@@ -183,7 +183,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         case DrawMode.Circle:
           const c: WbCircle = {
-            type: 'circle',
+            type: WbShapeType.Circle,
             guid: generateGuid(),
             center: this.startPoint!,
             radius: distance(this.startPoint!, pt),
@@ -197,7 +197,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         case DrawMode.Ellipse:
           const e: WbEllipse = {
-            type: 'ellipse',
+            type: WbShapeType.Ellipse,
             guid: generateGuid(),
             center: this.startPoint!,
             majorRad: distance(this.startPoint!, pt),
@@ -216,7 +216,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           const w = Math.abs(pt.x - ctr.x) * 2
           const h = Math.abs(pt.y - ctr.y) * 2
           const r: WbRect = {
-            type: 'rect',
+            type: WbShapeType.Rect,
             guid: generateGuid(),
             center: ctr,
             width: w,
@@ -246,19 +246,19 @@ export class WhiteboardOverlay extends BaseOverlay {
     if (e.button == 2 || this.global.drawMode == "delete") {
       const del = this.shapes.find(s => {
         switch (s.type) {
-          case 'line':
+          case WbShapeType.Line:
             const l = s as WbLine
             return isPointOnLine(l.p1, l.p2, pt, 5 / this.getCanvas().scale)
-          case 'circle':
+          case WbShapeType.Circle:
             const c = s as WbCircle
             return isPointOnCircle(c.center, c.radius, pt, 5 / this.getCanvas().scale)
-          case 'ellipse':
+          case WbShapeType.Ellipse:
             const e = s as WbEllipse
             return isPointOnEllipse(e.center, e.majorRad, e.minorRad, e.rotation, pt, 5 / this.getCanvas().scale)
-          case 'rect':
+          case WbShapeType.Rect:
             const r = s as WbRect
             return isPointOnRect(r.center, r.width, r.height, r.rotation, pt, 5 / this.getCanvas().scale)
-          case 'freehand':
+          case WbShapeType.Freehand:
             return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
           default:
         }
@@ -298,7 +298,7 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public receiveShape(rs: WbShape) {
     // normalize empty path cache
-    if (rs.type == 'freehand') {
+    if (rs.type == WbShapeType.Freehand) {
       const fh = rs as WbFreehand
       fh.path = undefined
     }

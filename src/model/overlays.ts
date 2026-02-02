@@ -6,7 +6,13 @@ export interface MilSymbol {
   sym: string
 }
 
-export type WbShapeType = 'freehand' | 'line' | 'circle' | 'rect' | 'ellipse'
+export enum WbShapeType {
+  Freehand = 0,
+  Line = 1,
+  Circle = 2,
+  Rect = 3,
+  Ellipse = 4
+}
 
 export interface WbShape {
   type: WbShapeType
