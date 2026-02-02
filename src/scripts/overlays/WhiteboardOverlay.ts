@@ -22,6 +22,7 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   private shapes: WbShape[] = []
 
+  private lockAspectRatio = false
   private drawMode: DrawMode = DrawMode.None
   private drawStep = 0
   private oldDrawStep = -1
@@ -54,60 +55,34 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
+    if (!this.startPoint || !this.cursorPoint) return
+    const p1 = this.toCnv(this.startPoint)
+    const p2 = this.toCnv(this.cursorPoint)
+    const dist = distance(p1, p2)
+    const ctx = cnv.context
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = 'black'
+    ctx.setLineDash([1, 3])
+
     switch (this.drawMode) {
       case DrawMode.Line:
-        if (this.startPoint && this.cursorPoint) {
-          // TODO: tmp
-          const p1 = this.toCnv(this.startPoint)
-          const p2 = this.toCnv(this.cursorPoint)
-          const ctx = cnv.context
-          ctx.lineWidth = 1.5
-          ctx.strokeStyle = 'black'
-          ctx.setLineDash([1, 3])
-          this.drawLine(cnv, p1, p2)
-        }
+        this.drawLine(cnv, p1, p2)
         break
       case DrawMode.Circle:
-        if (this.startPoint && this.cursorPoint) {
-          // TODO: tmp
-          const ctr = this.toCnv(this.startPoint)
-          const cur = this.toCnv(this.cursorPoint)
-          const dist = distance(ctr, cur)
-          const ctx = cnv.context
-          ctx.lineWidth = 1.5
-          ctx.strokeStyle = 'black'
-          ctx.setLineDash([1, 3])
-          this.drawCircle(cnv, ctr, dist)
-          this.drawLine(cnv, ctr, cur)
-        }
+        this.drawCircle(cnv, p1, dist)
+        this.drawLine(cnv, p1, p2)
         break
       case DrawMode.Ellipse:
-        if (this.startPoint && this.cursorPoint) {
-          // TODO: tmp
-          const ctr = this.toCnv(this.startPoint)
-          const cur = this.toCnv(this.cursorPoint)
-          const dist = distance(ctr, cur)
-          const ctx = cnv.context
-          ctx.lineWidth = 1.5
-          ctx.strokeStyle = 'black'
-          ctx.setLineDash([1, 3])
-          this.drawEllipse(cnv, ctr, dist, dist / 2, this.rotation)
-          this.drawLine(cnv, ctr, cur)
-        }
+        const re = this.getRotatedRectDimensions(p1, p2)
+        if (this.lockAspectRatio) re.h = re.w
+        this.drawEllipse(cnv, p1, re.w / 2, re.h / 2, this.rotation)
+        this.drawLine(cnv, p1, p2)
         break
       case DrawMode.Rect:
-        if (this.startPoint && this.cursorPoint) {
-          // TODO: tmp
-          const ctr = this.toCnv(this.startPoint)
-          const cur = this.toCnv(this.cursorPoint)
-          const rr = this.getRotatedRectDimensions(ctr, cur)
-          const ctx = cnv.context
-          ctx.lineWidth = 1.5
-          ctx.strokeStyle = 'black'
-          ctx.setLineDash([1, 3])
-          this.drawRect(cnv, ctr, rr.w, rr.h, this.rotation)
-          this.drawLine(cnv, ctr, cur)
-        }
+        const rr = this.getRotatedRectDimensions(p1, p2)
+        if (this.lockAspectRatio) rr.h = rr.w
+        this.drawRect(cnv, p1, rr.w, rr.h, this.rotation)
+        this.drawLine(cnv, p1, p2)
         break
       case DrawMode.Freehand:
         this.drawWorldInScreenSpace(() => {
@@ -141,19 +116,17 @@ export class WhiteboardOverlay extends BaseOverlay {
   public onPointerDown(e: PointerEvent) {
     if (e.button == 0) {
       this.drawMode = this.determineDrawMode(e)
-      const pt = this.fromCnv({x: e.pageX, y: e.pageY})
+      this.startPoint = this.fromCnv({x: e.pageX, y: e.pageY})
       switch (this.drawMode) {
         case DrawMode.Line:
         case DrawMode.Circle:
-          this.startPoint = pt
           break
         case DrawMode.Ellipse:
         case DrawMode.Rect:
-          this.startPoint = pt
           this.rotation = 0
           break
         case DrawMode.Freehand:
-          this.splinePainter.startDrawing(pt)
+          this.splinePainter.startDrawing(this.startPoint)
           break
         default:
       }
@@ -162,7 +135,7 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public onPointerUp(e: PointerEvent) {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
-    if (e.button == 0) {
+    if ((e.button == 0) && this.startPoint) {
       const cfg = this.settings.settings.whiteboard
       const colFill = cfg.fillStyle == 'solid' ? colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4) : ''
       const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
@@ -172,7 +145,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           const l: WbLine = {
             type: WbShapeType.Line,
             guid: generateGuid(),
-            p1: this.startPoint!,
+            p1: this.startPoint,
             p2: pt,
             color: colLine,
             lineWidth: cfg.lineWidth,
@@ -185,8 +158,8 @@ export class WhiteboardOverlay extends BaseOverlay {
           const c: WbCircle = {
             type: WbShapeType.Circle,
             guid: generateGuid(),
-            center: this.startPoint!,
-            radius: distance(this.startPoint!, pt),
+            center: this.startPoint,
+            radius: distance(this.startPoint, pt),
             color: colLine,
             lineWidth: cfg.lineWidth,
             fillColor: colFill,
@@ -196,12 +169,14 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.imcsClient!.msgSendDraw([c])
           break
         case DrawMode.Ellipse:
+          const rr = this.getRotatedRectDimensions(this.startPoint, pt)
+          if (this.lockAspectRatio) rr.h = rr.w
           const e: WbEllipse = {
             type: WbShapeType.Ellipse,
             guid: generateGuid(),
-            center: this.startPoint!,
-            majorRad: distance(this.startPoint!, pt),
-            minorRad: distance(this.startPoint!, pt) / 2,
+            center: this.startPoint,
+            majorRad: rr.w / 2,
+            minorRad: rr.h / 2,
             rotation: this.rotation,
             color: colLine,
             lineWidth: cfg.lineWidth,
@@ -212,12 +187,12 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.imcsClient!.msgSendDraw([e])
           break
         case DrawMode.Rect: {
-          const ctr = this.startPoint!
-          const rr = this.getRotatedRectDimensions(ctr, pt)
+          const rr = this.getRotatedRectDimensions(this.startPoint, pt)
+          if (this.lockAspectRatio) rr.h = rr.w
           const r: WbRect = {
             type: WbShapeType.Rect,
             guid: generateGuid(),
-            center: ctr,
+            center: this.startPoint,
             width: rr.w,
             height: rr.h,
             rotation: this.rotation,
@@ -275,26 +250,25 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public onPointerMove(e: PointerEvent) {
     this.drawStep = this.determineDrawStep(e)
-    const pt = this.fromCnv({x: e.pageX, y: e.pageY})
+    this.cursorPoint = this.fromCnv({x: e.pageX, y: e.pageY})
     switch (this.drawMode) {
       case DrawMode.Line:
       case DrawMode.Circle:
-        this.cursorPoint = pt
         break;
       case DrawMode.Ellipse:
       case DrawMode.Rect:
-        this.cursorPoint = pt
+        this.lockAspectRatio = (getModMask(e) & Mod.Shift) > 0
         switch (this.drawStep) {
           case 1:
             if (this.drawStep != this.oldDrawStep)
-              this.startRotation = rad2deg(vector(this.startPoint!, pt).dir)
-            this.rotation = rad2deg(vector(this.startPoint!, pt).dir) - this.startRotation
+              this.startRotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir)
+            this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - this.startRotation
             break
         }
         break
       case DrawMode.Freehand:
         if (!this.splinePainter.isDrawingSpline()) return
-        this.splinePainter.addPoint(pt)
+        this.splinePainter.addPoint(this.cursorPoint)
         break
       default:
     }
@@ -402,7 +376,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.save()
     ctx.beginPath()
 
-    // rotate around center, then draw rect centered at origin
+    // rotate around the center, then draw rect centered at origin
     ctx.translate(ctr.x, ctr.y)
     ctx.rotate(rotation)
     ctx.rect(-halfW, -halfH, width, height)
