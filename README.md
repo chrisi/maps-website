@@ -49,13 +49,13 @@ yarn build
 * The symbols-layer is now also smart-scaling and allows for editing and removing previously placed symbols.
 * Introduced smart-scaling like in the sim itself, the elements scale but not as much as the environment to keep elements readable on zoomed out maps.
 * Pan with middle-mouse-button while in different map mode
+* Whiteboard is now vector-based for better scalability and performance.
+* Mission/Route integration with clickable waypoints
+* IMCS Integration
 
 ### Roadmap
 
-* IMCS Integration
-* Whiteboard/Pen/Eraser
 * Weather Integration
-* Mission Integration, clickable route
 * Special page for OKB Integration
 
 ### Demo
