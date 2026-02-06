@@ -1,9 +1,10 @@
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
-import {drawArrowHead, drawOutlined, drawTextWithBox} from "@/scripts/draw.ts";
+import {drawArrowHead, drawOutlined, drawTextBoxed} from "@/scripts/draw.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
 import {Mode} from "@/model/mode.ts";
+import {pointOffsetRad} from "@/scripts/utils.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
@@ -65,9 +66,7 @@ export class MeasureOverlay extends BaseOverlay {
     ctx.fillStyle = this.rulerColor;
     drawArrowHead(ctx, pTo.x, pTo.y, -vec.dir + Math.PI / 2, 10);
     this.drawTicks(cnv, pFrom, pTo);
-    ctx.beginPath();
     this.drawMeasurement(cnv, mid, vec.mag, vec.dir);
-    ctx.stroke();
   }
 
   private drawTicks(cnv: Canvas, pFrom: Point, pTo: Point) {
@@ -97,8 +96,8 @@ export class MeasureOverlay extends BaseOverlay {
     const text = degrees + "\xb0 / " + scaledDist + " NM";
     let rotation = radians + Math.PI / 2;
     if (rotation > Math.PI / 2 || rotation < -Math.PI / 2) rotation += Math.PI; // keep text upright
-    const dy = -15; // Offset to draw above the line
-    drawTextWithBox(ctx, text, pos.x, pos.y, this.font, this.rulerColor, this.textColor, -rotation, dy);
+    ctx.font = this.font;
+    drawTextBoxed(ctx, text, pointOffsetRad(pos, -rotation, 15), -rotation, this.rulerColor, this.textColor, 0.6);
   }
 
 }

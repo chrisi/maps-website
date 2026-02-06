@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
+import {onBeforeMount, onMounted, onUnmounted, ref, shallowRef, watch} from "vue";
 import {useRoute} from "vue-router";
 
 import {useGlobalStore} from "@/stores/global.ts";
@@ -42,11 +42,15 @@ import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import type {CollabSettings} from "@/model/settings.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
+import {withCanvasCallCounters} from "@/scripts/utils.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
 
 const canvasMapRef = ref()
+
+//used only for debugging
+const ovlCtx = shallowRef<CanvasRenderingContext2D | null>(null)
 
 const pos = ref<Point>()
 const zoom = ref(1)
@@ -134,6 +138,14 @@ const handleKeyDown = (e: KeyboardEvent) => {
       break
     case '#':
       settings.settings.debug = !settings.settings.debug
+      break
+    case '+':
+      const {counts} = withCanvasCallCounters(
+        ovlCtx.value!,
+        ['save', 'restore', 'beginPath', 'stroke', 'fill', 'fillText', 'strokeText', 'drawImage', 'clip'],
+        () => overlayManager.draw(ovlCtx.value!, {x: 0, y: 0}, 0.25),
+      )
+      console.table(Object.fromEntries(counts))
       break
     case 'c':
       imcsClient.connect({
@@ -247,6 +259,7 @@ const getMapUrl = (map: Theater) => {
       :cursor="global.hotspots.length > 0 ? 'pointer' : 'default'"
       @update:zoom="zoom = $event"
       @update:pos="pos = $event"
+      @init="(ctx) => { ovlCtx = ctx }"
       @draw="(ctx, offset, scale) => overlayManager.draw(ctx, offset, scale)"
       @pointerdown="overlayManager.onPointerDown($event)"
       @pointermove="overlayManager.onPointerMove($event)"

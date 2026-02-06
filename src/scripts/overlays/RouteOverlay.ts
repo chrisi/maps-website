@@ -7,7 +7,8 @@ import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/mod
 import {drawOutlined, drawTextOutlined} from "@/scripts/draw.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import {drawTextWithBox} from "@/scripts/draw.ts";
+import {drawTextBoxed} from "@/scripts/draw.ts";
+import {pointOffsetRad} from "@/scripts/utils.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
@@ -74,7 +75,9 @@ export class RouteOverlay extends BaseOverlay {
 
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 2;
-      drawTextWithBox(ctx, ppt.desc, p.x, p.y, '14px monospace', 'rgba(0, 0, 0, 0.5)', 'orange');
+      drawTextBoxed(ctx, ppt.desc, p);
+
+      // , '14px monospace', 'rgba(0, 0, 0, 0.5)', 'orange'
     });
   }
 
@@ -138,6 +141,10 @@ export class RouteOverlay extends BaseOverlay {
     const px2nm = 6.95; // pixel to Nm scaler //TODO: move to constants
 
     ctx.setLineDash([]);
+    ctx.font = '14px monospace';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = 'white';
 
     // Go through the target list.
     for (let i = 0; i < list.length - 1; i++) {
@@ -148,10 +155,6 @@ export class RouteOverlay extends BaseOverlay {
         const vec = vector(p1, p2);
         const mid = midpoint(p1, p2)
 
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.fillStyle = 'white';
-
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
@@ -160,11 +163,12 @@ export class RouteOverlay extends BaseOverlay {
         ctx.fillRect(mid.x - 3, mid.y - 3, 6, 6);
         ctx.stroke();
 
-        const dist = (vec.mag / px2nm / cnv.scale).toFixed(1)
+        const dist = vec.mag / px2nm / cnv.scale
+        const strDist = dist >= 10 ? dist.toFixed(0) : dist.toFixed(1)
 
         // Omit distance if the route segment is too short on current scale to declutter UI
         if (vec.mag > 50) {
-          drawTextOutlined(ctx, dist, mid.x, mid.y - 10, '14px monospace');
+          drawTextOutlined(ctx, strDist, pointOffsetRad(mid, Math.PI, -10));
         }
         // Only draw lines up to landing
         if (list[i + 1]!.action == 7) endRoute = true;
