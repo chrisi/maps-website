@@ -5,7 +5,7 @@ import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {type WbCircle, type WbEllipse, type WbFreehand, type WbLine, type WbRect, type WbShape, WbShapeType} from "@/model/overlays.ts";
-import {buildFreehandPath, colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
+import {buildBezierPathFromPoints, alphaColor, dashStyle, drawCircle, drawEllipse, drawLine, drawRect} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
 
@@ -15,7 +15,8 @@ enum DrawMode {
   Line = 2,
   Circle = 3,
   Rect = 4,
-  Ellipse = 5
+  Ellipse = 5,
+  Text = 6
 }
 
 export class WhiteboardOverlay extends BaseOverlay {
@@ -66,23 +67,23 @@ export class WhiteboardOverlay extends BaseOverlay {
 
     switch (this.drawMode) {
       case DrawMode.Line:
-        this.drawLine(cnv, p1, p2)
+        drawLine(ctx, p1, p2)
         break
       case DrawMode.Circle:
-        this.drawCircle(cnv, p1, dist)
-        this.drawLine(cnv, p1, p2)
+        drawCircle(ctx, p1, dist)
+        drawLine(ctx, p1, p2)
         break
       case DrawMode.Ellipse:
         const re = this.getRotatedRectDimensions(p1, p2)
         if (this.lockAspectRatio) re.h = re.w
-        this.drawEllipse(cnv, p1, re.w / 2, re.h / 2, this.rotation)
-        this.drawLine(cnv, p1, p2)
+        drawEllipse(ctx, p1, re.w / 2, re.h / 2, this.rotation)
+        drawLine(ctx, p1, p2)
         break
       case DrawMode.Rect:
         const rr = this.getRotatedRectDimensions(p1, p2)
         if (this.lockAspectRatio) rr.h = rr.w
-        this.drawRect(cnv, p1, rr.w, rr.h, this.rotation)
-        this.drawLine(cnv, p1, p2)
+        drawRect(ctx, p1, rr.w, rr.h, this.rotation)
+        drawLine(ctx, p1, p2)
         break
       case DrawMode.Freehand:
         this.drawWorldInScreenSpace(() => {
@@ -137,8 +138,8 @@ export class WhiteboardOverlay extends BaseOverlay {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     if ((e.button == 0) && this.startPoint) {
       const cfg = this.settings.settings.whiteboard
-      const colFill = cfg.fillStyle == 'solid' ? colorWithAlpha(cfg.fillColor, cfg.opacity * 0.4) : ''
-      const colLine = colorWithAlpha(cfg.lineColor, cfg.opacity)
+      const colFill = cfg.fillStyle == 'solid' ? alphaColor(cfg.fillColor, cfg.opacity * 0.4) : ''
+      const colLine = alphaColor(cfg.lineColor, cfg.opacity)
       const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
       switch (this.drawMode) {
         case DrawMode.Line:
@@ -292,7 +293,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   private drawWbFreehand(cnv: Canvas, fh: WbFreehand) {
-    if (!fh.path) fh.path = buildFreehandPath(fh.points, fh.cornerIndices)
+    if (!fh.path) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
     const ctx = cnv.context
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
@@ -309,18 +310,11 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.strokeStyle = c.color
     ctx.lineWidth = c.lineWidth / cnv.scale
     ctx.setLineDash(c.dash)
-    this.drawCircle(cnv, c.center, c.radius)
+    drawCircle(cnv.context, c.center, c.radius)
     if (c.fillColor != '') {
       ctx.fillStyle = c.fillColor
       ctx.fill()
     }
-  }
-
-  private drawCircle(cnv: Canvas, ctr: Point, rad: number) {
-    const ctx = cnv.context
-    ctx.beginPath()
-    ctx.arc(ctr.x, ctr.y, rad, 0, 2 * Math.PI)
-    ctx.stroke()
   }
 
   private drawWbEllipse(cnv: Canvas, c: WbEllipse) {
@@ -328,30 +322,11 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.strokeStyle = c.color
     ctx.lineWidth = c.lineWidth / cnv.scale
     ctx.setLineDash(c.dash)
-    this.drawEllipse(cnv, c.center, c.majorRad, c.minorRad, c.rotation)
+    drawEllipse(cnv.context, c.center, c.majorRad, c.minorRad, c.rotation)
     if (c.fillColor != '') {
       ctx.fillStyle = c.fillColor
       ctx.fill()
     }
-  }
-
-  private drawEllipse(cnv: Canvas, ctr: Point, majorRad: number, minorRad: number, rot: number) {
-    const rotation = deg2rad(rot)
-    const ctx = cnv.context
-
-    ctx.save()
-    ctx.beginPath()
-
-    // Move origin to center, rotate axes, then scale a unit circle into an ellipse
-    ctx.translate(ctr.x, ctr.y)
-    ctx.rotate(rotation)
-    ctx.scale(majorRad, minorRad)
-
-    // unit circle -> scaled into ellipse
-    ctx.arc(0, 0, 1, 0, 2 * Math.PI)
-
-    ctx.restore()
-    ctx.stroke()
   }
 
   private drawWbRect(cnv: Canvas, r: WbRect) {
@@ -359,30 +334,11 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.strokeStyle = r.color
     ctx.lineWidth = r.lineWidth / cnv.scale
     ctx.setLineDash(r.dash)
-    this.drawRect(cnv, r.center, r.width, r.height, r.rotation)
+    drawRect(cnv.context, r.center, r.width, r.height, r.rotation)
     if (r.fillColor != '') {
       ctx.fillStyle = r.fillColor
       ctx.fill()
     }
-  }
-
-  private drawRect(cnv: Canvas, ctr: Point, width: number, height: number, rot: number) {
-    const rotation = deg2rad(rot)
-    const ctx = cnv.context
-
-    const halfW = width / 2
-    const halfH = height / 2
-
-    ctx.save()
-    ctx.beginPath()
-
-    // rotate around the center, then draw rect centered at origin
-    ctx.translate(ctr.x, ctr.y)
-    ctx.rotate(rotation)
-    ctx.rect(-halfW, -halfH, width, height)
-
-    ctx.restore()
-    ctx.stroke()
   }
 
   private drawWbLine(cnv: Canvas, l: WbLine) {
@@ -390,16 +346,8 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.strokeStyle = l.color
     ctx.lineWidth = l.lineWidth / cnv.scale
     ctx.setLineDash(l.dash)
-    this.drawLine(cnv, l.p1, l.p2)
+    drawLine(cnv.context, l.p1, l.p2)
     ctx.fill()
-  }
-
-  private drawLine(cnv: Canvas, p1: Point, p2: Point) {
-    const ctx = cnv.context
-    ctx.beginPath()
-    ctx.moveTo(p1.x, p1.y)
-    ctx.lineTo(p2.x, p2.y)
-    ctx.stroke()
   }
 
   private determineDrawStep(e: PointerEvent): number {

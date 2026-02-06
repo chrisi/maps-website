@@ -112,19 +112,19 @@ export class RouteOverlay extends BaseOverlay {
         case Action.S_D:
         case Action.Recon:
         case Action.Sweep:
-          drawOutlined(ctx, "white", "black", 2.6, 0.6, c => {
+          drawOutlined(ctx, c => {
             const triSize = 8
             const triOfs = 1
             c.moveTo(wp.x - triSize, wp.y + triSize - triOfs);
             c.lineTo(wp.x, wp.y - triSize - triOfs);
             c.lineTo(wp.x + triSize, wp.y + triSize - triOfs);
             c.lineTo(wp.x - triSize, wp.y + triSize - triOfs);
-          })
+          }, "white", "black", 2.6, 0.6)
           break;
         default:
-          drawOutlined(ctx, "white", "black", 2.6, 0.6, c => {
+          drawOutlined(ctx, c => {
             c.arc(wp.x, wp.y, 7, 0, 2 * Math.PI);
-          })
+          }, "white", "black", 2.6, 0.6)
       }
 
       // Add Waypoint Number
@@ -164,7 +164,7 @@ export class RouteOverlay extends BaseOverlay {
 
         // Omit distance if the route segment is too short on current scale to declutter UI
         if (vec.mag > 50) {
-          drawTextOutlined(ctx, dist, mid.x, mid.y - 10, "14px monospace");
+          drawTextOutlined(ctx, dist, mid.x, mid.y - 10, '14px monospace');
         }
         // Only draw lines up to landing
         if (list[i + 1]!.action == 7) endRoute = true;

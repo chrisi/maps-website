@@ -1,6 +1,6 @@
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import {colorWithAlpha, dashStyle} from "@/scripts/draw.ts";
+import {alphaColor, dashStyle} from "@/scripts/draw.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
 import {generateGuid} from "@/scripts/utils.ts";
 import {type WbFreehand, WbShapeType} from "@/model/overlays.ts";
@@ -32,7 +32,7 @@ export class SplinePainter {
       guid: generateGuid(),
       points: this.line,
       cornerIndices: this.cornerIndices,
-      color: colorWithAlpha(paintConfig.lineColor, paintConfig.opacity),
+      color: alphaColor(paintConfig.lineColor, paintConfig.opacity),
       lineWidth: paintConfig.lineWidth,
       dash: dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
     }
@@ -51,7 +51,7 @@ export class SplinePainter {
     const ctx = cnv.context
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    ctx.strokeStyle = colorWithAlpha(paintConfig.lineColor, paintConfig.opacity)
+    ctx.strokeStyle = alphaColor(paintConfig.lineColor, paintConfig.opacity)
     ctx.lineWidth = paintConfig.lineWidth / cnv.scale
     ctx.lineDashOffset = 0
     const dash = dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
