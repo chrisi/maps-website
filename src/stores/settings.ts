@@ -13,6 +13,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const settings = reactive<Settings>(
     {
+      debug: false,
       bullseye: {
         lineColor: 'navy',
         lineWidth: 1.5,

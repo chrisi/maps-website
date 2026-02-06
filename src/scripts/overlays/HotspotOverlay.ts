@@ -1,7 +1,18 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import {watch} from "vue";
 
 export class HotspotOverlay extends BaseOverlay {
+
+  public init() {
+    watch(() => this.settings.settings.debug, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.settings.debug
+  }
 
   public onDraw(cnv: Canvas): void {
     const saveScale = cnv?.scale ?? 1

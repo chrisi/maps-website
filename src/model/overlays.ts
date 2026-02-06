@@ -34,6 +34,13 @@ export interface WbLine extends WbShape {
   p2: Point
 }
 
+export interface WbText extends WbShape {
+  pos: Point
+  rotation: number
+  text: string
+  fontSize: number
+}
+
 export interface WbCircle extends WbShape {
   center: Point
   radius: number

@@ -35,6 +35,7 @@ export interface WhiteboardSettings {
 }
 
 export interface Settings {
+  debug: boolean;
   bullseye: BullseyeSettings;
   collab: CollabSettings;
   whiteboard: WhiteboardSettings;

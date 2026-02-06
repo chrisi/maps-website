@@ -41,11 +41,10 @@ import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import type {CollabSettings} from "@/model/settings.ts";
+import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
-
-const debug = ref(false)
 
 const canvasMapRef = ref()
 
@@ -82,11 +81,9 @@ onBeforeMount(() => {
   global.message = "N00°00.000',N00°00.000' | X.0,Y:0"
 })
 
-let hotspotOvl: HotspotOverlay | undefined
-
 onMounted(() => {
-  hotspotOvl = overlayManager.registerOverlay(new HotspotOverlay())
-  hotspotOvl.setEnabled(debug.value)
+  overlayManager.registerOverlay(new HotspotOverlay())
+  overlayManager.registerOverlay(new DebugOverlay())
 
   overlayManager.registerOverlay(new BullseyeOverlay())
 
@@ -136,7 +133,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       suspend.value = false
       break
     case '#':
-      debug.value = !debug.value
+      settings.settings.debug = !settings.settings.debug
       break
     case 'c':
       imcsClient.connect({
@@ -197,10 +194,6 @@ const execTool = (tool: string) => {
   }
 }
 
-watch(debug, (newValue) => {
-  hotspotOvl?.setEnabled(newValue)
-})
-
 watch(pos, (newPos) => {
   if (newPos) {
     showPointerCoord(newPos);
@@ -260,7 +253,7 @@ const getMapUrl = (map: Theater) => {
       @pointerup="overlayManager.onPointerUp($event)"
     />
   </div>
-  <div id="debug" v-if="debug">
+  <div id="debug" v-if="settings.settings.debug">
     <out-value caption="Mode" :val="global.mode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
