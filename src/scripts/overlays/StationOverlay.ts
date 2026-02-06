@@ -28,7 +28,7 @@ export class StationOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (0.8 - cnv.scale) * 0.7
-    cnv.context.lineCap = 'square'
+    cnv.context.setLineDash([])
     this.stations.forEach(sta => {
       const pt = this.toCnv(sta.pt, cnv)
       if (sta.station.type === 'Airbase')
@@ -106,7 +106,6 @@ export class StationOverlay extends BaseOverlay {
 
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = 'black';
-    ctx.setLineDash([]);
 
     if (isTac) {
       const tabAngles = [Math.PI / 2, (7 * Math.PI) / 6, (11 * Math.PI) / 6]; // 90, 210, 330 degrees
@@ -171,10 +170,8 @@ export class StationOverlay extends BaseOverlay {
 
     ctx.save()
     ctx.translate(pt.x, pt.y)
-    ctx.lineCap = 'butt'
     ctx.lineWidth = lineWidth
     ctx.strokeStyle = 'black'
-    ctx.setLineDash([])
     ctx.beginPath()
     ctx.moveTo(-crossSize, 0)
     ctx.lineTo(crossSize, 0)
@@ -187,9 +184,8 @@ export class StationOverlay extends BaseOverlay {
   private drawCircle(cnv: Canvas, pt: Point, rad: number,
                      borderWidth: number = 1, strokeColor: string, fillColor?: string) {
     const ctx = cnv.context;
-    ctx.setLineDash([])
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI, false);
+    ctx.beginPath()
+    ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI)
     if (fillColor) {
       ctx.fillStyle = fillColor
       ctx.fill()

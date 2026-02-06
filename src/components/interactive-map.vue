@@ -142,7 +142,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
     case '+':
       const {counts} = withCanvasCallCounters(
         ovlCtx.value!,
-        ['save', 'restore', 'beginPath', 'stroke', 'fill', 'fillText', 'strokeText', 'drawImage', 'clip'],
+        ['save', 'restore', 'beginPath', 'stroke', 'fill', 'fillText', 'strokeText',
+          'drawImage', 'clip', 'lineWidth', 'setLineDash', 'translate', 'rotate', 'scale'],
         () => overlayManager.draw(ovlCtx.value!, {x: 0, y: 0}, 0.25),
       )
       console.table(Object.fromEntries(counts))
