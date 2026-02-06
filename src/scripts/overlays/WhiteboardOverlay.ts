@@ -97,10 +97,15 @@ export class WhiteboardOverlay extends BaseOverlay {
       case DrawMode.Text:
         const fontScale = this.settings.settings.whiteboard.fontSize
         drawLine(ctx, p1, p2)
-        const angle = vector(p1, p2).dir * -1 + Math.PI / 2
+        let rot = 0
+        if (distance(p1, p2) > 25) {
+          rot = vector(p1, p2).dir * -1 + Math.PI / 2
+          if (this.drawStep == 1)
+            rot = Math.round(rot / deg2rad(15)) * deg2rad(15)
+        }
         ctx.setLineDash([])
         ctx.font = `${fontScale}px sans-serif`
-        drawText(ctx, this.settings.settings.whiteboard.text, p1, angle, 'black')
+        drawText(ctx, this.settings.settings.whiteboard.text, p1, rot, 'black')
         break
       case DrawMode.Freehand:
         this.drawWorldInScreenSpace(() => {
@@ -311,6 +316,11 @@ export class WhiteboardOverlay extends BaseOverlay {
         break
       case DrawMode.Text:
         this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - 90
+        switch (this.drawStep) {
+          case 1:
+            this.rotation = Math.round(this.rotation / 15) * 15
+            break
+        }
         break
       case DrawMode.Freehand:
         if (!this.splinePainter.isDrawingSpline()) return
