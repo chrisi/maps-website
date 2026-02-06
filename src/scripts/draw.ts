@@ -94,7 +94,6 @@ export function drawText(ctx: CanvasRenderingContext2D, text: string, pos: Point
   ctx.fillStyle = color
   ctx.translate(pos.x, pos.y)
   ctx.rotate(rotaRad)
-  ctx.strokeText(text, 0, 0)
   ctx.fillText(text, 0, 0)
   ctx.restore()
 }

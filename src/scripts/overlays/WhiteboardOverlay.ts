@@ -94,12 +94,22 @@ export class WhiteboardOverlay extends BaseOverlay {
         drawRect(ctx, p1, rr.w, rr.h, this.rotation)
         drawLine(ctx, p1, p2)
         break
+      case DrawMode.Text:
+        const fontScale = this.settings.settings.whiteboard.fontSize
+        drawLine(ctx, p1, p2)
+        const angle = vector(p1, p2).dir * -1 + Math.PI / 2
+        ctx.setLineDash([])
+        ctx.font = `${fontScale}px sans-serif`
+        drawText(ctx, this.settings.settings.whiteboard.text, p1, angle, 'black')
+        break
       case DrawMode.Freehand:
         this.drawWorldInScreenSpace(() => {
           this.splinePainter.draw(cnv, this.settings.settings.whiteboard)
         })
         break
     }
+    ctx.setLineDash([])
+
     this.drawWorldInScreenSpace(() => {
       this.shapes.forEach(s => {
         switch (s.type) {
@@ -118,6 +128,9 @@ export class WhiteboardOverlay extends BaseOverlay {
           case WbShapeType.Freehand:
             this.drawWbFreehand(cnv, s as WbFreehand)
             break
+          case WbShapeType.Text:
+            this.drawWbText(cnv, s as WbText)
+            break
         }
       })
     })
@@ -133,6 +146,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         case DrawMode.Ellipse:
         case DrawMode.Rect:
+        case DrawMode.Text:
           this.rotation = 0
           break
         case DrawMode.Freehand:
@@ -215,6 +229,22 @@ export class WhiteboardOverlay extends BaseOverlay {
           this.imcsClient!.msgSendDraw([r])
           break
         }
+        case DrawMode.Text: {
+          const t: WbText = {
+            type: WbShapeType.Text,
+            guid: generateGuid(),
+            pos: this.startPoint,
+            rotation: this.rotation,
+            text: cfg.text,
+            fontSize: cfg.fontSize / this.getCanvas().scale,
+            color: colLine,
+            lineWidth: cfg.lineWidth,
+            dash: dash
+          }
+          this.receiveShape(t)
+          this.imcsClient!.msgSendDraw([t])
+          break
+        }
         case DrawMode.Freehand:
           const fh = this.splinePainter.stopDrawing(this.settings.settings.whiteboard, this.getCanvas().scale || 1);
           if (fh) {
@@ -244,6 +274,9 @@ export class WhiteboardOverlay extends BaseOverlay {
             return isPointOnRect(r.center, r.width, r.height, r.rotation, pt, 5 / this.getCanvas().scale)
           case WbShapeType.Freehand:
             return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
+          case WbShapeType.Text:
+            const t = s as WbText
+            return distance(t.pos, pt) <= 10 / this.getCanvas().scale
           default:
         }
         return false
@@ -275,6 +308,9 @@ export class WhiteboardOverlay extends BaseOverlay {
             this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - this.startRotation
             break
         }
+        break
+      case DrawMode.Text:
+        this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - 90
         break
       case DrawMode.Freehand:
         if (!this.splinePainter.isDrawingSpline()) return
@@ -392,9 +428,12 @@ export class WhiteboardOverlay extends BaseOverlay {
       case "freehand":
         mode = DrawMode.Freehand
         break
+      case "text":
+        mode = DrawMode.Text
+        break
     }
     // quickly override mode with modifiers
-    if (getModMask(e) == Mod.Shift) return DrawMode.Line
+    if (getModMask(e) == Mod.Shift) return DrawMode.Text
     if (getModMask(e) == Mod.Shift + Mod.Alt) return DrawMode.Rect
     if (getModMask(e) == Mod.Alt) return DrawMode.Ellipse
     return mode

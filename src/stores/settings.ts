@@ -35,7 +35,9 @@ export const useSettingsStore = defineStore('settings', () => {
         fillColor: '#ffffff',
         opacity: 40,
         eraserSize: 10,
-        supportPoints: true
+        supportPoints: true,
+        fontSize: 16,
+        text: 'Hello BMS'
       },
     }
   )

@@ -32,6 +32,8 @@ export interface WhiteboardSettings {
   opacity: number;
   eraserSize: number;
   supportPoints: boolean;
+  text: string;
+  fontSize: number;
 }
 
 export interface Settings {

@@ -15,7 +15,7 @@ import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 import ToolButton from "@/components/forms/tool-button.vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {DrawMode} from "@/model/mode.ts";
-import ToolOutput from "@/components/forms/tool-output.vue";
+import ToolTextfield from "@/components/forms/tool-textfield.vue";
 
 const settings = useSettingsStore()
 const global = useGlobalStore()
@@ -50,6 +50,9 @@ const btnDrawModeClick = (sender: string) => {
       break
     case "drawMode_rect":
       global.drawMode = DrawMode.Rect
+      break
+    case "drawMode_text":
+      global.drawMode = DrawMode.Text
       break
     case "drawMode_delete":
       global.drawMode = DrawMode.Delete
@@ -116,20 +119,26 @@ const btnDrawModeClick = (sender: string) => {
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Circle"/>
     <tool-button id="drawMode_rect" icon="/common/icons/rect.png"
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Rect"/>
+    <tool-button id="drawMode_text" icon="/common/icons/rect.png"
+                 @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Text"/>
+    <template v-if="global.drawMode == DrawMode.Text">
+      <tool-input :variant="variant" label="Size" for="fontSize">
+        <div style="display: flex; width: 95%; gap: 8px;">
+          <div style="flex: 10">
+            <range-slider id="fontSize" v-model="settings.settings.whiteboard.fontSize"/>
+          </div>
+          <div style="flex: 2">
+            <input :value="settings.settings.whiteboard.fontSize" style="width: 100%" readonly/>
+          </div>
+        </div>
+      </tool-input>
+      <tool-textfield :variant="variant" label="Text" v-model="settings.settings.whiteboard.text"/>
+    </template>
+
+    <tool-spacer/>
+    <tool-section name="Delete"/>
     <tool-button id="drawMode_delete" icon="/common/icons/delete.png"
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Delete"/>
-    <tool-spacer/>
-    <tool-section name="Eraser"/>
-    <tool-input :variant="variant" label="Size" for="eraser-size">
-      <div style="display: flex; width: 95%; gap: 8px;">
-        <div style="flex: 10">
-          <range-slider id="eraser-size" v-model="settings.settings.whiteboard.eraserSize"/>
-        </div>
-        <div style="flex: 2">
-          <input :value="settings.settings.whiteboard.eraserSize" style="width: 100%" readonly/>
-        </div>
-      </div>
-    </tool-input>
     <tool-spacer/>
     <tool-section name="Debug"/>
     <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>

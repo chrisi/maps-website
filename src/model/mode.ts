@@ -15,5 +15,6 @@ export enum DrawMode {
   Line = "line",
   Circle = "circle",
   Rect = "rect",
+  Text = "text",
   Delete = "delete"
 }

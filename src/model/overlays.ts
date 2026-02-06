@@ -11,7 +11,8 @@ export enum WbShapeType {
   Line = 1,
   Circle = 2,
   Rect = 3,
-  Ellipse = 4
+  Ellipse = 4,
+  Text = 5
 }
 
 export interface WbShape {
