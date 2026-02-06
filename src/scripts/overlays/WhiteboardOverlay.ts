@@ -4,8 +4,17 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import {type WbCircle, type WbEllipse, type WbFreehand, type WbLine, type WbRect, type WbShape, WbShapeType} from "@/model/overlays.ts";
-import {buildBezierPathFromPoints, alphaColor, dashStyle, drawCircle, drawEllipse, drawLine, drawRect} from "@/scripts/draw.ts";
+import {
+  type WbCircle,
+  type WbEllipse,
+  type WbFreehand,
+  type WbLine,
+  type WbRect,
+  type WbShape,
+  WbShapeType,
+  type WbText
+} from "@/model/overlays.ts";
+import {buildBezierPathFromPoints, alphaColor, dashStyle, drawCircle, drawEllipse, drawLine, drawRect, drawText} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
 
@@ -347,6 +356,14 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.lineWidth = l.lineWidth / cnv.scale
     ctx.setLineDash(l.dash)
     drawLine(cnv.context, l.p1, l.p2)
+    ctx.fill()
+  }
+
+  private drawWbText(cnv: Canvas, t: WbText) {
+    const ctx = cnv.context
+    ctx.strokeStyle = t.color
+    ctx.font = `${t.fontSize}px sans-serif`
+    drawText(cnv.context, t.text, t.pos, deg2rad(t.rotation), t.color)
     ctx.fill()
   }
 
