@@ -402,7 +402,6 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.lineWidth = l.lineWidth / cnv.scale
     ctx.setLineDash(l.dash)
     drawLine(cnv.context, l.p1, l.p2)
-    ctx.fill()
   }
 
   private drawWbText(cnv: Canvas, t: WbText) {
@@ -410,7 +409,6 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.strokeStyle = t.color
     ctx.font = `${t.fontSize}px sans-serif`
     drawText(cnv.context, t.text, t.pos, deg2rad(t.rotation), t.color)
-    ctx.fill()
   }
 
   private determineDrawStep(e: PointerEvent): number {

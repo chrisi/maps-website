@@ -119,7 +119,7 @@ const btnDrawModeClick = (sender: string) => {
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Circle"/>
     <tool-button id="drawMode_rect" icon="/common/icons/rect.png"
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Rect"/>
-    <tool-button id="drawMode_text" icon="/common/icons/rect.png"
+    <tool-button id="drawMode_text" icon="/common/icons/text.png"
                  @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Text"/>
     <template v-if="global.drawMode == DrawMode.Text">
       <tool-input :variant="variant" label="Size" for="fontSize">
