@@ -164,7 +164,6 @@ onMounted(() => {
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
-  console.log(dpr)
   if (mapRef.value && ctx) {
     mapRef.value.width = window.innerWidth * dpr;
     mapRef.value.height = window.innerHeight * dpr;
