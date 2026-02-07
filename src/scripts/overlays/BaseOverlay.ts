@@ -26,6 +26,8 @@ export interface Overlay {
 
   onPointerMove?(e: PointerEvent, ownHotspots: Hotspot[]): void
 
+  onLongPress?(e: PointerEvent, ownHotspots: Hotspot[]): void
+
   onHoverHotspot?(hotspots: Hotspot[], e: PointerEvent): void
 
   onHoverOwnHotspot?(ownHotspots: Hotspot[], e: PointerEvent): void

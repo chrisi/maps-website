@@ -160,6 +160,16 @@ export class OverlayManager {
     }
   }
 
+  public onLongPress(e: PointerEvent): void {
+    this.calculateAllHotspots({x: e.pageX, y: e.pageY})
+    for (const overlay of this.overlays) {
+      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
+        const ownHs = this.calculateOwnHotspots(overlay, {x: e.pageX, y: e.pageY})
+        overlay.onLongPress?.(e, ownHs)
+      }
+    }
+  }
+
   private calculateAllHotspots(pt: Point): void {
     this.allHotspots = this.findHotspots(pt, cb => this.forEachHotspot(cb), false)
     this.global.hotspots = this.allHotspots

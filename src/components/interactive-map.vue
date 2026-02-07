@@ -265,6 +265,7 @@ const getMapUrl = (map: Theater) => {
       @pointerdown="overlayManager.onPointerDown($event)"
       @pointermove="overlayManager.onPointerMove($event)"
       @pointerup="overlayManager.onPointerUp($event)"
+      @longpress="overlayManager.onLongPress($event)"
     />
   </div>
   <div id="debug" v-if="settings.settings.debug">

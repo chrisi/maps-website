@@ -19,6 +19,7 @@ const emit = defineEmits<{
   (e: 'pointerdown', event: PointerEvent): void
   (e: 'pointerup', event: PointerEvent): void
   (e: 'pointermove', event: PointerEvent): void
+  (e: 'longpress', event: PointerEvent): void
 }>()
 
 defineExpose({
@@ -336,9 +337,18 @@ let startDist = 0;
 let startScale = 1;
 let multiPointer = false;
 
+let longPressTimer: number | null = null;
+let longPressStartPos = {x: 0, y: 0};
+
 function onDown(e: PointerEvent) {
   pointers.set(e.pointerId, e);
-  if (pointers.size > 1) multiPointer = true;
+  if (pointers.size > 1) {
+    multiPointer = true;
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
 
   emit('pointerdown', e);
   lastMouseX = e.clientX;
@@ -356,6 +366,15 @@ function onDown(e: PointerEvent) {
     lastX = e.clientX;
     lastY = e.clientY;
     lastTime = performance.now();
+
+    // Start long press timer for touch or primary button
+    if (e.pointerType === 'touch' || e.button === 0) {
+      longPressStartPos = {x: e.clientX, y: e.clientY};
+      longPressTimer = setTimeout(() => {
+        emit('longpress', e);
+        longPressTimer = null;
+      }, 750);
+    }
   } else {
     isPanning = false;
     if (pointers.size === 2) {
@@ -380,6 +399,15 @@ function onMove(e: PointerEvent) {
 
   if (!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, e);
+
+  if (longPressTimer) {
+    const dist = Math.hypot(e.clientX - longPressStartPos.x, e.clientY - longPressStartPos.y);
+    if (dist > 10) { // 10px threshold
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
+
   if (pointers.size === 1 && isPanning) {
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
@@ -439,6 +467,11 @@ function onMove(e: PointerEvent) {
 }
 
 function onUp(e: PointerEvent) {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+
   if (!multiPointer) emit('pointerup', e);
   pointers.delete(e.pointerId);
 
@@ -564,6 +597,8 @@ function onContextMenu(e: MouseEvent) {
 
 <style scoped>
 .viewport {
+  user-select: none;
+  -webkit-user-select: none;
   position: relative;
   width: 100vw;
   height: 100vh;
