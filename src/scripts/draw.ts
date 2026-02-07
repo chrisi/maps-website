@@ -163,6 +163,19 @@ export function drawLine(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
   ctx.stroke()
 }
 
+export function drawLineAlt(ctx: CanvasRenderingContext2D, p1: Point, p2: Point, c1: string = 'black', c2: string = 'white', step: number = 4) {
+  ctx.beginPath()
+  ctx.moveTo(p1.x, p1.y)
+  ctx.lineTo(p2.x, p2.y)
+  ctx.setLineDash([step, step])
+  ctx.strokeStyle = c1
+  ctx.lineDashOffset = step
+  ctx.stroke()
+  ctx.strokeStyle = c2
+  ctx.lineDashOffset = 0
+  ctx.stroke()
+}
+
 export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point, width: number, height: number, rotaDeg: number) {
   const rotation = deg2rad(rotaDeg)
 

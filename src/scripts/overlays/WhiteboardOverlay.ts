@@ -14,7 +14,17 @@ import {
   WbShapeType,
   type WbText
 } from "@/model/overlays.ts";
-import {buildBezierPathFromPoints, alphaColor, dashStyle, drawCircle, drawEllipse, drawLine, drawRect, drawText} from "@/scripts/draw.ts";
+import {
+  buildBezierPathFromPoints,
+  alphaColor,
+  dashStyle,
+  drawCircle,
+  drawEllipse,
+  drawLine,
+  drawRect,
+  drawText,
+  drawLineAlt
+} from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
 
@@ -70,13 +80,12 @@ export class WhiteboardOverlay extends BaseOverlay {
     const p2 = this.toCnv(this.cursorPoint)
     const dist = distance(p1, p2)
     const ctx = cnv.context
-    ctx.lineWidth = 1.5
+    ctx.lineWidth = 2
     ctx.strokeStyle = 'black'
-    ctx.setLineDash([1, 3])
-
+    ctx.setLineDash([2, 2])
     switch (this.drawMode) {
       case DrawMode.Line:
-        drawLine(ctx, p1, p2)
+        drawLineAlt(ctx, p1, p2)
         break
       case DrawMode.Circle:
         drawCircle(ctx, p1, dist)
