@@ -243,6 +243,17 @@ export function isPointOnEllipse(ctr: Point, majorRad: number, minorRad: number,
   return approxDist <= t
 }
 
+export function isPointInRect(ctr: Point, width: number, height: number, rot: number, p: Point): boolean {
+  const dx = p.x - ctr.x
+  const dy = p.y - ctr.y
+  const rad = deg2rad(-rot)
+  const c = Math.cos(rad)
+  const s = Math.sin(rad)
+  const localX = dx * c - dy * s
+  const localY = dx * s + dy * c
+  return Math.abs(localX) <= width / 2 && Math.abs(localY) <= height / 2
+}
+
 export function isPointOnRect(ctr: Point, width: number, height: number, rot: number, p: Point, threshold: number): boolean {
   const pts = rectCornersFromCenter(ctr, width, height, rot)
   return isPointOnLine(pts[0], pts[1], p, threshold) ||

@@ -26,7 +26,17 @@ import {
   drawLineAlt
 } from "@/scripts/draw.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
-import {deg2rad, distance, isPointOnCircle, isPointOnEllipse, isPointOnLine, isPointOnRect, rad2deg, vector} from "@/scripts/math.ts";
+import {
+  deg2rad,
+  distance,
+  isPointInRect,
+  isPointOnCircle,
+  isPointOnEllipse,
+  isPointOnLine,
+  isPointOnRect,
+  rad2deg,
+  vector
+} from "@/scripts/math.ts";
 
 enum DrawMode {
   None = 0,
@@ -289,8 +299,7 @@ export class WhiteboardOverlay extends BaseOverlay {
           case WbShapeType.Freehand:
             return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
           case WbShapeType.Text:
-            const t = s as WbText
-            return distance(t.pos, pt) <= 10 / this.getCanvas().scale
+            return this.hitTestText(this.getCanvas()!, s as WbText, pt)
           default:
         }
         return false
@@ -466,6 +475,31 @@ export class WhiteboardOverlay extends BaseOverlay {
     const hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
     ctx.restore()
     return hit
+  }
+
+  private hitTestText(cnv: Canvas, text: WbText, pt: Point): boolean {
+    const ctx = cnv.context
+    ctx.save()
+    ctx.font = `${text.fontSize}px sans-serif`
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    const metrics = ctx.measureText(text.text)
+    ctx.restore()
+
+    const width = metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft
+    const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+
+    const localCenterX = (metrics.actualBoundingBoxRight - metrics.actualBoundingBoxLeft) / 2
+    const localCenterY = (metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent) / 2
+
+    const rot = deg2rad(text.rotation)
+    const c = Math.cos(rot)
+    const s = Math.sin(rot)
+
+    const worldCenterX = text.pos.x + localCenterX * c - localCenterY * s
+    const worldCenterY = text.pos.y + localCenterX * s + localCenterY * c
+
+    return isPointInRect({x: worldCenterX, y: worldCenterY}, width, height, text.rotation, pt)
   }
 
   private getRotatedRectDimensions(ctr: Point, cur: Point): { w: number, h: number } {
