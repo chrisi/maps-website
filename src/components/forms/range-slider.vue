@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 withDefaults(defineProps<{
-  id: string
+  id?: string
   name?: string
   modelValue: number
   min?: number

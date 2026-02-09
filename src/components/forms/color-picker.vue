@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
-const props = withDefaults(defineProps<{
-  id: string
+withDefaults(defineProps<{
+  id?: string
   name?: string
   modelValue: string
   width?: string

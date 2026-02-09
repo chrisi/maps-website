@@ -40,8 +40,8 @@ const btnDrawModeClick = (sender: string) => {
     case "drawMode_line":
       global.drawMode = DrawMode.Line
       break
-    case "drawMode_circle":
-      global.drawMode = DrawMode.Circle
+    case "drawMode_ellipse":
+      global.drawMode = DrawMode.Ellipse
       break
     case "drawMode_rect":
       global.drawMode = DrawMode.Rect
@@ -60,10 +60,10 @@ const btnDrawModeClick = (sender: string) => {
                @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Freehand"/>
   <tool-button id="drawMode_line" icon="/common/icons/line.png"
                @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Line"/>
-  <tool-button id="drawMode_circle" icon="/common/icons/circle.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Circle"/>
   <tool-button id="drawMode_rect" icon="/common/icons/rect.png"
                @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Rect"/>
+  <tool-button id="drawMode_ellipse" icon="/common/icons/circle.png"
+               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Ellipse"/>
   <tool-button id="drawMode_text" icon="/common/icons/text.png"
                @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Text"/>
   <tool-spacer/>
@@ -71,16 +71,26 @@ const btnDrawModeClick = (sender: string) => {
     <tool-input :variant="variant" label="Color" for="line-style">
       <div style="display: flex; width: 100%; gap: 4px;">
         <div style="flex: 12">
-          <color-picker id="line-color" v-model="settings.settings.whiteboard.lineColor"/>
+          <color-picker v-model="settings.settings.whiteboard.lineColor"/>
+        </div>
+      </div>
+    </tool-input>
+    <tool-input :variant="variant" label="Opacity" for="opacity">
+      <div style="display: flex; width: 95%; gap: 8px;">
+        <div style="flex: 9">
+          <range-slider v-model="settings.settings.whiteboard.opacity"/>
+        </div>
+        <div style="flex: 3">
+          <input :value="settings.settings.whiteboard.opacity" style="width: 100%" readonly/>
         </div>
       </div>
     </tool-input>
     <tool-input :variant="variant" label="Size" for="fontSize">
       <div style="display: flex; width: 95%; gap: 8px;">
-        <div style="flex: 10">
-          <range-slider id="fontSize" v-model="settings.settings.whiteboard.fontSize"/>
+        <div style="flex: 9">
+          <range-slider v-model="settings.settings.whiteboard.fontSize"/>
         </div>
-        <div style="flex: 2">
+        <div style="flex: 3">
           <input :value="settings.settings.whiteboard.fontSize" style="width: 100%" readonly/>
         </div>
       </div>
@@ -91,32 +101,36 @@ const btnDrawModeClick = (sender: string) => {
     <tool-input :variant="variant" label="Line" for="line-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">
-          <pure-dropdown id="line-style" v-model="settings.settings.whiteboard.lineStyle" style="width: 100%;">
+          <pure-dropdown v-model="settings.settings.whiteboard.lineStyle" style="width: 100%;">
             <option value="solid">Solid</option>
             <option value="dashed">Dashed</option>
             <option value="dotted">Dotted</option>
           </pure-dropdown>
         </div>
         <div style="flex: 3">
-          <color-picker id="line-color" v-model="settings.settings.whiteboard.lineColor"/>
+          <color-picker v-model="settings.settings.whiteboard.lineColor"/>
         </div>
         <div style="flex: 3">
-          <pure-numberfield id="thickness" v-model="settings.settings.whiteboard.lineWidth" :min="1" :max="10" :step="1"/>
+          <pure-numberfield v-model="settings.settings.whiteboard.lineWidth" :min="1" :max="10" :step="1"/>
         </div>
       </div>
     </tool-input>
   </template>
-  <template v-if="global.drawMode == DrawMode.Circle || global.drawMode == DrawMode.Rect">
+  <template v-if="global.drawMode == DrawMode.Freehand">
+    <tool-section name="Debug"/>
+    <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
+  </template>
+  <template v-if="global.drawMode == DrawMode.Ellipse || global.drawMode == DrawMode.Rect">
     <tool-input :variant="variant" label="Fill" for="fill-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">
-          <pure-dropdown id="fill-style" v-model="settings.settings.whiteboard.fillStyle">
+          <pure-dropdown v-model="settings.settings.whiteboard.fillStyle">
             <option value="none">None</option>
             <option value="solid">Solid</option>
           </pure-dropdown>
         </div>
         <div style="flex: 3">
-          <color-picker id="fill-color" v-model="settings.settings.whiteboard.fillColor"/>
+          <color-picker v-model="settings.settings.whiteboard.fillColor"/>
         </div>
         <div style="flex: 3"></div>
       </div>
@@ -124,7 +138,7 @@ const btnDrawModeClick = (sender: string) => {
     <tool-input :variant="variant" label="Opacity" for="opacity">
       <div style="display: flex; width: 95%; gap: 8px;">
         <div style="flex: 9">
-          <range-slider id="opacity" v-model="settings.settings.whiteboard.opacity"/>
+          <range-slider v-model="settings.settings.whiteboard.opacity"/>
         </div>
         <div style="flex: 3">
           <input :value="settings.settings.whiteboard.opacity" style="width: 100%" readonly/>
@@ -132,8 +146,6 @@ const btnDrawModeClick = (sender: string) => {
       </div>
     </tool-input>
   </template>
-  <tool-section name="Debug"/>
-  <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
 </template>
 
 <style scoped>

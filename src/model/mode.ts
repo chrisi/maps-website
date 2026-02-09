@@ -10,8 +10,8 @@ export enum Mode {
 export enum DrawMode {
   Freehand = "freehand",
   Line = "line",
-  Circle = "circle",
   Rect = "rect",
+  Ellipse = "ellipse",
   Text = "text",
   Symbol = "symbol",
   Delete = "delete"

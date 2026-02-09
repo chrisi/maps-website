@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-    id: string
+    id?: string
     name?: string
     label: string
     modelValue?: boolean
@@ -19,8 +19,9 @@ const emit = defineEmits<{
 function onChange(event: Event) {
   const target = event.target as HTMLInputElement
   const checked = target.checked
+  if (props.id)
+    emit('change', props.id, checked)
   emit('update:modelValue', checked)
-  emit('change', props.id, checked)
 }
 </script>
 
@@ -30,7 +31,8 @@ function onChange(event: Event) {
       <input type="checkbox" :id="id" :name="name" :checked="modelValue" @change="onChange">
     </div>
     <div>
-      <label :for="id">{{ label }}</label>
+      <label v-if="id" :for="id">{{ label }}</label>
+      <span v-else>{{ label }}</span>
     </div>
   </div>
 </template>

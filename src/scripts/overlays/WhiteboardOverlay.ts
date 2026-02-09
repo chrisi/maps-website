@@ -39,13 +39,12 @@ import {
 } from "@/scripts/math.ts";
 
 enum DrawMode {
-  None = 0,
-  Freehand = 1,
-  Line = 2,
+  Freehand = 0,
+  Line = 1,
+  Rect = 2,
   Circle = 3,
-  Rect = 4,
-  Ellipse = 5,
-  Text = 6
+  Ellipse = 4,
+  Text = 5
 }
 
 export class WhiteboardOverlay extends BaseOverlay {
@@ -53,7 +52,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   private shapes: WbShape[] = []
 
   private lockAspectRatio = false
-  private drawMode: DrawMode = DrawMode.None
+  private drawMode: DrawMode | undefined = undefined
   private drawStep = 0
   private oldDrawStep = -1
   private rotation = 0
@@ -285,11 +284,11 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         default:
       }
-      this.drawMode = DrawMode.None
+      this.drawMode = undefined
     }
 
     if (e.button == 2 || this.global.drawMode == "delete") {
-      const del = this.shapes.find(s => {
+      const del = this.shapes.findLast(s => {
         switch (s.type) {
           case WbShapeType.Line:
             const l = s as WbLine
@@ -438,22 +437,21 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   private determineDrawStep(e: PointerEvent): number {
-    if (this.drawMode == DrawMode.None) return 0
+    if (!this.drawMode) return 0
     if ((getModMask(e) & Mod.Shift) > 0) return 1
     return 0
   }
 
   //we cannot use ctrl as a modifier for left-click since firefox handles this as right-click on Mac
-  private determineDrawMode(e: PointerEvent): DrawMode {
-    if (this.drawMode != DrawMode.None)
+  private determineDrawMode(e: PointerEvent): DrawMode | undefined {
+    if (this.drawMode)
       return this.drawMode
-    let mode = DrawMode.None
+    let mode = undefined
     switch (this.global.drawMode) {
       case "line":
         mode = DrawMode.Line
         break
-      case "circle":
-        // mode = DrawMode.Circle
+      case "ellipse":
         mode = DrawMode.Ellipse
         break
       case "rect":
