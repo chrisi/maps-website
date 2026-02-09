@@ -27,10 +27,10 @@ const tools: Tool[] = ([
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
     desc: "Move the map view around the map."
   },
-  {
-    name: "connect", caption: "Connect", activeIcon: "connect.png", icons: ["connect.png", "connect.png"],
-    desc: "Quickly connect to collaboration server."
-  },
+  // {
+  //   name: "connect", caption: "Connect", activeIcon: "connect.png", icons: ["connect.png", "connect.png"],
+  //   desc: "Quickly connect to collaboration server."
+  // },
   // {
   //   name: "zoom1", caption: "Zoom-Out", activeIcon: "icon_zoom1.png",
   //   desc: "Zoom out of the map view."
@@ -39,10 +39,10 @@ const tools: Tool[] = ([
   //   name: "zoom2", caption: "Zoom-In", activeIcon: "icon_zoom2.png",
   //   desc: "Zoom in to the map view."
   // },
-  {
-    name: "zoomRoute", caption: "Route", activeIcon: "route.png", icons: ["route.png", "route.png"],
-    desc: "Center the Mission route on the map."
-  },
+  // {
+  //   name: "non", caption: "Route", activeIcon: "route.png", icons: ["route.png", "route.png"],
+  //   desc: "Center the Mission route on the map."
+  // },
   {
     name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
     desc: "Set the bullseye point on the map."
@@ -55,10 +55,10 @@ const tools: Tool[] = ([
     name: "measure", caption: "Measure", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
     desc: "Measure distances on the map."
   },
-  {
-    name: "symbol", caption: "Symbol", activeIcon: "icon_sword.png", icons: ["icon_sword.png", "icon_sword1.png"],
-    desc: "Draw symbols on the map."
-  },
+  // {
+  //   name: "symbol", caption: "Symbol", activeIcon: "icon_sword.png", icons: ["icon_sword.png", "icon_sword1.png"],
+  //   desc: "Draw symbols on the map."
+  // },
   {
     name: "whiteboard", caption: "Whiteboard", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
     desc: "Draw lines on the map."

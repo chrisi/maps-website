@@ -23,7 +23,6 @@ import {WhiteboardOverlay} from "@/scripts/overlays/WhiteboardOverlay.ts";
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";
 import RouteWindow from "@/components/route-window.vue";
-import SymbolsWindow from "@/components/symbols-window.vue";
 import WhiteboardWindow from "@/components/whiteboard-window.vue";
 
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
@@ -250,7 +249,6 @@ const getMapUrl = (map: Theater) => {
 <template>
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
-  <symbols-window :visible="activeWindow=='symbol'" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">

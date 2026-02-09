@@ -1,19 +1,29 @@
 <script setup lang="ts">
-defineProps<{
-  name: string
-}>()
+withDefaults(
+  defineProps<{
+    name: string
+    spacer?: boolean
+  }>(),
+  {
+    spacer: true,
+  },
+)
 </script>
 
 <template>
-  <h4>{{ name }}</h4>
+  <h4 :class="{ spacer }">{{ name }}</h4>
   <hr>
 </template>
 
 <style scoped>
 h4 {
-  margin: 12px 0 0;
+  margin: 0;
   font-family: sans-serif;
   font-weight: bold;
+}
+
+h4.spacer {
+  margin-top: 12px;
 }
 
 hr {

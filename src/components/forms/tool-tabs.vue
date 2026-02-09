@@ -74,7 +74,7 @@ onMounted(() => {
 /* Style the tab content */
 .tabcontent {
   display: none;
-  padding: 1px 12px;
+  padding: 4px 0;
   border-style: none;
 }
 

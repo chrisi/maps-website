@@ -2,9 +2,7 @@
 
 import {onMounted, ref, watch} from "vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
-// import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolDropdown from "@/components/forms/tool-dropdown.vue";
-import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {useGlobalStore} from "@/stores/global.ts";
@@ -17,8 +15,6 @@ defineProps({
 })
 
 const global = useGlobalStore();
-
-// const emit = defineEmits(['close'])
 
 const idents: ValueCaptionPair[] = [
   {value: "1006", caption: "Hostile"},
@@ -104,29 +100,25 @@ onMounted(() => {
 </script>
 
 <template>
-<!--  <tool-window :visible="visible" @close="emit('close')">-->
-    <tool-title text="C2 Symbols"/>
-    <tool-section name="Symbol Set"/>
-    <tool-dropdown label="Identity" v-model="selectedIdent" :options="idents"/>
-    <tool-dropdown label="Type" v-model="selectedType" :options="types"/>
-    <tool-section name="Identification"/>
-    <tool-dropdown label="Entity" v-model="selectedEntity" :options="entities"/>
-    <tool-dropdown label="Sector 1" :options="sec1"/>
-    <tool-dropdown label="Sector 2">
-      <option value="00">Unspecified</option>
-    </tool-dropdown>
-    <tool-section name="Symbol Identification Code"/>
-    <tool-spacer/>
-    <div class="symbol" v-if="global.selectedSymbol">
-      <div>
-        <img id="sidc-symbol" :src="`../common/assets/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
-      </div>
-      <div>{{ global.selectedSymbol }}</div>
+  <tool-dropdown label="Identity" v-model="selectedIdent" :options="idents"/>
+  <tool-dropdown label="Type" v-model="selectedType" :options="types"/>
+  <tool-section name="Identification"/>
+  <tool-dropdown label="Entity" v-model="selectedEntity" :options="entities"/>
+  <tool-dropdown label="Sector 1" :options="sec1"/>
+  <tool-dropdown label="Sector 2">
+    <option value="00">Unspecified</option>
+  </tool-dropdown>
+  <tool-section name="Symbol Identification Code"/>
+  <tool-spacer/>
+  <div class="symbol" v-if="global.selectedSymbol">
+    <div>
+      <img id="sidc-symbol" :src="`../common/assets/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
     </div>
-    <div style="text-align: center">
-      <a :href="sidcDocUrl" style="font-size:70%" target="_blank">MIL-STD-2525D</a>
-    </div>
-<!--  </tool-window>-->
+    <div>{{ global.selectedSymbol }}</div>
+  </div>
+  <div style="text-align: center">
+    <a :href="sidcDocUrl" style="font-size:70%" target="_blank">MIL-STD-2525D</a>
+  </div>
 </template>
 
 <style scoped>
