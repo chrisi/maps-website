@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {reactive, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolInput from "@/components/forms/tool-input.vue";
@@ -30,7 +30,6 @@ defineProps({
 const emit = defineEmits(['close'])
 
 const variant = ref("d")
-
 
 watch(() => global.drawMode, value => {
   // TODO placeholder
