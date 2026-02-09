@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {ref, watch} from "vue";
-import ToolWindow from "@/components/forms/tool-window.vue";
+// import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolInput from "@/components/forms/tool-input.vue";
 import ColorPicker from "@/components/forms/color-picker.vue";
@@ -27,7 +27,7 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['close'])
+// const emit = defineEmits(['close'])
 
 const variant = ref("d")
 
@@ -63,7 +63,7 @@ const btnDrawModeClick = (sender: string) => {
 </script>
 
 <template>
-  <tool-window :visible="visible" @close="emit('close')">
+<!--  <tool-window :visible="visible" @close="emit('close')">-->
     <tool-title text="Whiteboard"/>
     <tool-spacer/>
     <tool-section name="Pencil"/>
@@ -141,7 +141,7 @@ const btnDrawModeClick = (sender: string) => {
     <tool-spacer/>
     <tool-section name="Debug"/>
     <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
-  </tool-window>
+<!--  </tool-window>-->
 </template>
 
 <style scoped>

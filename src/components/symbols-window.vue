@@ -2,7 +2,7 @@
 
 import {onMounted, ref, watch} from "vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
-import ToolWindow from "@/components/forms/tool-window.vue";
+// import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
@@ -18,7 +18,7 @@ defineProps({
 
 const global = useGlobalStore();
 
-const emit = defineEmits(['close'])
+// const emit = defineEmits(['close'])
 
 const idents: ValueCaptionPair[] = [
   {value: "1006", caption: "Hostile"},
@@ -104,7 +104,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <tool-window :visible="visible" @close="emit('close')">
+<!--  <tool-window :visible="visible" @close="emit('close')">-->
     <tool-title text="C2 Symbols"/>
     <tool-section name="Symbol Set"/>
     <tool-dropdown label="Identity" v-model="selectedIdent" :options="idents"/>
@@ -126,7 +126,7 @@ onMounted(() => {
     <div style="text-align: center">
       <a :href="sidcDocUrl" style="font-size:70%" target="_blank">MIL-STD-2525D</a>
     </div>
-  </tool-window>
+<!--  </tool-window>-->
 </template>
 
 <style scoped>
