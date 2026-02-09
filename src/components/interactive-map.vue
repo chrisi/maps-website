@@ -122,15 +122,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
       suspend.value = true
       break
     case '3':
-      global.mode = Mode.Symbol
-      suspend.value = true
-      break
-    case '4':
       global.mode = Mode.Whiteboard
       suspend.value = true
       break
     case 'Escape':
-      global.mode = Mode.None
+      global.mode = Mode.Move
       activeWindow.value = ''
       selectedStation.value = undefined
       suspend.value = false

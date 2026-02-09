@@ -44,16 +44,12 @@ const tools: Tool[] = ([
   //   desc: "Center the Mission route on the map."
   // },
   {
-    name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
-    desc: "Set the bullseye point on the map."
-  },
-  {
-    name: "route", caption: "Route", activeIcon: "icon_compass.png",
-    desc: "Draw the mission route on the map."
-  },
-  {
     name: "measure", caption: "Measure", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
     desc: "Measure distances on the map."
+  },
+  {
+    name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
+    desc: "Set the bullseye point on the map."
   },
   // {
   //   name: "symbol", caption: "Symbol", activeIcon: "icon_sword.png", icons: ["icon_sword.png", "icon_sword1.png"],
@@ -62,6 +58,10 @@ const tools: Tool[] = ([
   {
     name: "whiteboard", caption: "Whiteboard", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
     desc: "Draw lines on the map."
+  },
+  {
+    name: "route", caption: "Route", activeIcon: "icon_compass.png",
+    desc: "Draw the mission route on the map."
   },
   // {
   //   name: "text", caption: "Text", activeIcon: "icon_text.png", icons: ["icon_text.png", "icon_text1.png"],
