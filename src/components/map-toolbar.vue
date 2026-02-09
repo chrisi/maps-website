@@ -124,7 +124,7 @@ const clickTool = (tool: Tool) => {
     <tr v-for="tool in tools" v-bind:key="tool.name">
       <td>
         <img :src="`${baseUrl}/common/assets/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
-             class="toolButton" @click.stop="clickTool(tool)" @mousedown.stop @mouseup.stop @mousemove.stop>
+             class="toolButton" @click.stop="clickTool(tool)">
       </td>
     </tr>
     </tbody>
@@ -132,6 +132,12 @@ const clickTool = (tool: Tool) => {
 </template>
 
 <style scoped>
+
+table {
+  pointer-events: auto;
+  touch-action: none;
+}
+
 .pm0 {
   padding: 0;
   margin: 0;
