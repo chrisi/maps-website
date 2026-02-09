@@ -49,9 +49,6 @@ const btnDrawModeClick = (sender: string) => {
     case "drawMode_text":
       global.drawMode = DrawMode.Text
       break
-    case "drawMode_delete":
-      global.drawMode = DrawMode.Delete
-      break
     default:
   }
 }

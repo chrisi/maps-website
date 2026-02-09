@@ -2,11 +2,8 @@ export enum Mode {
   None = "none",
   Move = "move",
   Bullseye = "bullseye",
-  Compass = "compass",
   Measure = "measure",
   Whiteboard = "whiteboard",
-  Erase = "erase",
-  Write = "write",
   Symbol = "symbol"
 }
 
@@ -16,5 +13,6 @@ export enum DrawMode {
   Circle = "circle",
   Rect = "rect",
   Text = "text",
+  Symbol = "symbol",
   Delete = "delete"
 }
