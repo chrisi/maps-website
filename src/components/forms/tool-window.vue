@@ -13,7 +13,7 @@ const emit = defineEmits(['close'])
 
 <template>
   <div class="modal-backdrop" v-if="props.visible" @click="emit('close')">
-    <div class="modal-content" @click.stop @mousedown.stop @mouseup.stop @wheel.stop @mousemove.stop @touchmove.prevent>
+    <div class="modal-content" @click.stop>
       <slot/>
     </div>
   </div>
@@ -33,6 +33,7 @@ const emit = defineEmits(['close'])
 
 .modal-content {
   pointer-events: auto;
+  touch-action: none;
   position: fixed;
   left: 55px;
   top: 77px;
