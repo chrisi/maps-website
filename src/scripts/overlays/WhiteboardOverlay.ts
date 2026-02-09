@@ -114,16 +114,17 @@ export class WhiteboardOverlay extends BaseOverlay {
         drawLine(ctx, p1, p2)
         break
       case DrawMode.Text:
-        const fontScale = this.settings.settings.whiteboard.fontSize
+        let fontSize = this.settings.settings.whiteboard.fontSize
         drawLine(ctx, p1, p2)
         let rot = 0
-        if (distance(p1, p2) > 25) {
+        if (dist > 25) {
           rot = vector(p1, p2).dir * -1 + Math.PI / 2
           if (this.drawStep == 1)
             rot = Math.round(rot / deg2rad(15)) * deg2rad(15)
+          fontSize = this.getTextScale(this.settings.settings.whiteboard.text, dist)
         }
         ctx.setLineDash([])
-        ctx.font = `${fontScale}px sans-serif`
+        ctx.font = `${fontSize}px sans-serif`
         drawText(ctx, this.settings.settings.whiteboard.text, p1, rot, 'black')
         break
       case DrawMode.Freehand:
@@ -254,13 +255,19 @@ export class WhiteboardOverlay extends BaseOverlay {
           break
         }
         case DrawMode.Text: {
+          const dist = distance(this.toCnv(this.startPoint), this.toCnv(pt))
+          let fontSize = cfg.fontSize
+          if (dist > 25) {
+            fontSize = this.getTextScale(cfg.text, dist)
+          }
+
           const t: WbText = {
             type: WbShapeType.Text,
             guid: generateGuid(),
             pos: this.startPoint,
             rotation: this.rotation,
             text: cfg.text,
-            fontSize: cfg.fontSize / this.getCanvas().scale,
+            fontSize: fontSize / this.getCanvas().scale,
             color: colLine,
             lineWidth: cfg.lineWidth,
             dash: dash
@@ -333,7 +340,8 @@ export class WhiteboardOverlay extends BaseOverlay {
         }
         break
       case DrawMode.Text:
-        this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - 90
+        this.rotation = distance(this.startPoint!, this.cursorPoint) > 25
+          ? rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - 90 : 0
         switch (this.drawStep) {
           case 1:
             this.rotation = Math.round(this.rotation / 15) * 15
@@ -509,5 +517,14 @@ export class WhiteboardOverlay extends BaseOverlay {
     const localX = dx * Math.cos(rot) + dy * Math.sin(rot)
     const localY = -dx * Math.sin(rot) + dy * Math.cos(rot)
     return {w: Math.abs(localX) * 2, h: Math.abs(localY) * 2}
+  }
+
+  private getTextScale(text: string, length: number): number {
+    const ctx = this.getCanvas().context
+    ctx.save()
+    ctx.font = `10px sans-serif`
+    const metrics = ctx.measureText(text)
+    ctx.restore()
+    return (length / metrics.width) * 10
   }
 }
