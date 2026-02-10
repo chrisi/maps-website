@@ -1,4 +1,4 @@
-export enum Mode {
+export enum OverlayMode {
   None = "none",
   Move = "move",
   Bullseye = "bullseye",

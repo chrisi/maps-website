@@ -2,7 +2,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Point} from "@/model/base.ts";
-import {Mode} from "@/model/mode.ts";
+import {OverlayMode} from "@/model/mode.ts";
 import {watch} from "vue";
 
 export class BullseyeOverlay extends BaseOverlay {
@@ -34,8 +34,8 @@ export class BullseyeOverlay extends BaseOverlay {
     return this.settings.viz.be
   }
 
-  public getActiveMode(): Mode | undefined {
-    return Mode.Bullseye
+  public isActive(mode: OverlayMode): boolean {
+    return mode == OverlayMode.Bullseye
   }
 
   public onDraw(cnv: Canvas): void {

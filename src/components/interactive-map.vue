@@ -28,7 +28,7 @@ import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
-import {Mode} from "@/model/mode.ts";
+import {OverlayMode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
 import type {Coord, Point} from "@/model/base.ts";
@@ -114,19 +114,19 @@ onUnmounted(() => {
 const handleKeyDown = (e: KeyboardEvent) => {
   switch (e.key) {
     case '1':
-      global.mode = Mode.Measure
+      global.mode = OverlayMode.Measure
       suspend.value = true
       break
     case '2':
-      global.mode = Mode.Bullseye
+      global.mode = OverlayMode.Bullseye
       suspend.value = true
       break
     case '3':
-      global.mode = Mode.Whiteboard
+      global.mode = OverlayMode.Whiteboard
       suspend.value = true
       break
     case 'Escape':
-      global.mode = Mode.Move
+      global.mode = OverlayMode.Move
       activeWindow.value = ''
       selectedStation.value = undefined
       suspend.value = false

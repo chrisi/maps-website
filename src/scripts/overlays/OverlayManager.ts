@@ -121,7 +121,7 @@ export class OverlayManager {
     this.clickPos = {x: e.pageX, y: e.pageY}
     this.calculateAllHotspots({x: e.pageX, y: e.pageY})
     for (const overlay of this.overlays) {
-      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
+      if (overlay.isEnabled() && overlay.isActive(this.global.mode)) {
         const ownHs = this.calculateOwnHotspots(overlay, {x: e.pageX, y: e.pageY})
         overlay.onPointerDown?.(e, ownHs)
       }
@@ -131,7 +131,7 @@ export class OverlayManager {
   public onPointerMove(e: PointerEvent): void {
     this.calculateAllHotspots({x: e.pageX, y: e.pageY})
     for (const overlay of this.overlays) {
-      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
+      if (overlay.isEnabled() && overlay.isActive(this.global.mode)) {
         overlay.onPointerMove?.(e, this.allHotspots)
         if (this.allHotspots.length > 0)
           overlay.onHoverHotspot?.(this.allHotspots, e)
@@ -146,7 +146,7 @@ export class OverlayManager {
     const isClick = e.pageX === this.clickPos?.x && e.pageY === this.clickPos?.y
     this.clickPos = undefined
     for (const overlay of this.overlays) {
-      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
+      if (overlay.isEnabled() && overlay.isActive(this.global.mode)) {
         overlay.onPointerUp?.(e, overlay.getHotspots(), isClick)
         if (isClick) {
           if (this.allHotspots.length > 0)
@@ -163,7 +163,7 @@ export class OverlayManager {
   public onLongPress(e: PointerEvent): void {
     this.calculateAllHotspots({x: e.pageX, y: e.pageY})
     for (const overlay of this.overlays) {
-      if (overlay.isEnabled() && (overlay.getActiveMode() == this.global.mode || !overlay.getActiveMode())) {
+      if (overlay.isEnabled() && overlay.isActive(this.global.mode)) {
         const ownHs = this.calculateOwnHotspots(overlay, {x: e.pageX, y: e.pageY})
         overlay.onLongPress?.(e, ownHs)
       }

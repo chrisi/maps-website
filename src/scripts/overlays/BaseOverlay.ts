@@ -1,6 +1,6 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
-import type {Mode} from "@/model/mode.ts";
+import {type OverlayMode} from "@/model/mode.ts";
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {ImcsClient} from "@/scripts/ImcsClient.ts";
@@ -14,9 +14,13 @@ export interface Overlay {
 
   init?(): void
 
+  // is the overlay enabled?
+  // if false, overlay will not be drawn and no pointer events will be forwarded to it.
   isEnabled(): boolean
 
-  getActiveMode(): Mode | undefined
+  // is the overlay active in the current mode?
+  // if false, no pointer events will be forwarded to it but it will still be drawn.
+  isActive(mode: OverlayMode): boolean
 
   onDraw(cnv: Canvas): void
 
@@ -77,8 +81,8 @@ export abstract class BaseOverlay implements Overlay {
     return this.enabled
   }
 
-  public getActiveMode(): Mode | undefined {
-    return undefined
+  public isActive(mode: OverlayMode): boolean {
+    return true
   }
 
   public abstract onDraw(cnv: Canvas): void

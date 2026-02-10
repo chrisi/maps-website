@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
 import {watch} from "vue";
-import type {Mode} from "@/model/mode.ts";
+import type {OverlayMode} from "@/model/mode.ts";
 
 const baseUrl = import.meta.env.BASE_URL
 
 const props = defineProps<{
-  modelValue: Mode
+  modelValue: OverlayMode
 }>()
 
 const emit = defineEmits<{

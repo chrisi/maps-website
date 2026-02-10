@@ -1,5 +1,5 @@
 import {watch} from "vue";
-import {Mode} from "@/model/mode.ts";
+import {OverlayMode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
@@ -79,8 +79,8 @@ export class WhiteboardOverlay extends BaseOverlay {
     return this.settings.viz.wb
   }
 
-  public getActiveMode(): Mode | undefined {
-    return Mode.Whiteboard
+  public isActive(mode: OverlayMode): boolean {
+    return mode == OverlayMode.Whiteboard
   }
 
   public onDraw(cnv: Canvas): void {

@@ -3,7 +3,7 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {MilSymbol} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import {Mode} from "@/model/mode.ts";
+import {OverlayMode} from "@/model/mode.ts";
 import {generateGuid} from "@/scripts/utils.ts";
 import {watch} from "vue";
 
@@ -35,8 +35,8 @@ export class SymbolOverlay extends BaseOverlay {
     return this.settings.viz.wb
   }
 
-  public getActiveMode(): Mode | undefined {
-    return Mode.Symbol
+  public isActive(mode: OverlayMode): boolean {
+    return mode == OverlayMode.Symbol
   }
 
   public onDraw(cnv: Canvas): void {

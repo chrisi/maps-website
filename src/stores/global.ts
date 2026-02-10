@@ -1,6 +1,6 @@
 import {ref} from 'vue'
 import {defineStore} from 'pinia'
-import {DrawMode, Mode} from "@/model/mode.ts";
+import {DrawMode, OverlayMode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Coord, Point} from "@/model/base.ts";
 import type {Waypoint} from "@/model/mission.ts";
@@ -9,7 +9,7 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 export const useGlobalStore = defineStore('global', () => {
   const message = ref('')
 
-  const mode = ref<Mode>(Mode.None)
+  const mode = ref<OverlayMode>(OverlayMode.None)
   const drawMode = ref<DrawMode>(DrawMode.Freehand)
   const map = ref<Theater>()
 
