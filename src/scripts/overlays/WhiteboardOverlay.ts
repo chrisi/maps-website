@@ -333,7 +333,7 @@ export class WhiteboardOverlay extends BaseOverlay {
         switch (this.drawStep) {
           case 1:
             if (this.drawStep != this.oldDrawStep)
-              this.startRotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir)
+              this.startRotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - this.rotation
             this.rotation = rad2deg(vector(this.startPoint!, this.cursorPoint).dir) - this.startRotation
             break
         }
