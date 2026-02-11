@@ -68,13 +68,12 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public onPointerUp(e: PointerEvent, _: Hotspot[], isClick?: boolean): void {
-    const clickPt = this.fromCnv({x: e.pageX, y: e.pageY})
-    if (e.button == 0) {
+    if (e.button == 0 && this.global.inputMode != "delete") {
       if (isClick && !this.dragSymbol) {
         const s: MilSymbol = {
           guid: generateGuid(),
           sym: this.global.selectedSymbol!,
-          pos: clickPt
+          pos: this.fromCnv({x: e.pageX, y: e.pageY})
         }
         this.symbols.push(s)
         this.imcsClient!.msgSendSymbol([s])
