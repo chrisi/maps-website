@@ -287,7 +287,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       this.drawMode = undefined
     }
 
-    if (e.button == 2 || this.global.drawMode == "delete") {
+    if (e.button == 2 || this.global.inputMode == "delete") {
       const del = this.shapes.findLast(s => {
         switch (s.type) {
           case WbShapeType.Line:
@@ -447,7 +447,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     if (this.drawMode)
       return this.drawMode
     let mode = undefined
-    switch (this.global.drawMode) {
+    switch (this.global.inputMode) {
       case "line":
         mode = DrawMode.Line
         break

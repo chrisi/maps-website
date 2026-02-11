@@ -11,7 +11,7 @@ import {useSettingsStore} from "@/stores/settings.ts";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 import ToolButton from "@/components/forms/tool-button.vue";
 import {useGlobalStore} from "@/stores/global.ts";
-import {DrawMode} from "@/model/mode.ts";
+import {InputMode} from "@/model/mode.ts";
 import ToolTextfield from "@/components/forms/tool-textfield.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 
@@ -27,7 +27,7 @@ defineProps({
 
 const variant = ref("d")
 
-watch(() => global.drawMode, value => {
+watch(() => global.inputMode, value => {
   // TODO placeholder
   console.log(`drawMode changed to ${value}`)
 })
@@ -35,19 +35,19 @@ watch(() => global.drawMode, value => {
 const btnDrawModeClick = (sender: string) => {
   switch (sender) {
     case "drawMode_freehand":
-      global.drawMode = DrawMode.Freehand
+      global.inputMode = InputMode.Freehand
       break
     case "drawMode_line":
-      global.drawMode = DrawMode.Line
+      global.inputMode = InputMode.Line
       break
     case "drawMode_ellipse":
-      global.drawMode = DrawMode.Ellipse
+      global.inputMode = InputMode.Ellipse
       break
     case "drawMode_rect":
-      global.drawMode = DrawMode.Rect
+      global.inputMode = InputMode.Rect
       break
     case "drawMode_text":
-      global.drawMode = DrawMode.Text
+      global.inputMode = InputMode.Text
       break
     default:
   }
@@ -57,17 +57,17 @@ const btnDrawModeClick = (sender: string) => {
 
 <template>
   <tool-button id="drawMode_freehand" icon="/common/icons/freehand.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Freehand"/>
+               @click="btnDrawModeClick" :active="global.inputMode == InputMode.Freehand"/>
   <tool-button id="drawMode_line" icon="/common/icons/line.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Line"/>
+               @click="btnDrawModeClick" :active="global.inputMode == InputMode.Line"/>
   <tool-button id="drawMode_rect" icon="/common/icons/rect.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Rect"/>
+               @click="btnDrawModeClick" :active="global.inputMode == InputMode.Rect"/>
   <tool-button id="drawMode_ellipse" icon="/common/icons/circle.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Ellipse"/>
+               @click="btnDrawModeClick" :active="global.inputMode == InputMode.Ellipse"/>
   <tool-button id="drawMode_text" icon="/common/icons/text.png"
-               @click="btnDrawModeClick" :active="global.drawMode == DrawMode.Text"/>
+               @click="btnDrawModeClick" :active="global.inputMode == InputMode.Text"/>
   <tool-spacer/>
-  <template v-if="global.drawMode == DrawMode.Text">
+  <template v-if="global.inputMode == InputMode.Text">
     <tool-input :variant="variant" label="Color" for="line-style">
       <div style="display: flex; width: 100%; gap: 4px;">
         <div style="flex: 12">
@@ -97,7 +97,7 @@ const btnDrawModeClick = (sender: string) => {
     </tool-input>
     <tool-textfield :variant="variant" label="Text" v-model="settings.settings.whiteboard.text"/>
   </template>
-  <template v-if="global.drawMode != DrawMode.Text && global.drawMode != DrawMode.Delete">
+  <template v-if="global.inputMode != InputMode.Text && global.inputMode != InputMode.Delete">
     <tool-input :variant="variant" label="Line" for="line-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">
@@ -116,11 +116,11 @@ const btnDrawModeClick = (sender: string) => {
       </div>
     </tool-input>
   </template>
-  <template v-if="global.drawMode == DrawMode.Freehand">
+  <template v-if="global.inputMode == InputMode.Freehand">
     <tool-section name="Debug"/>
     <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
   </template>
-  <template v-if="global.drawMode == DrawMode.Ellipse || global.drawMode == DrawMode.Rect">
+  <template v-if="global.inputMode == InputMode.Ellipse || global.inputMode == InputMode.Rect">
     <tool-input :variant="variant" label="Fill" for="fill-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">

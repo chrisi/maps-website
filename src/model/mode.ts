@@ -7,7 +7,7 @@ export enum OverlayMode {
   Symbol = "symbol"
 }
 
-export enum DrawMode {
+export enum InputMode {
   Freehand = "freehand",
   Line = "line",
   Rect = "rect",
