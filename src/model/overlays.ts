@@ -4,6 +4,7 @@ export interface MilSymbol {
   guid: string
   pos: Point
   sym: string
+  deleted?: boolean
 }
 
 export enum WbShapeType {

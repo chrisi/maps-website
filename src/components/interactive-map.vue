@@ -263,10 +263,11 @@ const getMapUrl = (map: Theater) => {
     />
   </div>
   <div id="debug" v-if="settings.settings.debug">
-    <out-value caption="Mode" :val="global.mode"/>
+    <out-value caption="Tool-Window" :val="activeWindow"/>
+    <out-value caption="Overlay-Mode" :val="global.mode"/>
+    <out-value caption="Input-Mode" :val="global.inputMode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
-    <out-value caption="Tool" :val="activeWindow"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
   <div id="position" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
@@ -288,8 +289,8 @@ const getMapUrl = (map: Theater) => {
   position: fixed;
   top: 20px;
   right: 20px;
-  height: 86px;
-  width: 200px;
+  height: 120px;
+  width: 240px;
   color: white;
   padding: 5px;
   background-color: navy;

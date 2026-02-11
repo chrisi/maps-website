@@ -1,7 +1,7 @@
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {MilSymbol} from "@/model/overlays.ts";
+import {type MilSymbol, type WbFreehand, type WbShape, WbShapeType} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {OverlayMode} from "@/model/mode.ts";
 import {generateGuid} from "@/scripts/utils.ts";
@@ -16,19 +16,28 @@ export class SymbolOverlay extends BaseOverlay {
 
   public init() {
     this.imcsClient?.onSymbolEvent((symbols: MilSymbol[]) => {
-      const incoming = symbols[0]!
-      const existing = this.symbols.find(s => s.guid === incoming.guid)
-      if (existing) {
-        existing.pos = incoming.pos
-        existing.sym = incoming.sym
-      } else {
-        this.symbols.push(incoming)
-      }
-      this.redraw()
+      symbols.forEach(s => {
+        this.receiveSymbol(s)
+      })
     })
     watch(() => this.settings.viz.wb, () => {
       this.redraw()
     })
+  }
+
+  public receiveSymbol(inSym: MilSymbol) {
+    if (inSym.deleted) {
+      const idx = this.symbols.findIndex(s => s.guid === inSym.guid)
+      if (idx >= 0) this.symbols.splice(idx, 1)
+    } else {
+      const existing = this.symbols.find(s => s.guid === inSym.guid)
+      if (existing) {
+        existing.pos = inSym.pos
+        existing.sym = inSym.sym
+      } else
+        this.symbols.push(inSym)
+    }
+    this.redraw()
   }
 
   public isEnabled(): boolean {
@@ -59,12 +68,13 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public onPointerUp(e: PointerEvent, _: Hotspot[], isClick?: boolean): void {
+    const clickPt = this.fromCnv({x: e.pageX, y: e.pageY})
     if (e.button == 0) {
       if (isClick && !this.dragSymbol) {
         const s: MilSymbol = {
           guid: generateGuid(),
           sym: this.global.selectedSymbol!,
-          pos: this.fromCnv({x: e.pageX, y: e.pageY})
+          pos: clickPt
         }
         this.symbols.push(s)
         this.imcsClient!.msgSendSymbol([s])
@@ -75,11 +85,21 @@ export class SymbolOverlay extends BaseOverlay {
         this.dragSymbol = undefined
       }
     }
+
+    if (e.button == 2 || this.global.inputMode == "delete") {
+      let delTgt = this.getHotspots().pop()
+      if (delTgt) {
+        const del = delTgt.target as MilSymbol
+        del.deleted = true
+        this.imcsClient!.msgSendSymbol([del])
+        this.receiveSymbol(del)
+      }
+    }
   }
 
   public providesHotspots(): Hotspot[] {
     return this.symbols.map(s => {
-      return {pos: s.pos, size: 15, target: s, name: s.sym, provider: 'SymbolOverlay', type: 'Mil-Symbol'}
+      return {pos: s.pos, size: -18, target: s, name: s.sym, provider: 'SymbolOverlay', type: 'Mil-Symbol'}
     })
   }
 

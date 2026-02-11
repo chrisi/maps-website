@@ -17,7 +17,7 @@ export class StationOverlay extends BaseOverlay {
 
   public providesHotspots(): Hotspot[] {
     return this.stations.map(s => {
-      const sz = s.station.type.startsWith('VOR') ? 45 : undefined; //TODO: make 45 configurable
+      const sz = s.station.type.startsWith('VOR') ? 45 : -16; //TODO: make 45 configurable
       return {pos: s.pt, size: sz, target: s.station, name: s.station.name, type: s.station.type, provider: 'StationOverlay'}
     })
   }

@@ -89,10 +89,11 @@ export class OverlayManager {
     }
     const res: HotspotCandidate[] = []
     const saveScale = this.cnv.scale ?? 1
+    const smartScale = saveScale + (0.8 - saveScale) * 0.7
     //TODO: priority management: sort overlays by priority (tbd)
     //TODO: manage exactly colocated items by trigger threshold (tbd)
     hotspotIterator(hs => {
-      let dist = this.isNearbyHotspot(hs, pt, saveScale)
+      let dist = this.isNearbyHotspot(hs, pt, smartScale)
       if (dist) {
         if (single) return [hs]
         res.push({target: hs, dist: dist})
@@ -101,9 +102,9 @@ export class OverlayManager {
     return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
   }
 
-  private isNearbyHotspot(hs: Hotspot, pt: Point, saveScale: number): number | undefined {
+  private isNearbyHotspot(hs: Hotspot, pt: Point, scale: number): number | undefined {
     const dist = distance(pt, hs.pos)
-    const sz = !hs.size ? 15 / saveScale : (hs.size < 0 ? -hs.size / saveScale : hs.size) // TODO 15: make global hot spot size configurable
+    const sz = !hs.size ? 15 / scale : (hs.size < 0 ? -hs.size / scale : hs.size) // TODO 15: make global hot spot size configurable
     if (dist < sz) return dist
   }
 

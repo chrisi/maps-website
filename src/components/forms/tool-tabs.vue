@@ -2,6 +2,8 @@
 
 import {onMounted, type PropType} from "vue";
 
+const emit = defineEmits(['tab-changed'])
+
 const props = defineProps({
   tabs: {
     type: Array as PropType<string[]>,
@@ -21,6 +23,7 @@ function openTab(tabName: string) {
     if (tab.name == tabName) tab.className += " active";
   }
   document.getElementById(tabName)!.style.display = "block";
+  emit('tab-changed', tabName)
 }
 
 onMounted(() => {

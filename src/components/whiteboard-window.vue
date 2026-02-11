@@ -6,7 +6,7 @@ import SketchingTab from "@/components/sketching-tab.vue";
 import SymbolsTab from "@/components/symbols-tab.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
-import {InputMode} from "@/model/mode.ts";
+import {InputMode, OverlayMode} from "@/model/mode.ts";
 import ToolButton from "@/components/forms/tool-button.vue";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
@@ -32,13 +32,27 @@ const btnInputModeClick = (sender: string) => {
   }
 }
 
+const tabChanged = (sender: string) => {
+  switch (sender) {
+    case "C2-Symbols":
+      //global.inputMode = InputMode.Symbol
+      global.mode = OverlayMode.Symbol
+      break
+    case "Sketching":
+      //global.inputMode = InputMode.Freehand
+      global.mode = OverlayMode.Whiteboard
+      break
+    default:
+  }
+}
+
 </script>
 
 <template>
   <tool-window :visible="visible" @close="emit('close')">
     <tool-title text="Whiteboard"/>
     <tool-spacer/>
-    <tool-tabs :tabs="['Sketching','C2-Symbols']">
+    <tool-tabs :tabs="['Sketching','C2-Symbols']" @tab-changed="tabChanged">
       <template #Sketching>
         <tool-spacer/>
         <sketching-tab :visible="true"/>

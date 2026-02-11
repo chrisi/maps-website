@@ -75,6 +75,22 @@ export class WhiteboardOverlay extends BaseOverlay {
     })
   }
 
+  public receiveShape(rs: WbShape) {
+    // normalize empty path cache
+    if (rs.type == WbShapeType.Freehand) {
+      const fh = rs as WbFreehand
+      fh.path = undefined
+    }
+    if (rs.deleted) {
+      // atm re-transmission only happens on delete
+      const idx = this.shapes.findIndex(fs => fs.guid === rs.guid)
+      if (idx >= 0) this.shapes.splice(idx, 1)
+    } else
+      this.shapes.push(rs)
+    this.redraw()
+  }
+
+
   public isEnabled(): boolean {
     return this.settings.viz.wb
   }
@@ -354,21 +370,6 @@ export class WhiteboardOverlay extends BaseOverlay {
       default:
     }
     this.oldDrawStep = this.drawStep
-    this.redraw()
-  }
-
-  public receiveShape(rs: WbShape) {
-    // normalize empty path cache
-    if (rs.type == WbShapeType.Freehand) {
-      const fh = rs as WbFreehand
-      fh.path = undefined
-    }
-    if (rs.deleted) {
-      // atm re-transmission only happens on delete
-      const idx = this.shapes.findIndex(fs => fs.guid === rs.guid)
-      if (idx >= 0) this.shapes.splice(idx, 1)
-    } else
-      this.shapes.push(rs)
     this.redraw()
   }
 

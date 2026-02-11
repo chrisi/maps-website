@@ -7,8 +7,8 @@ defineProps<{
 
 <template>
   <div class="wrapper row">
-    <div class="caption col-4">{{ caption }}</div>
-    <div class="value col-8">{{ typeof val === 'number' ? val.toFixed(2) : val }}</div>
+    <div class="caption col-5">{{ caption }}</div>
+    <div class="value col-7">{{ typeof val === 'number' ? val.toFixed(2) : val }}</div>
   </div>
 </template>
 
