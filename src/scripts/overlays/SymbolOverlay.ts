@@ -86,7 +86,7 @@ export class SymbolOverlay extends BaseOverlay {
     }
 
     if (e.button == 2 || this.global.inputMode == "delete") {
-      let delTgt = this.getHotspots().pop()
+      const delTgt = this.getHotspots().pop()
       if (delTgt) {
         const del = delTgt.target as MilSymbol
         del.deleted = true

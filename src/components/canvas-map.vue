@@ -332,7 +332,7 @@ function onWheel(e: WheelEvent) {
   emit('update:pos', pos);
 }
 
-let pointers = new Map<number, PointerEvent>();
+const pointers = new Map<number, PointerEvent>();
 let startDist = 0;
 let startScale = 1;
 let multiPointer = false;
