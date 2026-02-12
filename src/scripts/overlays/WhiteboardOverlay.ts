@@ -60,6 +60,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   private splinePainter: SplinePainter = new SplinePainter()
   private startPoint: Point | undefined = undefined
   private cursorPoint: Point | undefined = undefined
+  private dragShape: WbShape | undefined = undefined
 
   public init() {
     this.imcsClient?.onDrawEvent((shapes: WbShape[]) => {
@@ -90,7 +91,6 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.redraw()
   }
 
-
   public isEnabled(): boolean {
     return this.settings.viz.wb
   }
@@ -101,6 +101,34 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     if (!this.startPoint || !this.cursorPoint) return
+
+    this.drawWorldInScreenSpace(() => {
+      this.shapes.forEach(s => {
+        switch (s.type) {
+          case WbShapeType.Line:
+            this.drawWbLine(cnv, s as WbLine)
+            break
+          case WbShapeType.Circle:
+            this.drawWbCircle(cnv, s as WbCircle)
+            break
+          case WbShapeType.Ellipse:
+            this.drawWbEllipse(cnv, s as WbEllipse)
+            break
+          case WbShapeType.Rect:
+            this.drawWbRect(cnv, s as WbRect)
+            break
+          case WbShapeType.Freehand:
+            this.drawWbFreehand(cnv, s as WbFreehand)
+            break
+          case WbShapeType.Text:
+            this.drawWbText(cnv, s as WbText)
+            break
+        }
+      })
+    })
+
+    if (this.dragShape) return
+
     const p1 = this.toCnv(this.startPoint)
     const p2 = this.toCnv(this.cursorPoint)
     const dist = distance(p1, p2)
@@ -149,37 +177,18 @@ export class WhiteboardOverlay extends BaseOverlay {
         break
     }
     ctx.setLineDash([])
-
-    this.drawWorldInScreenSpace(() => {
-      this.shapes.forEach(s => {
-        switch (s.type) {
-          case WbShapeType.Line:
-            this.drawWbLine(cnv, s as WbLine)
-            break
-          case WbShapeType.Circle:
-            this.drawWbCircle(cnv, s as WbCircle)
-            break
-          case WbShapeType.Ellipse:
-            this.drawWbEllipse(cnv, s as WbEllipse)
-            break
-          case WbShapeType.Rect:
-            this.drawWbRect(cnv, s as WbRect)
-            break
-          case WbShapeType.Freehand:
-            this.drawWbFreehand(cnv, s as WbFreehand)
-            break
-          case WbShapeType.Text:
-            this.drawWbText(cnv, s as WbText)
-            break
-        }
-      })
-    })
   }
 
   public onPointerDown(e: PointerEvent) {
     if (e.button == 0) {
-      this.drawMode = this.determineDrawMode(e)
       this.startPoint = this.fromCnv({x: e.pageX, y: e.pageY})
+
+      const cnv = this.getCanvas()
+      const tol = 5 / (cnv.scale || 1)
+      this.dragShape = this.shapes.findLast(s => this.hitTestShape(cnv, s, this.startPoint!, tol))
+      if (this.dragShape) return
+
+      this.drawMode = this.determineDrawMode(e)
       switch (this.drawMode) {
         case DrawMode.Line:
         case DrawMode.Circle:
@@ -200,6 +209,17 @@ export class WhiteboardOverlay extends BaseOverlay {
   public onPointerUp(e: PointerEvent) {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
     if ((e.button == 0) && this.startPoint) {
+
+      if (this.dragShape) {
+        const shape: WbShape = this.dragShape!
+        if (shape.type == WbShapeType.Rect) {
+          const r = shape as WbRect
+          this.imcsClient!.msgSendDraw([r])
+        }
+        this.dragShape = undefined
+        return
+      }
+
       const cfg = this.settings.settings.whiteboard
       const colFill = cfg.fillStyle == 'solid' ? alphaColor(cfg.fillColor, cfg.opacity * 0.4) : ''
       const colLine = alphaColor(cfg.lineColor, cfg.opacity)
@@ -337,8 +357,19 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerMove(e: PointerEvent) {
-    this.drawStep = this.determineDrawStep(e)
     this.cursorPoint = this.fromCnv({x: e.pageX, y: e.pageY})
+
+    if (this.dragShape) {
+      const shape: WbShape = this.dragShape!
+      if (shape.type == WbShapeType.Rect) {
+        const r = shape as WbRect
+        r.center = this.cursorPoint
+      }
+      this.redraw()
+      return
+    }
+
+    this.drawStep = this.determineDrawStep(e)
     switch (this.drawMode) {
       case DrawMode.Line:
       case DrawMode.Circle:
@@ -371,6 +402,36 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
     this.oldDrawStep = this.drawStep
     this.redraw()
+  }
+
+  private hitTestShape(cnv: Canvas, s: WbShape, pt: Point, tol: number): boolean {
+    switch (s.type) {
+      case WbShapeType.Line: {
+        const l = s as WbLine
+        return isPointOnLine(l.p1, l.p2, pt, tol)
+      }
+      case WbShapeType.Circle: {
+        const c = s as WbCircle
+        return isPointOnCircle(c.center, c.radius, pt, tol)
+      }
+      case WbShapeType.Ellipse: {
+        const e = s as WbEllipse
+        return isPointOnEllipse(e.center, e.majorRad, e.minorRad, e.rotation, pt, tol)
+      }
+      case WbShapeType.Rect: {
+        const r = s as WbRect
+        return isPointOnRect(r.center, r.width, r.height, r.rotation, pt, tol)
+      }
+      case WbShapeType.Freehand: {
+        const fh = s as WbFreehand
+        if (!fh.path) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
+        return this.hitTestFreehand(cnv, fh, pt, tol)
+      }
+      case WbShapeType.Text:
+        return this.hitTestText(cnv, s as WbText, pt)
+      default:
+        return false
+    }
   }
 
   private drawWbFreehand(cnv: Canvas, fh: WbFreehand) {
