@@ -25,6 +25,10 @@ export interface WbShape {
   deleted?: boolean
 }
 
+export interface WbPosition  {
+  pos: Point
+}
+
 export interface WbFreehand extends WbShape {
   points: Point[]
   cornerIndices: number[]
@@ -36,29 +40,25 @@ export interface WbLine extends WbShape {
   p2: Point
 }
 
-export interface WbText extends WbShape {
-  pos: Point
+export interface WbText extends WbShape, WbPosition {
   rotation: number
   text: string
   fontSize: number
 }
 
-export interface WbCircle extends WbShape {
-  center: Point
+export interface WbCircle extends WbShape, WbPosition {
   radius: number
   fillColor: string
 }
 
-export interface WbEllipse extends WbShape {
-  center: Point
+export interface WbEllipse extends WbShape, WbPosition {
   majorRad: number
   minorRad: number
   rotation: number
   fillColor: string
 }
 
-export interface WbRect extends WbShape {
-  center: Point
+export interface WbRect extends WbShape, WbPosition {
   width: number
   height: number
   rotation: number
