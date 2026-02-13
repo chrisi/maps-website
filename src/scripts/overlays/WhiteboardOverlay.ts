@@ -192,12 +192,21 @@ export class WhiteboardOverlay extends BaseOverlay {
 
       this.dragShape = this.shapes.findLast(s => this.hitTestShape(cnv, s, this.startPoint!, tol))
       if (this.dragShape) {
-        if (this.dragShape.type == WbShapeType.Line) {
-          const shapePos = this.dragShape! as WbLine
-          this.dragOffset = {x: this.startPoint.x - shapePos!.p1.x, y: this.startPoint.y - shapePos.p1.y}
-        } else {
-          const shapePos = this.dragShape! as unknown as WbPosition
-          this.dragOffset = {x: this.startPoint.x - shapePos!.pos.x, y: this.startPoint.y - shapePos.pos.y}
+        switch (this.dragShape.type) {
+          case WbShapeType.Freehand:
+            break
+          case WbShapeType.Line:
+            const linePos = this.dragShape! as WbLine
+            this.dragOffset = {x: this.startPoint.x - linePos!.p1.x, y: this.startPoint.y - linePos.p1.y}
+            break
+          case WbShapeType.Circle:
+          case WbShapeType.Ellipse:
+          case WbShapeType.Rect:
+          case WbShapeType.Text:
+            const shapePos = this.dragShape! as unknown as WbPosition
+            this.dragOffset = {x: this.startPoint.x - shapePos!.pos.x, y: this.startPoint.y - shapePos.pos.y}
+            break
+          default:
         }
         return
       }
@@ -349,7 +358,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             const r = s as WbRect
             return isPointOnRect(r.pos, r.width, r.height, r.rotation, pt, 5 / this.getCanvas().scale)
           case WbShapeType.Freehand:
-            return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5)
+            return this.hitTestFreehand(this.getCanvas()!, s as WbFreehand, pt, 5 / this.getCanvas().scale)
           case WbShapeType.Text:
             return this.hitTestText(this.getCanvas()!, s as WbText, pt)
           default:
@@ -562,7 +571,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     ctx.save()
     // ensure identity transform to make isPointInStroke work correctly for world space coordinates (removed dpr transform)
     ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.lineWidth = (fh.lineWidth + tol) / cnv.scale
+    ctx.lineWidth = fh.lineWidth < tol ? tol : fh.lineWidth
     ctx.setLineDash([])
     const hit = ctx.isPointInStroke(fh.path!, pt.x, pt.y)
     ctx.restore()
