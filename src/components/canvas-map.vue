@@ -309,9 +309,27 @@ function toImageCoords(x: number, y: number) {
   };
 }
 
+function getMinScale() {
+  if (!mapImage.width || !mapImage.height) return 1;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  return Math.max(vw / mapImage.width, vh / mapImage.height);
+}
+
 function onWheel(e: WheelEvent) {
   //if (props.suspend) return;
   e.preventDefault();
+
+  const minScale = getMinScale();
+
+  const tryingToZoomOut = e.deltaY > 0;
+  const tryingToZoomIn = e.deltaY < 0;
+
+  if (tryingToZoomOut && targetScale <= minScale + 0.0001)
+    return;
+
+  if (tryingToZoomIn && targetScale >= maxScale - 0.0001)
+    return;
 
   let zoomFactor: number;
   if (e.ctrlKey) {
