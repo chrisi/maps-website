@@ -7,16 +7,10 @@ enum ImcsMsgId {
   Auth = 0,
   Bullseye = 1,
   Symbol = 2,
-  Line = 3,
-  Ellipse = 4,
-  Marker = 5,
-  Text = 6,
-  Erase = 7,
-  Whiteboard = 8,
-  Pointer = 9,
-  Ping = 10,
-  Draw = 11,
-  Mission = 12,
+  Pointer = 3,
+  Draw = 4,
+  Mission = 5,
+  Ping = 6
 }
 
 interface ImcsMsg {
@@ -123,12 +117,6 @@ export class ImcsClient {
     this.socket.send(raw);
   }
 
-  public msgSendWhiteboard(canvas: HTMLCanvasElement) {
-    const data = canvas.toDataURL('image/png')
-    const msg: ImcsMsgWhiteboard = {id: ImcsMsgId.Whiteboard, client: this.client, dataUrl: data}
-    this.send(msg)
-  }
-
   public msgSendPointer(pos?: Point) {
     const msg: ImcsMsgPos = {id: ImcsMsgId.Pointer, client: this.client, pos: pos}
     this.send(msg)
@@ -154,6 +142,7 @@ export class ImcsClient {
     this.send(msg)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private connectionHandler = (e: Event) => {
     if (this.socket?.readyState == WebSocket.OPEN) {
       this.imcsDebug("connected to IMCS");
@@ -180,6 +169,7 @@ export class ImcsClient {
     this.socket.send(JSON.stringify(msg))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private errorHandler = (e: Event) => {
     console.log("failed to connect to IMCS")
   }
@@ -200,24 +190,6 @@ export class ImcsClient {
       case ImcsMsgId.Symbol:
         this.symbolEventHandler.forEach(cb => cb(msg.symbols))
         break;
-      // case 3:
-      //   imcsMsgLineRcvd(msg);
-      //   break;
-      // case 4:
-      //   imcsMsgEllipseRcvd(msg);
-      //   break;
-      // case 5:
-      //   imcsMsgMarkerRcvd(msg);
-      //   break;
-      // case 6:
-      //   imcsMsgTextRcvd(msg);
-      //   break;
-      // case 7:
-      //   imcsMsgEraseRcvd(msg);
-      //   break;
-      case ImcsMsgId.Whiteboard:
-        this.msgReceivedWhiteboard(msg);
-        break;
       case ImcsMsgId.Pointer:
         this.pointerEventHandler.forEach(cb => cb(msg.pos))
         break;
@@ -232,7 +204,7 @@ export class ImcsClient {
     }
   }
 
-  private imcsDebug(...args: any[]) {
+  private imcsDebug(...args: unknown[]) {
     if (this.IMCS_DEBUG) args.forEach(arg => console.log(arg));
   }
 
@@ -248,17 +220,5 @@ export class ImcsClient {
         this.send(ping)
       }, 30000)
     }
-  }
-
-  private msgReceivedWhiteboard(msg: ImcsMsgWhiteboard) {
-    this.imcsDebug("Message: Whiteboard: " + msg.dataUrl.length)
-    const img = new Image(this.global.map!.pixels, this.global.map!.pixels)
-    img.src = msg.dataUrl;
-    img.onload = () => {
-      // TODO: migrate to new canvas
-      // layer.whitebrd.ctx.clearRect(0, 0, 3840, 3840);
-      // layer.whitebrd.ctx.drawImage(img, 0, 0, 3840, 3840);
-      // refreshCanvas();
-    };
   }
 }
