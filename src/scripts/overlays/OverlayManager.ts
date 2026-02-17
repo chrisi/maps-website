@@ -93,7 +93,7 @@ export class OverlayManager {
     //TODO: priority management: sort overlays by priority (tbd)
     //TODO: manage exactly colocated items by trigger threshold (tbd)
     hotspotIterator(hs => {
-      let dist = this.isNearbyHotspot(hs, pt, smartScale)
+      const dist = this.isNearbyHotspot(hs, pt, smartScale)
       if (dist) {
         if (single) return [hs]
         res.push({target: hs, dist: dist})
@@ -177,7 +177,7 @@ export class OverlayManager {
   }
 
   private calculateOwnHotspots(overlay: Overlay, pt: Point): Hotspot[] {
-    let ownCandidates = overlay.providesHotspots?.() || []
+    const ownCandidates = overlay.providesHotspots?.() || []
     const ownHs = this.findHotspots(pt, cb => ownCandidates.forEach(cb), false)
     overlay.setHotspots(ownHs)
     return ownHs

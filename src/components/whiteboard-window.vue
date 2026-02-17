@@ -9,12 +9,17 @@ import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {InputMode, OverlayMode} from "@/model/mode.ts";
 import ToolButton from "@/components/forms/tool-button.vue";
 import {useGlobalStore} from "@/stores/global.ts";
+import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 
 const global = useGlobalStore()
 
-defineProps({
+const props = defineProps({
   visible: {
     type: Boolean,
+    required: true
+  },
+  overlayManager: {
+    type: Object as () => OverlayManager,
     required: true
   }
 })
@@ -24,7 +29,7 @@ const emit = defineEmits(['close'])
 const btnClearClick = () => {
   global.whiteboard.shapes = []
   global.whiteboard.symbols = []
-  // TODO: redraw whiteboard
+  props.overlayManager.redraw()
 }
 
 const btnDownloadClick = () => {
@@ -78,10 +83,10 @@ const tabChanged = (sender: string) => {
     </tool-tabs>
     <tool-spacer/>
     <div style="display: flex; justify-content: space-between;">
-      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick" />
+      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick"/>
       <tool-button id="inputMode_delete" icon="/common/icons/eraser.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
-      <tool-button id="clearSketch" icon="/common/icons/delete.png" @click="btnClearClick" />
+      <tool-button id="clearSketch" icon="/common/icons/delete.png" @click="btnClearClick"/>
     </div>
   </tool-window>
 </template>
