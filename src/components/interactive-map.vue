@@ -69,6 +69,13 @@ dropFileHandler.onIniLoaded((filename, content) => {
   missionMgr.loadDataCartridge(filename, content.split("\n"))
   imcsClient.msgSendMission(filename, content.split("\n"))
 })
+dropFileHandler.onWbLoaded((filename, content) => {
+  global.whiteboard = JSON.parse(content)
+  imcsClient.msgSendDraw(global.whiteboard.shapes)
+  imcsClient.msgSendSymbol(global.whiteboard.symbols)
+  overlayManager.redraw()
+})
+
 imcsClient.onMissionEvent((title, ini) => {
   missionMgr.loadDataCartridge(title, ini)
 })
@@ -139,7 +146,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
         ovlCtx.value!,
         ['save', 'restore', 'beginPath', 'stroke', 'fill', 'fillText', 'strokeText',
           'drawImage', 'clip', 'lineWidth', 'setLineDash', 'translate', 'rotate', 'scale'],
-        () => overlayManager.draw(ovlCtx.value!, {x: 0, y: 0}, 0.25),
+        () => overlayManager.redraw(),
       )
       console.table(Object.fromEntries(counts))
       break

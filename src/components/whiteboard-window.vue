@@ -21,13 +21,12 @@ defineProps({
 
 const emit = defineEmits(['close'])
 
-
 const btnDownloadClick = () => {
   const blob = new Blob([JSON.stringify(global.whiteboard, null, 2)], {type: 'application/json'})
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `whiteboard-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`
+  a.download = `whiteboard-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.wb`
   a.click()
   URL.revokeObjectURL(url)
 }
@@ -71,10 +70,10 @@ const tabChanged = (sender: string) => {
         <symbols-tab :visible="true"/>
       </template>
     </tool-tabs>
-    <div style="display: flex; justify-content: flex-end;">
+    <div style="display: flex; justify-content: space-between;">
+      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick" />
       <tool-button id="inputMode_delete" icon="/common/icons/delete.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
-      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick" />
     </div>
   </tool-window>
 </template>

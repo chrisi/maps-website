@@ -77,11 +77,6 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public receiveShape(rs: WbShape) {
-    // normalize empty path cache
-    if (rs.type == WbShapeType.Freehand) {
-      const fh = rs as WbFreehand
-      fh.path = undefined
-    }
     const idx = this.global.whiteboard.shapes.findIndex(fs => fs.guid === rs.guid)
     if (idx == -1 && !rs.deleted)
       this.global.whiteboard.shapes.push(rs)
@@ -455,7 +450,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       }
       case WbShapeType.Freehand: {
         const fh = s as WbFreehand
-        if (!fh.path) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
+        if (!(fh.path instanceof Path2D)) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
         return this.hitTestFreehand(cnv, fh, pt, tol)
       }
       case WbShapeType.Text:
@@ -466,7 +461,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   private drawWbFreehand(cnv: Canvas, fh: WbFreehand) {
-    if (!fh.path) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
+    if (!(fh.path instanceof Path2D)) fh.path = buildBezierPathFromPoints(fh.points, fh.cornerIndices)
     const ctx = cnv.context
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
