@@ -233,9 +233,9 @@ export class WhiteboardOverlay extends BaseOverlay {
       }
 
       const cfg = this.settings.settings.whiteboard
-      const colFill = cfg.fillStyle == 'solid' ? alphaColor(cfg.fillColor, cfg.opacity * 0.4) : ''
-      const colLine = alphaColor(cfg.lineColor, cfg.opacity)
-      const dash = dashStyle(cfg.lineWidth, cfg.lineStyle)
+      const colFill = cfg.fill.style == 'solid' ? alphaColor(cfg.fill.color, cfg.fill.opacity) : ''
+      const colLine = alphaColor(cfg.line.color, cfg.line.opacity)
+      const dash = dashStyle(cfg.line.width, cfg.line.style)
       switch (this.drawMode) {
         case DrawMode.Line:
           const l: WbLine = {
@@ -244,7 +244,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             p1: this.startPoint,
             p2: pt,
             color: colLine,
-            lineWidth: cfg.lineWidth,
+            lineWidth: cfg.line.width,
             dash: dash
           }
           this.receiveShape(l)
@@ -257,7 +257,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             pos: this.startPoint,
             radius: distance(this.startPoint, pt),
             color: colLine,
-            lineWidth: cfg.lineWidth,
+            lineWidth: cfg.line.width,
             fillColor: colFill,
             dash: dash
           }
@@ -275,7 +275,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             minorRad: rr.h / 2,
             rotation: this.rotation,
             color: colLine,
-            lineWidth: cfg.lineWidth,
+            lineWidth: cfg.line.width,
             fillColor: colFill,
             dash: dash
           }
@@ -293,7 +293,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             height: rr.h,
             rotation: this.rotation,
             color: colLine,
-            lineWidth: cfg.lineWidth,
+            lineWidth: cfg.line.width,
             fillColor: colFill,
             dash: dash
           }
@@ -316,7 +316,7 @@ export class WhiteboardOverlay extends BaseOverlay {
             text: cfg.text,
             fontSize: fontSize / this.getCanvas().scale,
             color: colLine,
-            lineWidth: cfg.lineWidth,
+            lineWidth: cfg.line.width,
             dash: dash
           }
           this.receiveShape(t)

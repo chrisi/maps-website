@@ -28,16 +28,20 @@ export const useSettingsStore = defineStore('settings', () => {
         port: 4848
       },
       whiteboard: {
-        lineStyle: 'solid',
-        lineColor: '#ff0000',
-        lineWidth: 3,
-        fillStyle: 'none',
-        fillColor: '#ffffff',
-        opacity: 40,
-        eraserSize: 10,
-        supportPoints: true,
+        line: {
+          style: 'solid',
+          color: '#ff0000',
+          opacity: 80,
+          width: 6,
+        },
+        fill: {
+          style: 'solid',
+          color: '#0088ff',
+          opacity: 40
+        },
         fontSize: 16,
-        text: 'Hello BMS'
+        text: 'Hello BMS',
+        supportPoints: true
       },
     }
   )

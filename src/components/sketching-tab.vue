@@ -68,27 +68,27 @@ const btnDrawModeClick = (sender: string) => {
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Text"/>
   <tool-spacer/>
   <template v-if="global.inputMode == InputMode.Text">
-    <tool-input :variant="variant" label="Color" for="line-style">
+    <tool-input :variant="variant" label="Color" for="text-color">
       <div style="display: flex; width: 100%; gap: 4px;">
         <div style="flex: 12">
-          <color-picker v-model="settings.settings.whiteboard.lineColor"/>
+          <color-picker id="text-color" v-model="settings.settings.whiteboard.line.color"/>
         </div>
       </div>
     </tool-input>
-    <tool-input :variant="variant" label="Opacity" for="opacity">
+    <tool-input :variant="variant" label="Opacity" for="text-opacity">
       <div style="display: flex; width: 95%; gap: 8px;">
         <div style="flex: 9">
-          <range-slider v-model="settings.settings.whiteboard.opacity"/>
+          <range-slider id="text-opacity" v-model="settings.settings.whiteboard.line.opacity"/>
         </div>
         <div style="flex: 3">
-          <input :value="settings.settings.whiteboard.opacity" style="width: 100%" readonly/>
+          <input :value="settings.settings.whiteboard.line.opacity" style="width: 100%" readonly/>
         </div>
       </div>
     </tool-input>
-    <tool-input :variant="variant" label="Size" for="fontSize">
+    <tool-input :variant="variant" label="Size" for="text-size">
       <div style="display: flex; width: 95%; gap: 8px;">
         <div style="flex: 9">
-          <range-slider v-model="settings.settings.whiteboard.fontSize"/>
+          <range-slider id="text-size" v-model="settings.settings.whiteboard.fontSize"/>
         </div>
         <div style="flex: 3">
           <input :value="settings.settings.whiteboard.fontSize" style="width: 100%" readonly/>
@@ -97,54 +97,68 @@ const btnDrawModeClick = (sender: string) => {
     </tool-input>
     <tool-textfield :variant="variant" label="Text" v-model="settings.settings.whiteboard.text"/>
   </template>
+
+
   <template v-if="global.inputMode != InputMode.Text && global.inputMode != InputMode.Delete">
     <tool-input :variant="variant" label="Line" for="line-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">
-          <pure-dropdown v-model="settings.settings.whiteboard.lineStyle" style="width: 100%;">
+          <pure-dropdown v-model="settings.settings.whiteboard.line.style" style="width: 100%;">
             <option value="solid">Solid</option>
             <option value="dashed">Dashed</option>
             <option value="dotted">Dotted</option>
           </pure-dropdown>
         </div>
         <div style="flex: 3">
-          <color-picker v-model="settings.settings.whiteboard.lineColor"/>
+          <color-picker v-model="settings.settings.whiteboard.line.color"/>
         </div>
         <div style="flex: 3">
-          <pure-numberfield v-model="settings.settings.whiteboard.lineWidth" :min="1" :max="10" :step="1"/>
+          <pure-numberfield v-model="settings.settings.whiteboard.line.width" :min="1" :max="10" :step="1"/>
         </div>
       </div>
     </tool-input>
-  </template>
-  <template v-if="global.inputMode == InputMode.Freehand">
-    <tool-section name="Debug"/>
-    <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
+    <tool-input :variant="variant" label="Opacity" for="line-opacity">
+      <div style="display: flex; width: 95%; gap: 8px;">
+        <div style="flex: 9">
+          <range-slider id="line-opacity" v-model="settings.settings.whiteboard.line.opacity"/>
+        </div>
+        <div style="flex: 3">
+          <input :value="settings.settings.whiteboard.line.opacity" style="width: 100%" readonly/>
+        </div>
+      </div>
+    </tool-input>
   </template>
   <template v-if="global.inputMode == InputMode.Ellipse || global.inputMode == InputMode.Rect">
     <tool-input :variant="variant" label="Fill" for="fill-style">
       <div style="display: flex; width: 97%; gap: 4px;">
         <div style="flex: 5">
-          <pure-dropdown v-model="settings.settings.whiteboard.fillStyle">
+          <pure-dropdown v-model="settings.settings.whiteboard.fill.style">
             <option value="none">None</option>
             <option value="solid">Solid</option>
           </pure-dropdown>
         </div>
         <div style="flex: 3">
-          <color-picker v-model="settings.settings.whiteboard.fillColor"/>
+          <color-picker v-model="settings.settings.whiteboard.fill.color"/>
         </div>
         <div style="flex: 3"></div>
       </div>
     </tool-input>
-    <tool-input :variant="variant" label="Opacity" for="opacity">
+    <tool-input :variant="variant" label="Opacity" for="fill-opacity">
       <div style="display: flex; width: 95%; gap: 8px;">
         <div style="flex: 9">
-          <range-slider v-model="settings.settings.whiteboard.opacity"/>
+          <range-slider id="fill-opacity" v-model="settings.settings.whiteboard.fill.opacity"/>
         </div>
         <div style="flex: 3">
-          <input :value="settings.settings.whiteboard.opacity" style="width: 100%" readonly/>
+          <input :value="settings.settings.whiteboard.fill.opacity" style="width: 100%" readonly/>
         </div>
       </div>
     </tool-input>
+  </template>
+
+
+  <template v-if="global.inputMode == InputMode.Freehand">
+    <tool-section name="Debug"/>
+    <tool-checkbox id="support_points" label="Show Support-Points" v-model="settings.settings.whiteboard.supportPoints"/>
   </template>
 </template>
 

@@ -24,16 +24,20 @@ export interface CollabSettings {
 }
 
 export interface WhiteboardSettings {
-  lineStyle: string;
-  lineColor: string;
-  lineWidth: number;
-  fillStyle: string;
-  fillColor: string;
-  opacity: number;
-  eraserSize: number;
-  supportPoints: boolean;
+  line: {
+    style: string;
+    color: string;
+    width: number;
+    opacity: number;
+  }
+  fill: {
+    style: string;
+    color: string;
+    opacity: number;
+  }
   text: string;
   fontSize: number;
+  supportPoints: boolean;
 }
 
 export interface Settings {

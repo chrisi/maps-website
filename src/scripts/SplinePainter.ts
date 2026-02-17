@@ -32,9 +32,9 @@ export class SplinePainter {
       guid: generateGuid(),
       points: this.line,
       cornerIndices: this.cornerIndices,
-      color: alphaColor(paintConfig.lineColor, paintConfig.opacity),
-      lineWidth: paintConfig.lineWidth,
-      dash: dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
+      color: alphaColor(paintConfig.line.color, paintConfig.line.opacity),
+      lineWidth: paintConfig.line.width,
+      dash: dashStyle(paintConfig.line.width, paintConfig.line.style)
     }
     this.line = []
     this.cornerIndices = []
@@ -51,10 +51,10 @@ export class SplinePainter {
     const ctx = cnv.context
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    ctx.strokeStyle = alphaColor(paintConfig.lineColor, paintConfig.opacity)
-    ctx.lineWidth = paintConfig.lineWidth / cnv.scale
+    ctx.strokeStyle = alphaColor(paintConfig.line.color, paintConfig.line.opacity)
+    ctx.lineWidth = paintConfig.line.width / cnv.scale
     ctx.lineDashOffset = 0
-    const dash = dashStyle(paintConfig.lineWidth, paintConfig.lineStyle)
+    const dash = dashStyle(paintConfig.line.width, paintConfig.line.style)
     ctx.setLineDash(dash)
     ctx.beginPath()
     const p0 = this.line[0]!
