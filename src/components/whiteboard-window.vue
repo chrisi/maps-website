@@ -10,6 +10,7 @@ import {InputMode, OverlayMode} from "@/model/mode.ts";
 import ToolButton from "@/components/forms/tool-button.vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
+import type {ImcsClient} from "@/scripts/ImcsClient.ts";
 
 const global = useGlobalStore()
 
@@ -21,6 +22,10 @@ const props = defineProps({
   overlayManager: {
     type: Object as () => OverlayManager,
     required: true
+  },
+  imcsClient: {
+    type: Object as () => ImcsClient,
+    required: true
   }
 })
 
@@ -30,6 +35,7 @@ const btnClearClick = () => {
   global.whiteboard.shapes = []
   global.whiteboard.symbols = []
   props.overlayManager.redraw()
+  props.imcsClient.msgSendClear()
 }
 
 const btnDownloadClick = () => {

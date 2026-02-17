@@ -69,10 +69,17 @@ dropFileHandler.onIniLoaded((filename, content) => {
   missionMgr.loadDataCartridge(filename, content.split("\n"))
   imcsClient.msgSendMission(filename, content.split("\n"))
 })
+
 dropFileHandler.onWbLoaded((filename, content) => {
   global.whiteboard = JSON.parse(content)
+  imcsClient.msgSendClear()
   imcsClient.msgSendDraw(global.whiteboard.shapes)
   imcsClient.msgSendSymbol(global.whiteboard.symbols)
+  overlayManager.redraw()
+})
+
+imcsClient.onClearEvent(() => {
+  global.whiteboard = {shapes: [], symbols: []}
   overlayManager.redraw()
 })
 
@@ -253,7 +260,8 @@ const getMapUrl = (map: Theater) => {
   <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
-  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"/>
+  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"
+                     :overlayManager="overlayManager" :imcsClient="imcsClient"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"

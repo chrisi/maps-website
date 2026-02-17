@@ -5,12 +5,13 @@ import type {CollabSettings} from "@/model/settings.ts";
 
 enum ImcsMsgId {
   Auth = 0,
-  Bullseye = 1,
-  Symbol = 2,
-  Pointer = 3,
-  Draw = 4,
-  Mission = 5,
-  Ping = 6
+  Pointer = 1,
+  Bullseye = 2,
+  Draw = 3,
+  Symbol = 4,
+  Clear = 5,
+  Mission = 6,
+  Ping = 7
 }
 
 interface ImcsMsg {
@@ -44,10 +45,6 @@ export interface ImcsMsgMission extends ImcsMsg {
   ini: string[]
 }
 
-export interface ImcsMsgWhiteboard extends ImcsMsg {
-  dataUrl: string
-}
-
 export class ImcsClient {
 
   private missionEventHandler: ((title: string, ini: string[]) => void)[] = [];
@@ -60,6 +57,12 @@ export class ImcsClient {
 
   public onDrawEvent(cb: ((parts: WbShape[]) => void)) {
     this.drawEventHandler.push(cb);
+  }
+
+  private clearEventHandler: (() => void)[] = [];
+
+  public onClearEvent(cb: (() => void)) {
+    this.clearEventHandler.push(cb);
   }
 
   private symbolEventHandler: ((symbols: MilSymbol[]) => void)[] = [];
@@ -127,13 +130,18 @@ export class ImcsClient {
     this.send(msg)
   }
 
-  public msgSendSymbol(symbols: MilSymbol[]) {
-    const msg: ImcsMsgSymbol = {id: ImcsMsgId.Symbol, client: this.client, symbols: symbols}
+  public msgSendClear() {
+    const msg: ImcsMsg = {id: ImcsMsgId.Clear, client: this.client}
     this.send(msg)
   }
 
   public msgSendDraw(parts: WbShape[]) {
     const msg: ImcsMsgDraw = {id: ImcsMsgId.Draw, client: this.client, parts: parts}
+    this.send(msg)
+  }
+
+  public msgSendSymbol(symbols: MilSymbol[]) {
+    const msg: ImcsMsgSymbol = {id: ImcsMsgId.Symbol, client: this.client, symbols: symbols}
     this.send(msg)
   }
 
@@ -184,17 +192,20 @@ export class ImcsClient {
       case ImcsMsgId.Auth:
         this.msgReceivedAuth(msg);
         break;
-      case ImcsMsgId.Bullseye:
-        this.bullseyePosEventHandler.forEach(cb => cb(msg.pos!))
-        break;
-      case ImcsMsgId.Symbol:
-        this.symbolEventHandler.forEach(cb => cb(msg.symbols))
-        break;
       case ImcsMsgId.Pointer:
         this.pointerEventHandler.forEach(cb => cb(msg.pos))
         break;
+      case ImcsMsgId.Bullseye:
+        this.bullseyePosEventHandler.forEach(cb => cb(msg.pos!))
+        break;
+      case ImcsMsgId.Clear:
+        this.clearEventHandler.forEach(cb => cb())
+        break;
       case ImcsMsgId.Draw:
         this.drawEventHandler.forEach(cb => cb(msg.parts))
+        break;
+      case ImcsMsgId.Symbol:
+        this.symbolEventHandler.forEach(cb => cb(msg.symbols))
         break;
       case ImcsMsgId.Mission:
         this.missionEventHandler.forEach(cb => cb(msg.title, msg.ini))
