@@ -8,10 +8,8 @@ import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {InputMode, OverlayMode} from "@/model/mode.ts";
 import ToolButton from "@/components/forms/tool-button.vue";
-import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 
-const settings = useSettingsStore()
 const global = useGlobalStore()
 
 defineProps({
@@ -22,6 +20,17 @@ defineProps({
 })
 
 const emit = defineEmits(['close'])
+
+
+const btnDownloadClick = () => {
+  const blob = new Blob([JSON.stringify(global.whiteboard, null, 2)], {type: 'application/json'})
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `whiteboard-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 const btnInputModeClick = (sender: string) => {
   switch (sender) {
@@ -65,6 +74,7 @@ const tabChanged = (sender: string) => {
     <div style="display: flex; justify-content: flex-end;">
       <tool-button id="inputMode_delete" icon="/common/icons/delete.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
+      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick" />
     </div>
   </tool-window>
 </template>

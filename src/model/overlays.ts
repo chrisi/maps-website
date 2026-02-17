@@ -64,3 +64,8 @@ export interface WbRect extends WbShape, WbPosition {
   rotation: number
   fillColor: string
 }
+
+export interface Whiteboard {
+  symbols: MilSymbol[]
+  shapes: WbShape[]
+}

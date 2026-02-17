@@ -50,8 +50,6 @@ enum DrawMode {
 
 export class WhiteboardOverlay extends BaseOverlay {
 
-  private shapes: WbShape[] = []
-
   private lockAspectRatio = false
   private drawMode: DrawMode | undefined = undefined
   private drawStep = 0
@@ -84,14 +82,14 @@ export class WhiteboardOverlay extends BaseOverlay {
       const fh = rs as WbFreehand
       fh.path = undefined
     }
-    const idx = this.shapes.findIndex(fs => fs.guid === rs.guid)
+    const idx = this.global.whiteboard.shapes.findIndex(fs => fs.guid === rs.guid)
     if (idx == -1 && !rs.deleted)
-      this.shapes.push(rs)
+      this.global.whiteboard.shapes.push(rs)
     else {
       if (rs.deleted)
-        this.shapes.splice(idx, 1)
+        this.global.whiteboard.shapes.splice(idx, 1)
       else
-        this.shapes[idx] = rs
+        this.global.whiteboard.shapes[idx] = rs
     }
     this.redraw()
   }
@@ -107,7 +105,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   public onDraw(cnv: Canvas): void {
 
     this.drawWorldInScreenSpace(() => {
-      this.shapes.forEach(s => {
+      this.global.whiteboard.shapes.forEach(s => {
         switch (s.type) {
           case WbShapeType.Line:
             this.drawWbLine(cnv, s as WbLine)
@@ -190,7 +188,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       const cnv = this.getCanvas()
       const tol = 5 / (cnv.scale || 1)
 
-      this.dragShape = this.shapes.findLast(s => this.hitTestShape(cnv, s, this.startPoint!, tol))
+      this.dragShape = this.global.whiteboard.shapes.findLast(s => this.hitTestShape(cnv, s, this.startPoint!, tol))
       if (this.dragShape) {
         switch (this.dragShape.type) {
           case WbShapeType.Freehand:
@@ -343,7 +341,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     }
 
     if (e.button == 2 || this.global.inputMode == "delete") {
-      const del = this.shapes.findLast(s => {
+      const del = this.global.whiteboard.shapes.findLast(s => {
         switch (s.type) {
           case WbShapeType.Line:
             const l = s as WbLine

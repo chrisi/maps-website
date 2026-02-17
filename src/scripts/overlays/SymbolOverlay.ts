@@ -1,7 +1,7 @@
 import type {Point} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import {type MilSymbol, type WbFreehand, type WbShape, WbShapeType} from "@/model/overlays.ts";
+import type {MilSymbol} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {OverlayMode} from "@/model/mode.ts";
 import {generateGuid} from "@/scripts/utils.ts";
@@ -9,7 +9,6 @@ import {watch} from "vue";
 
 export class SymbolOverlay extends BaseOverlay {
 
-  private symbols: MilSymbol[] = []
   private iconCache: Map<string, HTMLImageElement> = new Map()
 
   private dragSymbol: MilSymbol | undefined = undefined
@@ -27,15 +26,15 @@ export class SymbolOverlay extends BaseOverlay {
 
   public receiveSymbol(inSym: MilSymbol) {
     if (inSym.deleted) {
-      const idx = this.symbols.findIndex(s => s.guid === inSym.guid)
-      if (idx >= 0) this.symbols.splice(idx, 1)
+      const idx = this.global.whiteboard.symbols.findIndex(s => s.guid === inSym.guid)
+      if (idx >= 0) this.global.whiteboard.symbols.splice(idx, 1)
     } else {
-      const existing = this.symbols.find(s => s.guid === inSym.guid)
+      const existing = this.global.whiteboard.symbols.find(s => s.guid === inSym.guid)
       if (existing) {
         existing.pos = inSym.pos
         existing.sym = inSym.sym
       } else
-        this.symbols.push(inSym)
+        this.global.whiteboard.symbols.push(inSym)
     }
     this.redraw()
   }
@@ -50,7 +49,7 @@ export class SymbolOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7
-    this.symbols.forEach(sym => {
+    this.global.whiteboard.symbols.forEach(sym => {
       this.drawSymbol(cnv, sym.pos, smartScale, sym.sym);
     })
   }
@@ -75,7 +74,7 @@ export class SymbolOverlay extends BaseOverlay {
           sym: this.global.selectedSymbol!,
           pos: this.fromCnv({x: e.pageX, y: e.pageY})
         }
-        this.symbols.push(s)
+        this.global.whiteboard.symbols.push(s)
         this.imcsClient!.msgSendSymbol([s])
         this.redraw()
       } else {
@@ -97,7 +96,7 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public providesHotspots(): Hotspot[] {
-    return this.symbols.map(s => {
+    return this.global.whiteboard.symbols.map(s => {
       return {pos: s.pos, size: -18, target: s, name: s.sym, provider: 'SymbolOverlay', type: 'Mil-Symbol'}
     })
   }
