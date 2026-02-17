@@ -27,22 +27,6 @@ const tools: Tool[] = ([
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
     desc: "Move the map view around the map."
   },
-  // {
-  //   name: "connect", caption: "Connect", activeIcon: "connect.png", icons: ["connect.png", "connect.png"],
-  //   desc: "Quickly connect to collaboration server."
-  // },
-  // {
-  //   name: "zoom1", caption: "Zoom-Out", activeIcon: "icon_zoom1.png",
-  //   desc: "Zoom out of the map view."
-  // },
-  // {
-  //   name: "zoom2", caption: "Zoom-In", activeIcon: "icon_zoom2.png",
-  //   desc: "Zoom in to the map view."
-  // },
-  // {
-  //   name: "non", caption: "Route", activeIcon: "route.png", icons: ["route.png", "route.png"],
-  //   desc: "Center the Mission route on the map."
-  // },
   {
     name: "measure", caption: "Measure", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
     desc: "Measure distances on the map."
@@ -51,10 +35,6 @@ const tools: Tool[] = ([
     name: "bullseye", caption: "Bullseye", activeIcon: "icon_bullseye.png", icons: ["icon_bullseye.png", "icon_bullseye1.png"],
     desc: "Set the bullseye point on the map."
   },
-  // {
-  //   name: "symbol", caption: "Symbol", activeIcon: "icon_sword.png", icons: ["icon_sword.png", "icon_sword1.png"],
-  //   desc: "Draw symbols on the map."
-  // },
   {
     name: "whiteboard", caption: "Whiteboard", activeIcon: "icon_pencil.png", icons: ["icon_pencil.png", "icon_pencil1.png"],
     desc: "Draw lines on the map."
@@ -63,14 +43,6 @@ const tools: Tool[] = ([
     name: "route", caption: "Route", activeIcon: "icon_compass.png",
     desc: "Draw the mission route on the map."
   },
-  // {
-  //   name: "text", caption: "Text", activeIcon: "icon_text.png", icons: ["icon_text.png", "icon_text1.png"],
-  //   desc: "Write text on the map."
-  // },
-  // {
-  //   name: "eraser", caption: "Eraser", activeIcon: "icon_eraser.png", icons: ["icon_eraser.png", "icon_eraser1.png"],
-  //   desc: "Erase symbols and texts from the map."
-  // },
   {
     name: "settings", caption: "Settings", activeIcon: "icon_menu.png",
     desc: "Change the map view settings."
@@ -136,6 +108,8 @@ const clickTool = (tool: Tool) => {
 table {
   pointer-events: auto;
   touch-action: none;
+  border: 1px solid #555;
+  box-shadow: 2px 2px 5px #555;
 }
 
 .pm0 {

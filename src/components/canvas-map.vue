@@ -7,8 +7,10 @@ const props = withDefaults(defineProps<{
   src: string
   suspend: boolean
   cursor?: string
+  hideMap?: boolean
 }>(), {
-  cursor: 'default'
+  cursor: 'default',
+  hideMap: false
 })
 
 const emit = defineEmits<{
@@ -92,6 +94,10 @@ watch(() => props.suspend, (isSuspended) => {
   } else {
     // Logic when map interactions should resume
   }
+})
+
+watch(() => props.hideMap, () => {
+  redraw();
 })
 
 const maxScale = 4;
@@ -229,7 +235,12 @@ function constrain() {
 
 function redraw() {
   if (!ctx) return;
-  ctx.drawImage(mapImage, offsetX, offsetY, mapImage.width * scale, mapImage.height * scale);
+  if (props.hideMap) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, mapRef.value!.width, mapRef.value!.height);
+  } else {
+    ctx.drawImage(mapImage, offsetX, offsetY, mapImage.width * scale, mapImage.height * scale);
+  }
   redrawOverlay();
 }
 

@@ -4,11 +4,13 @@ import type {Settings, Visibility} from "@/model/settings.ts";
 
 export const useSettingsStore = defineStore('settings', () => {
   const viz = reactive<Visibility>({
-    be: false,
-    ms: false,
+    be: true,
+    ms: true,
     wx: true,
     wb: true,
-    xy: true
+    xy: true,
+    st: true,
+    mp: true,
   })
 
   const settings = reactive<Settings>(

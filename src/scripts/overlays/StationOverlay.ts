@@ -4,12 +4,23 @@ import type {Point} from "@/model/base.ts";
 import {deg2rad} from "@/scripts/math.ts";
 import type {Station} from "@/model/station.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
+import {watch} from "vue";
 
 export class StationOverlay extends BaseOverlay {
 
   private selectStationEventHandler: ((station: Station) => void)[] = [];
 
   private stations = this.global.map!.stations.map(s => this.prepareStation(s))
+
+  public init() {
+    watch(() => this.settings.viz.st, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.viz.st
+  }
 
   public addSelectStationEventHandler(cb: ((station: Station) => void)) {
     this.selectStationEventHandler.push(cb);

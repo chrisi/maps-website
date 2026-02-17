@@ -107,16 +107,17 @@ const cycles: ValueCaptionPair[] = [
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
+        <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
         <tool-checkbox id="bullseye_show" label="Show Bullseye" v-model="settings.viz.be"/>
         <tool-checkbox id="mission_show" label="Show Mission" v-model="settings.viz.ms"/>
         <tool-checkbox id="weather_show" label="Show Weather" v-model="settings.viz.wx"/>
-        <tool-checkbox id="whitebrd_show" label="Show Whiteboard" v-model="settings.viz.wb"/>
-        <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
-
-        <tool-spacer medium/>
-        <tool-button id="save" icon="/common/assets/icon_save.png" @click="btnClick"/>
-        <tool-button id="clear" icon="/common/assets/icon_clear.png" @click="btnClick"/>
-        <tool-button id="reset" icon="/common/assets/icon_reset.png" @click="btnClick"/>
+        <tool-checkbox id="whiteboard_show" label="Show Whiteboard" v-model="settings.viz.wb"/>
+        <tool-checkbox id="stations_show" label="Show Stations" v-model="settings.viz.st"/>
+        <tool-checkbox id="map_show" label="Show Map" v-model="settings.viz.mp"/>
+<!--        <tool-spacer medium/>-->
+<!--        <tool-button id="save" icon="/common/assets/icon_save.png" @click="btnClick"/>-->
+<!--        <tool-button id="clear" icon="/common/assets/icon_clear.png" @click="btnClick"/>-->
+<!--        <tool-button id="reset" icon="/common/assets/icon_reset.png" @click="btnClick"/>-->
       </template>
 
       <template #Connectivity>

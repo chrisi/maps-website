@@ -6,6 +6,8 @@ export interface Visibility {
   wx: boolean;
   wb: boolean;
   xy: boolean;
+  st: boolean;
+  mp: boolean;
 }
 
 export interface BullseyeSettings {

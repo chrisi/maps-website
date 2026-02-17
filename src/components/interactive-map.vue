@@ -266,6 +266,7 @@ const getMapUrl = (map: Theater) => {
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
       :suspend="suspend"
+      :hide-map="!settings.viz.mp"
       :cursor="global.hotspots.length > 0 ? 'pointer' : 'default'"
       @update:zoom="zoom = $event"
       @update:pos="pos = $event"

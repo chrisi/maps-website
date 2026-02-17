@@ -38,7 +38,7 @@ const btnClearClick = () => {
   props.imcsClient.msgSendClear()
 }
 
-const btnDownloadClick = () => {
+const btnSaveClick = () => {
   const blob = new Blob([JSON.stringify(global.whiteboard, null, 2)], {type: 'application/json'})
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -89,7 +89,7 @@ const tabChanged = (sender: string) => {
     </tool-tabs>
     <tool-spacer/>
     <div style="display: flex; justify-content: space-between;">
-      <tool-button id="downloadSketch" icon="/common/assets/icon_download.png" @click="btnDownloadClick"/>
+      <tool-button id="saveSketch" icon="/common/assets/icon_save.png" @click="btnSaveClick"/>
       <tool-button id="inputMode_delete" icon="/common/icons/eraser.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
       <tool-button id="clearSketch" icon="/common/icons/delete.png" @click="btnClearClick"/>
