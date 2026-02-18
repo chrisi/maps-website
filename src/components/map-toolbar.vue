@@ -24,6 +24,10 @@ interface Tool {
 
 const tools: Tool[] = ([
   {
+    name: "locate", caption: "Locate", activeIcon: "icon_zoom.png", icons: ["icon_zoom.png", "icon_zoom.png"],
+    desc: "Locate stations onthe map."
+  },
+  {
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
     desc: "Move the map view around the map."
   },

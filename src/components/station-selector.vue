@@ -28,10 +28,19 @@ const getStationsByCountryType = () => {
     return obj;
   }, {} as Record<string, Station[]>);
 }
+
+const dropdownRef = ref<HTMLSelectElement | null>(null)
+
+function focus() {
+  dropdownRef.value?.focus()
+}
+
+defineExpose({ focus })
+
 </script>
 
 <template>
-  <select v-model="dropdownName" @change="updateSelection">
+  <select ref="dropdownRef" v-model="dropdownName" @change="updateSelection">
     <option value=""></option>
     <optgroup v-for="(v,k) in getStationsByCountryType()" v-bind:key="k" :label="k">
       <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, onUnmounted, ref, shallowRef, watch} from "vue";
+import {nextTick, onBeforeMount, onMounted, onUnmounted, ref, shallowRef, watch} from "vue";
 import {useRoute} from "vue-router";
 
 import {useGlobalStore} from "@/stores/global.ts";
@@ -34,7 +34,6 @@ import type {Station} from "@/model/station.ts";
 import type {Coord, Point} from "@/model/base.ts";
 import CanvasMap from "@/components/canvas-map.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
-import StationSelector from "@/components/station-selector.vue";
 import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
@@ -89,13 +88,15 @@ imcsClient.onMissionEvent((title, ini) => {
 
 const route = useRoute()
 
+let inhibitLocate = false
+
 onBeforeMount(() => {
   const name = route.params['name']
   const mapName = Array.isArray(name) ? name[0] : name
   if (mapName) {
     global.map = findMap(mapName)
   }
-  global.message = "N00°00.000',N00°00.000' | X.0,Y:0"
+  global.message = "N00°00.000',N00°00.000'"
 })
 
 onMounted(() => {
@@ -105,13 +106,15 @@ onMounted(() => {
   overlayManager.registerOverlay(new BullseyeOverlay())
 
   overlayManager.registerOverlay(new StationOverlay())
-    .addSelectStationEventHandler(station => selectedStation.value = station)
+    .addSelectStationEventHandler(station => {
+      inhibitLocate = true
+      selectedStation.value = station
+      nextTick(() => inhibitLocate = false)
+    })
 
   overlayManager.registerOverlay(new RouteOverlay(missionMgr))
 
   overlayManager.registerOverlay(new LocateOverlay())
-    .setZoomFn((pos, zoom) => canvasMapRef.value.locatePosition(pos, zoom))
-
   overlayManager.registerOverlay(new SymbolOverlay())
   overlayManager.registerOverlay(new MeasureOverlay())
   overlayManager.registerOverlay(new WhiteboardOverlay())
@@ -126,6 +129,12 @@ onUnmounted(() => {
 })
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.ctrlKey && e.code == "KeyF") {
+    activeWindow.value = "locate"
+    suspend.value = true
+    e.preventDefault()
+  }
+
   switch (e.key) {
     case '1':
       global.mode = OverlayMode.Measure
@@ -183,7 +192,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
 
 const showPointerCoord = (pos: Point) => {
   const strCrd = strLatLong(canvasPos2LatLong(pos));
-  global.message = `${strCrd.lat},${strCrd.long} | X:${pos.x.toFixed(0)},Y:${pos.y.toFixed(0)}`;
+  // global.message = `${strCrd.lat},${strCrd.long} | X:${pos.x.toFixed(0)},Y:${pos.y.toFixed(0)}`;
+  global.message = `${strCrd.lat},${strCrd.long}`;
 }
 
 const canvasPos2LatLong = (point: Point): Coord => {
@@ -207,6 +217,7 @@ const execTool = (tool: string) => {
     case "symbol":
     case "bullseye":
     case "whiteboard":
+    case "locate":
       activeWindow.value = tool
       suspend.value = true
       break;
@@ -225,7 +236,14 @@ watch(pos, (newPos) => {
 watch(selectedStation, (newValue) => {
   const ovl = overlayManager.getOverlay(LocateOverlay)!
   if (newValue) {
-    ovl.locateStation(newValue.name)
+    ovl.highlightStation(newValue.name)
+    if (!inhibitLocate) {
+      const p = {
+        x: newValue.posx / global.map!.stationMappingSize * global.map!.pixels,
+        y: newValue.posy / global.map!.stationMappingSize * global.map!.pixels
+      }
+      canvasMapRef.value.locatePosition(p, 2)
+    }
   } else {
     ovl.clearLocation()
   }
@@ -257,7 +275,7 @@ const getMapUrl = (map: Theater) => {
 </script>
 
 <template>
-  <details-popup :station="selectedStation" :visible="selectedStation!=undefined" @close="selectedStation=undefined"/>
+  <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"
@@ -288,8 +306,7 @@ const getMapUrl = (map: Theater) => {
   </div>
   <div id="position" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
   <div id="inputs">
-    <station-selector id="station-select" :stations="global.map!.stations" v-model="selectedStation"/>
-    <map-toolbar @toolClick="execTool" class="spacer" v-model="global.mode"/>
+    <map-toolbar @toolClick="execTool" v-model="global.mode"/>
   </div>
   <hotspot-list/>
   <skyvector-logo/>
@@ -303,12 +320,13 @@ const getMapUrl = (map: Theater) => {
 
 #debug {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 40px;
+  right: 0;
   height: 120px;
   width: 240px;
   color: white;
   padding: 5px;
+  margin: 15px;
   background-color: navy;
   opacity: 0.8;
   border-radius: 4px;
@@ -317,17 +335,17 @@ const getMapUrl = (map: Theater) => {
 #inputs {
   pointer-events: none;
   position: fixed;
-  left: 15px;
-  top: 45px;
-}
-
-#position {
-  position: fixed;
   top: 0;
   left: 0;
   margin: 15px;
+}
 
+#position {
   pointer-events: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 15px;
   font-family: JetBrains Mono, monospace;
   font-size: 12px;
   background-color: rgba(255, 255, 255, 0.6);

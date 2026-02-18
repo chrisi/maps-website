@@ -1,38 +1,57 @@
 <script setup lang="ts">
 
-import {ref, watch} from "vue";
+import {nextTick, ref, watch} from "vue";
 import type {Chart, Details, Station} from "@/model/station.ts";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolListitem from "@/components/forms/tool-listitem.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
-import ToolTitle from "@/components/forms/tool-title.vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {cdnUrl} from "@/data/map.ts";
+import StationSelector from "@/components/station-selector.vue";
 
-const props = defineProps({
-  station: {
-    type: Object as () => Station | undefined
-  },
-  visible: {
-    type: Boolean,
-    required: true
-  }
-})
+const props = defineProps<{
+  modelValue: Station | undefined
+  visible: boolean
+}>()
 
-const global = useGlobalStore();
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: Station | undefined): void
+  (e: 'close'): void
+}>()
 
-const emit = defineEmits(['close'])
+const global = useGlobalStore()
 
 const data = ref<Details>()
+const selectedStation = ref<Station | undefined>()
+const selectorRef = ref<{ focus: () => void } | null>(null)
 
 watch(
-  () => props.station,
+  () => props.visible,
+  async (isVisible) => {
+    if (!isVisible) return
+    await nextTick()
+    selectorRef.value?.focus()
+  }
+)
+
+watch(
+  () => props.modelValue,
   (newVal) => {
-    if (!newVal)
+    selectedStation.value = newVal
+  }
+);
+
+watch(
+  () => selectedStation.value,
+  (newVal) => {
+    if (!newVal) {
       data.value = undefined
-    else
+      emit('update:modelValue', undefined)
+    } else {
       data.value = newVal.details
+      emit('update:modelValue', newVal)
+    }
   }
 )
 
@@ -59,8 +78,9 @@ function openChart(chart: Chart) {
 
 <template>
   <tool-window :visible="visible" @close="emit('close')">
+    <station-selector ref="selectorRef" :stations="global.map!.stations" v-model="selectedStation" style="width: 100%;"/>
+    <tool-spacer/>
     <div v-if="data">
-      <tool-title :text="data.name"/>
       <hr style="margin: 2px 0;">
       <tool-spacer/>
       <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>
@@ -81,9 +101,10 @@ function openChart(chart: Chart) {
       </ul>
     </div>
     <div v-else>
-      <h4 style="text-align: center">The data for<br/>
-        {{ station?.type }} {{ station?.name }}<br/>
-        is not jet migrated.</h4>
+      <h4 v-if="selectedStation" style="text-align: center">
+        No data available for <br/>{{ selectedStation.type }} {{ selectedStation.name }}
+      </h4>
+      <h4 v-else style="text-align: center">no station selected</h4>
     </div>
   </tool-window>
 </template>

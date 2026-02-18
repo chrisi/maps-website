@@ -6,7 +6,6 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 export class LocateOverlay extends BaseOverlay {
 
   private location: Point | undefined
-  private zoomFn: ((pos: Point, newScale?: number) => void) | undefined
 
   private highlightSize = 17; //TODO: settings
 
@@ -15,21 +14,16 @@ export class LocateOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  public setZoomFn = (zoomFn: (pos: Point, newScale?: number) => void) => {
-    this.zoomFn = zoomFn
-  }
-
-  public locateStation = (ap: string): void => {
-    const res = this.global.map!.stations.find(sta => {
+  public highlightStation = (ap: string): void => {
+    const map = this.global.map!
+    const res = map.stations.find(sta => {
       return (sta.name === ap)
     })
     if (res) {
-      this.location = {x: res.posx / 4096 * 6144, y: res.posy / 4096 * 6144}
-      if (this.zoomFn) {
-        this.zoomFn(this.location, 2)
-      }
+      this.location = {x: res.posx / map.stationMappingSize * map.pixels, y: res.posy / map.stationMappingSize * map.pixels}
     } else
       this.location = undefined
+    this.redraw()
   }
 
   public onDraw(cnv: Canvas): void {

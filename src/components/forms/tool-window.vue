@@ -35,8 +35,9 @@ const emit = defineEmits(['close'])
   pointer-events: auto;
   touch-action: none;
   position: fixed;
-  left: 55px;
-  top: 77px;
+  left: 40px;
+  top: 0;
+  margin: 15px;
   background-color: rgba(245, 245, 245, 1);
   border: 1px solid black;
   box-shadow: 5px 5px 5px #222;
