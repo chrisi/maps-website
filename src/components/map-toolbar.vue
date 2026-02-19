@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
@@ -30,7 +30,7 @@ const {viz} = storeToRefs(useSettingsStore())
 const tools: Tool[] = ([
   {
     name: "locate", caption: "Locate", activeIcon: "icon_zoom.png", icons: ["icon_zoom.png", "icon_zoom.png"],
-    desc: "Locate stations onthe map.", show: () => viz.value.st
+    desc: "Locate stations on the map.", show: () => viz.value.st
   },
   {
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
@@ -79,7 +79,16 @@ const activateTool = (name: string) => {
   }
 }
 
+const collapsed = ref(false)
+
+const toggleCollapsed = () => {
+  collapsed.value = !collapsed.value
+}
+
 const vizTools = computed(() => {
+    if (collapsed.value) {
+      return []
+    }
     return tools.filter(tool => tool.show && tool.show())
   }
 )
@@ -103,16 +112,18 @@ const clickTool = (tool: Tool) => {
   <table class="pm0">
     <tbody>
     <tr>
-      <td>
+      <td @click="toggleCollapsed" style="cursor: pointer">
         <img src="/common/assets/icon_toolbar.png" class="toolBar" alt="">
       </td>
     </tr>
-    <tr v-for="tool in vizTools" v-bind:key="tool.name">
-      <td>
-        <img :src="`${baseUrl}/common/assets/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
-             class="toolButton" @click.stop="clickTool(tool)">
-      </td>
-    </tr>
+    <transition-group name="list">
+      <tr v-for="tool in vizTools" v-bind:key="tool.name">
+        <td>
+          <img :src="`${baseUrl}/common/assets/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
+               class="toolButton" @click.stop="clickTool(tool)">
+        </td>
+      </tr>
+    </transition-group>
     </tbody>
   </table>
 </template>
@@ -148,5 +159,17 @@ table {
   display: block;
   cursor: pointer;
   pointer-events: auto;
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>
