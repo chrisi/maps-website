@@ -64,6 +64,8 @@ const overlayManager = new OverlayManager(imcsClient)
 const dropFileHandler = new DropFileHandler()
 const missionMgr = new MissionManager()
 
+const coords = ref("N00°00.000', E00°00.000'")
+
 dropFileHandler.onIniLoaded((filename, content) => {
   missionMgr.loadDataCartridge(filename, content.split("\n"))
   imcsClient.msgSendMission(filename, content.split("\n"))
@@ -96,7 +98,6 @@ onBeforeMount(() => {
   if (mapName) {
     global.map = findMap(mapName)
   }
-  global.message = "N00°00.000',N00°00.000'"
 })
 
 onMounted(() => {
@@ -191,9 +192,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
 }
 
 const showPointerCoord = (pos: Point) => {
-  const strCrd = strLatLong(canvasPos2LatLong(pos));
-  // global.message = `${strCrd.lat},${strCrd.long} | X:${pos.x.toFixed(0)},Y:${pos.y.toFixed(0)}`;
-  global.message = `${strCrd.lat},${strCrd.long}`;
+  const strCrd = strLatLong(canvasPos2LatLong(pos))
+  coords.value = `${strCrd.lat}, ${strCrd.long}`
 }
 
 const canvasPos2LatLong = (point: Point): Coord => {
@@ -304,7 +304,7 @@ const getMapUrl = (map: Theater) => {
     <out-value caption="Suspended" :val="suspend.toString()"/>
     <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
   </div>
-  <div id="position" v-if="settings.viz.xy">{{ global.message }}&nbsp;</div>
+  <div id="position" v-if="settings.viz.xy">{{ coords }}&nbsp;</div>
   <div id="inputs">
     <map-toolbar @toolClick="execTool" v-model="global.mode"/>
   </div>
@@ -313,10 +313,6 @@ const getMapUrl = (map: Theater) => {
 </template>
 
 <style scoped>
-
-.spacer {
-  margin-top: 10px !important;
-}
 
 #debug {
   position: fixed;

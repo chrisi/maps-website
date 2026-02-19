@@ -1,4 +1,4 @@
-import {reactive, ref} from "vue";
+import {reactive} from "vue";
 import {defineStore} from "pinia";
 import type {Settings, Visibility} from "@/model/settings.ts";
 

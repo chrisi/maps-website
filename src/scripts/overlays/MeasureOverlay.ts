@@ -59,8 +59,8 @@ export class MeasureOverlay extends BaseOverlay {
     ctx.lineWidth = 2;
     ctx.fillRect(pFrom.x - 3, pFrom.y - 3, 6, 6);
     drawOutlined(ctx, c => {
-      ctx.moveTo(pFrom.x, pFrom.y);
-      ctx.lineTo(pTo.x, pTo.y);
+      c.moveTo(pFrom.x, pFrom.y);
+      c.lineTo(pTo.x, pTo.y);
     }, 'white', this.rulerColor, 2, 1)
     ctx.strokeStyle = this.rulerColor;
     ctx.fillStyle = this.rulerColor;
