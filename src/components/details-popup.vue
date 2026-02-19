@@ -81,8 +81,8 @@ function openChart(chart: Chart) {
     <station-selector ref="selectorRef" :stations="global.map!.stations" v-model="selectedStation" style="width: 100%;"/>
     <tool-spacer/>
     <div v-if="data">
-      <tool-tabs :tabs="['General','Charts']">
-        <template #General>
+      <tool-tabs :tabs="['AIP','Charts']">
+        <template #AIP>
           <tool-spacer/>
           <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>
           <tool-spacer/>
