@@ -27,7 +27,7 @@ interface Tool {
 
 const {viz} = storeToRefs(useSettingsStore())
 
-const tools: Tool[] = ([
+const tools = ref<Tool[]>([
   {
     name: "locate", caption: "Locate", activeIcon: "icon_zoom.png", icons: ["icon_zoom.png", "icon_zoom.png"],
     desc: "Locate stations on the map.", show: () => viz.value.st
@@ -67,14 +67,15 @@ watch(
 );
 
 const resetTools = () => {
-  tools.filter(tool => tool.icons).forEach(tool => {
+  tools.value.filter(tool => tool.icons).forEach(tool => {
     tool.activeIcon = tool.icons![0]!
   })
 }
 
 const activateTool = (name: string) => {
-  const tool = tools.find(tool => tool.name == name)
+  const tool = tools.value.find(tool => tool.name == name)
   if (tool && tool.icons) {
+    console.log(`activate tool ${tool.name}`)
     tool.activeIcon = tool.icons![1]!
   }
 }
