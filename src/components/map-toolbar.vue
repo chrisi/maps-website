@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
@@ -66,6 +66,11 @@ watch(
   }
 );
 
+const headerIcon = computed(() => {
+  const icon = collapsed.value ? "tb_expand.png" : "tb_collapse.png"
+  return `${baseUrl}/common/icons/${icon}`
+})
+
 const resetTools = () => {
   tools.value.filter(tool => tool.icons).forEach(tool => {
     tool.activeIcon = tool.icons![0]!
@@ -104,7 +109,8 @@ const clickTool = (tool: Tool) => {
 <template>
   <div class="toolbar-wrapper">
     <div class="toolbar-toggle" @click="toggleCollapsed">
-      <img src="/common/assets/icon_toolbar.png" class="toolbar-header" alt="">
+      <!--      <img :src="collapsed ? '/common/icons/tb_collapse.png' : '/common/icons/tb_expand.png'" class="toolbar-header" alt="">-->
+      <img :src="headerIcon" class="toolbar-header" alt="">
     </div>
     <transition name="list">
       <div v-show="!collapsed" class="toolbar-content">
@@ -133,7 +139,7 @@ const clickTool = (tool: Tool) => {
   cursor: pointer;
   display: flex;
   width: 32px;
-  height: 8px;
+  height: 16px;
   justify-content: center;
 }
 
@@ -145,7 +151,8 @@ const clickTool = (tool: Tool) => {
 
 .toolbar-header {
   width: 32px;
-  height: 8px;
+  height: 16px;
+  background-color: #555;
   display: block;
 }
 
