@@ -61,7 +61,7 @@ onMounted(() => {
   cursor: pointer;
   padding: 4px 8px;
   transition: 0.3s;
-  font-size: 17px;
+  font-size: 15px;
 }
 
 /* Change background color of buttons on hover */

@@ -5,10 +5,10 @@ import type {Chart, Details, Station} from "@/model/station.ts";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolListitem from "@/components/forms/tool-listitem.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
-import ToolSection from "@/components/forms/tool-section.vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import {cdnUrl} from "@/data/map.ts";
 import StationSelector from "@/components/station-selector.vue";
+import ToolTabs from "@/components/forms/tool-tabs.vue";
 
 const props = defineProps<{
   modelValue: Station | undefined
@@ -81,24 +81,29 @@ function openChart(chart: Chart) {
     <station-selector ref="selectorRef" :stations="global.map!.stations" v-model="selectedStation" style="width: 100%;"/>
     <tool-spacer/>
     <div v-if="data">
-      <hr style="margin: 2px 0;">
-      <tool-spacer/>
-      <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>
-      <tool-spacer/>
-      <tool-listitem label="Elevation" :value="data.elev"/>
-      <tool-listitem label="RWY" :value="data.rwy"/>
-      <tool-listitem label="TCN" :value="data.tcn"/>
-      <tool-listitem label="ATIS" :value="data.atis"/>
-      <tool-listitem label="OPS" :value="data.ops" v-if="data.ops"/>
-      <tool-listitem label="GND" :value="data.gnd"/>
-      <tool-listitem label="TWR" :value="data.twr"/>
-      <tool-listitem label="APP/DEP" :value="data.appdep"/>
-      <tool-section name="Charts"/>
-      <ul class="charts">
-        <li v-for="chart in data.charts" v-bind:key="chart.name">
-          <span @click.stop="openChart(chart)">{{ chart.name }}</span>
-        </li>
-      </ul>
+      <tool-tabs :tabs="['General','Charts']">
+        <template #General>
+          <tool-spacer/>
+          <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>
+          <tool-spacer/>
+          <tool-listitem label="Elevation" :value="data.elev"/>
+          <tool-listitem label="RWY" :value="data.rwy"/>
+          <tool-listitem label="TCN" :value="data.tcn"/>
+          <tool-listitem label="ATIS" :value="data.atis"/>
+          <tool-listitem label="OPS" :value="data.ops" v-if="data.ops"/>
+          <tool-listitem label="GND" :value="data.gnd"/>
+          <tool-listitem label="TWR" :value="data.twr"/>
+          <tool-listitem label="APP/DEP" :value="data.appdep"/>
+        </template>
+        <template #Charts>
+          <tool-spacer/>
+          <ul class="charts">
+            <li v-for="chart in data.charts" v-bind:key="chart.name">
+              <span @click.stop="openChart(chart)">{{ chart.name }}</span>
+            </li>
+          </ul>
+        </template>
+      </tool-tabs>
     </div>
     <div v-else>
       <h4 v-if="selectedStation" style="text-align: center">

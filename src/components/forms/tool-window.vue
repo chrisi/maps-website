@@ -43,5 +43,6 @@ const emit = defineEmits(['close'])
   box-shadow: 5px 5px 5px #222;
   padding: 8px;
   width: 240px;
+  font-size: 15px;
 }
 </style>
