@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
@@ -85,14 +85,6 @@ const toggleCollapsed = () => {
   collapsed.value = !collapsed.value
 }
 
-const vizTools = computed(() => {
-    if (collapsed.value) {
-      return []
-    }
-    return tools.filter(tool => tool.show && tool.show())
-  }
-)
-
 const clickTool = (tool: Tool) => {
   resetTools()
   if (tool.icons) {
@@ -109,51 +101,54 @@ const clickTool = (tool: Tool) => {
 </script>
 
 <template>
-  <table class="pm0">
-    <tbody>
-    <tr>
-      <td @click="toggleCollapsed" style="cursor: pointer">
-        <img src="/common/assets/icon_toolbar.png" class="toolBar" alt="">
-      </td>
-    </tr>
-    <transition-group name="list">
-      <tr v-for="tool in vizTools" v-bind:key="tool.name">
-        <td>
+  <div class="toolbar-wrapper">
+    <div class="toolbar-toggle" @click="toggleCollapsed">
+      <img src="/common/assets/icon_toolbar.png" class="toolbar-header" alt="">
+    </div>
+    <transition name="list">
+      <div v-show="!collapsed" class="toolbar-content">
+        <div v-for="tool in tools.filter(t => t.show && t.show())" :key="tool.name">
           <img :src="`${baseUrl}/common/assets/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
-               class="toolButton" @click.stop="clickTool(tool)">
-        </td>
-      </tr>
-    </transition-group>
-    </tbody>
-  </table>
+               class="tool-button" @click.stop="clickTool(tool)">
+        </div>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <style scoped>
 
-table {
+.toolbar-wrapper {
+  display: inline-flex;
+  flex-direction: column;
   pointer-events: auto;
   touch-action: none;
   border: 1px solid #555;
   box-shadow: 2px 2px 5px #555;
+  background-color: white;
 }
 
-.pm0 {
-  padding: 0;
-  margin: 0;
-  border-spacing: 0;
+.toolbar-toggle {
+  cursor: pointer;
+  display: flex;
+  width: 32px;
+  height: 8px;
+  justify-content: center;
 }
 
-.pm0 td {
-  padding: 0;
+.toolbar-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important for height transitions */
 }
 
-.toolBar {
+.toolbar-header {
   width: 32px;
   height: 8px;
   display: block;
 }
 
-.toolButton {
+.tool-button {
   width: 32px;
   height: 32px;
   display: block;
@@ -161,15 +156,15 @@ table {
   pointer-events: auto;
 }
 
-.list-move,
 .list-enter-active,
 .list-leave-active {
   transition: all 0.3s ease;
+  max-height: 500px; /* Sufficiently large value */
 }
 
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: translateY(-20px);
+  max-height: 0;
 }
 </style>
