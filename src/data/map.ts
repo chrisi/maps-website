@@ -1,9 +1,12 @@
 import type {Theater} from "@/model/theater.ts"
-import {koreaStations} from "@/data/korea/stations.ts";
 import {balkanStations} from "@/data/balkans/stations.ts";
 import {FtPerNM} from "@/scripts/math.ts";
+import type { Station } from "@/model/station";
+import stationsJson from "./korea/stations.json";
 
 export const cdnUrl = "https://cdn.falcon-bms.com/maps"
+
+export const koreaStations = stationsJson as Station[]
 
 export const maps: Theater[] = [
   {
