@@ -213,10 +213,10 @@ export class StationOverlay extends BaseOverlay {
       orientation = parseInt(s.details.rwy.substring(0, 2)) * 10
       doubleRwy = s.details.rwy.includes('-')
     }
-    const rescale = 1 / this.global.map!.pixels * this.global.map!.stationMappingSize
+    const rescale = 1 / this.global.map!.stationMappingSize * this.global.map!.pixels
     return {
       station: s,
-      pt: {x: s.posx / rescale, y: s.posy / rescale},
+      pt: {x: s.posx * rescale, y: s.posy * rescale},
       orientation: orientation,
       doubleRwy: doubleRwy
     };
