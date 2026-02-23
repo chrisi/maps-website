@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+import {ref} from "vue";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
 import SketchingTab from "@/components/sketching-tab.vue";
@@ -11,6 +12,7 @@ import ToolButton from "@/components/forms/tool-button.vue";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 import type {ImcsClient} from "@/scripts/ImcsClient.ts";
+import ConfirmationDialog from "@/components/forms/confirmation-dialog.vue";
 
 const global = useGlobalStore()
 
@@ -31,7 +33,15 @@ const props = defineProps({
 
 const emit = defineEmits(['close'])
 
+const showClearConfirm = ref(false)
+
 const btnClearClick = () => {
+  console.log("clear clicked")
+  showClearConfirm.value = true
+}
+
+const confirmClear = () => {
+  showClearConfirm.value = false
   global.whiteboard.shapes = []
   global.whiteboard.symbols = []
   props.overlayManager.redraw()
@@ -95,6 +105,8 @@ const tabChanged = (sender: string) => {
       <tool-button id="clearSketch" icon="/common/icons/delete.png" @click="btnClearClick"/>
     </div>
   </tool-window>
+  <confirmation-dialog :visible="showClearConfirm" message="Really clear whiteboard?"
+                       @confirm="confirmClear" @cancel="showClearConfirm = false"/>
 </template>
 
 <style scoped>

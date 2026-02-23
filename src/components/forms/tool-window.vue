@@ -40,7 +40,7 @@ const emit = defineEmits(['close'])
   margin: 15px;
   background-color: rgba(245, 245, 245, 1);
   border: 1px solid black;
-  box-shadow: 5px 5px 5px #222;
+  box-shadow: 6px 6px 9px #444;
   padding: 8px;
   width: 240px;
   font-size: 15px;
