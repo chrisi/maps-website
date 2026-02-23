@@ -32,8 +32,8 @@ const emit = defineEmits<{
   border: 1px solid black;
   box-shadow: 6px 6px 9px #444;
   padding: 8px;
-  left: 330px;
-  top: 200px;
+  left: 100px;
+  top: 300px;
   width: 240px;
   z-index: 100;
 }
