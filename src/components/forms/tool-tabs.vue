@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onMounted, type PropType} from "vue";
+import {onMounted, type PropType, ref, watch, nextTick} from "vue";
 
 const emit = defineEmits(['tab-changed'])
 
@@ -11,7 +11,10 @@ const props = defineProps({
   }
 })
 
+const currentTab = ref<string | null>(null)
+
 function openTab(tabName: string) {
+  currentTab.value = tabName
   const tabcontent = document.getElementsByClassName("tabcontent") as HTMLCollectionOf<HTMLDivElement>;
   for (let i = 0; i < tabcontent.length; i++) {
     tabcontent[i]!.style.display = "none";
@@ -22,12 +25,26 @@ function openTab(tabName: string) {
     tab.className = tab.className.replace(" active", "");
     if (tab.name == tabName) tab.className += " active";
   }
-  document.getElementById(tabName)!.style.display = "block";
+  const element = document.getElementById(tabName);
+  if (element) {
+    element.style.display = "block";
+  }
   emit('tab-changed', tabName)
 }
 
+watch(() => props.tabs, async (newTabs) => {
+  if (currentTab.value && !newTabs.includes(currentTab.value)) {
+    if (newTabs.length > 0) {
+      await nextTick()
+      openTab(newTabs[0]!)
+    }
+  }
+}, { deep: true })
+
 onMounted(() => {
-  openTab(props.tabs[0]!)
+  if (props.tabs.length > 0) {
+    openTab(props.tabs[0]!)
+  }
 })
 
 </script>
