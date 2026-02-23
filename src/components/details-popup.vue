@@ -26,6 +26,8 @@ const data = ref<Details>()
 const selectedStation = ref<Station | undefined>()
 const selectorRef = ref<{ focus: () => void } | null>(null)
 
+const tabs = ref(['AIP', 'Charts'])
+
 watch(
   () => props.visible,
   async (isVisible) => {
@@ -50,6 +52,10 @@ watch(
       emit('update:modelValue', undefined)
     } else {
       data.value = newVal.details
+      if (newVal.details?.charts && newVal.details.charts.length > 0)
+        tabs.value = ['AIP', 'Charts']
+      else
+        tabs.value = ['AIP']
       emit('update:modelValue', newVal)
     }
   }
@@ -81,7 +87,7 @@ function openChart(chart: Chart) {
     <station-selector ref="selectorRef" :stations="global.map!.stations" v-model="selectedStation" style="width: 100%;"/>
     <tool-spacer/>
     <div v-if="data">
-      <tool-tabs :tabs="['AIP','Charts']">
+      <tool-tabs :tabs="tabs">
         <template #AIP>
           <tool-spacer/>
           <div class="data">{{ data.lat }}&nbsp;{{ data.long }}</div>

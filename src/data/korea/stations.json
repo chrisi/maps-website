@@ -816,7 +816,28 @@
       "ops": "304.800",
       "gnd": "273.525",
       "twr": "292.300",
-      "appdep": "292.650"
+      "appdep": "292.650",
+      "charts": [
+        {
+          "name": "ILS RWY 18 (110.3)",
+          "url": "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf"
+        },
+        {
+          "name": "ILS RWY 36 (110.3)",
+          "url": "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          "page": 3
+        },
+        {
+          "name": "TACAN RWY 18 (112.8)",
+          "url": "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          "page": 5
+        },
+        {
+          "name": "TACAN RWY 36 (112.8)",
+          "url": "01 South Korea (ROK-US)/Gunsan AB (RKJK)/Gunsan AB (RKJK) - ILS.pdf",
+          "page": 7
+        }
+      ]
     }
   },
   {
