@@ -9,9 +9,9 @@ export interface Station {
 
 export interface Details {
   name: string;
-  lat: string;
-  long: string;
-  elev: string;
+  lat?: string;
+  long?: string; //TODO remove
+  elev: string; //TODO remove
   rwy: string;
   tcn: string;
   atis: string;
