@@ -1,5 +1,4 @@
 import type {Theater} from "@/model/theater.ts"
-import {balkanStations} from "@/data/balkans/stations.ts";
 import {FtPerNM} from "@/scripts/math.ts";
 import type { Station } from "@/model/station";
 import stationsJson from "./korea/stations.json";
@@ -31,7 +30,7 @@ export const maps: Theater[] = [
     px2nm: FtPerNM / (3359580 / 6144), // approx 11.11 pixels per NM
     folder: "02_Balkans",
     mapFilename: "Balkans_UI_Map_6K.jpeg", // native 6144
-    stations: balkanStations,
+    stations: koreaStations,
     stationMappingSize: 4096,
     local: true // load the map from own assets instead from bms cdn
   }
