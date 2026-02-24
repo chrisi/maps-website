@@ -112,6 +112,8 @@ const canvasPos2LatLong = (point: Point): Coord => {
           <tool-spacer/>
           <div class="data">{{ coords }}</div>
           <tool-spacer/>
+          <tool-listitem label="Runways" :value="data.rwy"/>
+          <tool-spacer/>
           <tool-listitem label="Elevation" :value="data.elev"/>
           <tool-listitem label="TACAN" :value="data.tcn"/>
           <tool-listitem label="Range" :value="data.range"/>
@@ -120,7 +122,6 @@ const canvasPos2LatLong = (point: Point): Coord => {
           <tool-listitem label="Ground" :value="data.gnd"/>
           <tool-listitem label="Tower" :value="data.twr"/>
           <tool-listitem label="App/Dep" :value="data.appdep"/>
-          <tool-listitem label="Runways" :value="data.rwy"/>
         </template>
         <template #Charts>
           <tool-spacer/>

@@ -237,6 +237,8 @@ watch(selectedStation, (newValue) => {
   const ovl = overlayManager.getOverlay(LocateOverlay)!
   if (newValue) {
     ovl.highlightStation(newValue.name)
+    if (!activeWindow.value)
+      activeWindow.value = 'locate'
     if (!inhibitLocate) {
       const p = {
         x: newValue.posx / global.map!.stationMappingSize * global.map!.pixels,
