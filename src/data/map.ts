@@ -1,11 +1,13 @@
 import type {Theater} from "@/model/theater.ts"
 import {FtPerNM} from "@/scripts/math.ts";
 import type { Station } from "@/model/station";
-import stationsJson from "./korea/stations.json";
+import koreaStationsJson from "./korea/stations.json";
+import balkansStationsJson from "./balkans/stations.json";
 
 export const cdnUrl = "https://cdn.falcon-bms.com/maps"
 
-export const koreaStations = stationsJson as Station[]
+export const koreaStations = koreaStationsJson as Station[]
+export const balkansStations = balkansStationsJson as Station[]
 
 export const maps: Theater[] = [
   {
@@ -30,7 +32,7 @@ export const maps: Theater[] = [
     px2nm: FtPerNM / (3359580 / 6144), // approx 11.11 pixels per NM
     folder: "02_Balkans",
     mapFilename: "Balkans_UI_Map_6K.jpeg", // native 6144
-    stations: koreaStations,
+    stations: balkansStations,
     stationMappingSize: 4096,
     local: true // load the map from own assets instead from bms cdn
   }
