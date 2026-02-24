@@ -1,4 +1,6 @@
 export interface Station {
+  campId: number,
+  ocdIdx: number,
   name: string,
   country: string,
   type: string
@@ -9,9 +11,8 @@ export interface Station {
 
 export interface Details {
   name: string;
-  lat?: string;
-  long?: string; //TODO remove
-  elev: string; //TODO remove
+  elev: string;
+  range: string;
   rwy: string;
   tcn: string;
   atis: string;

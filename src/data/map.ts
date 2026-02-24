@@ -12,7 +12,7 @@ export const maps: Theater[] = [
   {
     name: "korea",
     datum: {lat: 38.5, long: 127.18},
-    feet: 3359580, // theater size, 1024 km
+    feet: 3359580, // theater size, 1024 km (3358699.5)
     pixels: 6144, // map image size
     resolution: 3359580 / 6144, // approx 546.8
     px2nm: FtPerNM / (3359580 / 6144), // approx 11.11 pixels per NM

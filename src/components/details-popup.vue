@@ -113,13 +113,14 @@ const canvasPos2LatLong = (point: Point): Coord => {
           <div class="data">{{ coords }}</div>
           <tool-spacer/>
           <tool-listitem label="Elevation" :value="data.elev"/>
-          <tool-listitem label="RWY" :value="data.rwy"/>
-          <tool-listitem label="TCN" :value="data.tcn"/>
+          <tool-listitem label="TACAN" :value="data.tcn"/>
+          <tool-listitem label="Range" :value="data.range"/>
           <tool-listitem label="ATIS" :value="data.atis"/>
           <tool-listitem label="OPS" :value="data.ops" v-if="data.ops"/>
-          <tool-listitem label="GND" :value="data.gnd"/>
-          <tool-listitem label="TWR" :value="data.twr"/>
-          <tool-listitem label="APP/DEP" :value="data.appdep"/>
+          <tool-listitem label="Ground" :value="data.gnd"/>
+          <tool-listitem label="Tower" :value="data.twr"/>
+          <tool-listitem label="App/Dep" :value="data.appdep"/>
+          <tool-listitem label="Runways" :value="data.rwy"/>
         </template>
         <template #Charts>
           <tool-spacer/>
