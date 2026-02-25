@@ -19,7 +19,10 @@ watch(selectedStation, (newStation) => {
 }, {immediate: true})
 
 const getStationsByCountryType = () => {
-  const countryOrder = ["South Korea", "Japan", "North Korea", "China"];
+  const countryOrder = ["South Korea", "Japan", "North Korea", "China",
+    "Italy", "Croatia", "Greece",
+    "Serbia and Montenegro", "Bosnia and Herzegovina",
+    "Slovenia", "Hungary", "North Macedonia", "Albania", "Kosovo"];
   const typeOrder = ["Airbases", "Airstrips", "Nav-Beacons"];
 
   const grouped = props.stations.reduce((obj, sta) => {
