@@ -19,14 +19,36 @@ watch(selectedStation, (newStation) => {
 }, {immediate: true})
 
 const getStationsByCountryType = () => {
-  return props.stations.reduce((obj, sta) => {
-    const key = `${sta.country} - ${sta.type}s`;
+  const countryOrder = ["South Korea", "Japan", "North Korea", "China"];
+
+  const grouped = props.stations.reduce((obj, sta) => {
+    const typeLabel = sta.type === 'Airbase' ? 'Airbases' : 'Nav-Beacons';
+    const key = `${sta.country} - ${typeLabel}`;
     if (!obj[key]) {
       obj[key] = [];
     }
     obj[key].push(sta);
     return obj;
   }, {} as Record<string, Station[]>);
+
+  const sortedKeys = Object.keys(grouped).sort((a, b) => {
+    const [countryA, typeA] = a.split(' - ');
+    const [countryB, typeB] = b.split(' - ');
+
+    const countryIndexA = countryOrder.indexOf(countryA!);
+    const countryIndexB = countryOrder.indexOf(countryB!);
+
+    if (countryIndexA !== countryIndexB) {
+      return (countryIndexA === -1 ? 99 : countryIndexA) - (countryIndexB === -1 ? 99 : countryIndexB);
+    }
+
+    return typeA === 'Airbases' ? -1 : 1;
+  });
+
+  return sortedKeys.map(key => ({
+    label: key,
+    stations: grouped[key]!.sort((a, b) => a.name.localeCompare(b.name))
+  }));
 }
 
 const dropdownRef = ref<HTMLSelectElement | null>(null)
@@ -42,8 +64,8 @@ defineExpose({ focus })
 <template>
   <select ref="dropdownRef" v-model="dropdownName" @change="updateSelection">
     <option value=""></option>
-    <optgroup v-for="(v,k) in getStationsByCountryType()" v-bind:key="k" :label="k">
-      <option v-for="c in v" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
+    <optgroup v-for="group in getStationsByCountryType()" v-bind:key="group.label" :label="group.label">
+      <option v-for="c in group.stations" v-bind:key="c.name" :value="c.name">{{ c.name }}</option>
     </optgroup>
   </select>
 </template>
