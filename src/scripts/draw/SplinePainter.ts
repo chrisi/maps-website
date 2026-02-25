@@ -1,7 +1,7 @@
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import {alphaColor, dashStyle} from "@/scripts/draw.ts";
-import {detectCorners, simplifyPoints} from "@/scripts/spline.ts";
+import {alphaColor, dashStyle} from "@/scripts/draw/basic.ts";
+import {detectCorners, simplifyPoints} from "@/scripts/draw/spline.ts";
 import {generateGuid} from "@/scripts/utils.ts";
 import {type WbFreehand, WbShapeType} from "@/model/overlays.ts";
 import type {WhiteboardSettings} from "@/model/settings.ts";

@@ -4,10 +4,10 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {MissionManager} from "@/scripts/MissionManager.ts";
 import {watch} from "vue";
 import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
-import {drawOutlined, drawTextOutlined} from "@/scripts/draw.ts";
+import {drawOutlined, drawTextOutlined} from "@/scripts/draw/basic.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {drawHighlight} from "@/common/scripts/map_draw";
-import {drawTextBoxed} from "@/scripts/draw.ts";
+import {drawTextBoxed} from "@/scripts/draw/basic.ts";
 import {pointOffsetRad} from "@/scripts/utils.ts";
 
 export class RouteOverlay extends BaseOverlay {

@@ -1,5 +1,5 @@
 import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
-import {drawArrowHead, drawOutlined, drawTextBoxed} from "@/scripts/draw.ts";
+import {drawArrowHead, drawOutlined, drawTextBoxed} from "@/scripts/draw/basic.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";

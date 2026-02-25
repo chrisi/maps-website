@@ -176,28 +176,25 @@ export function drawLineAlt(ctx: CanvasRenderingContext2D, p1: Point, p2: Point,
   ctx.stroke()
 }
 
-export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point, width: number, height: number, rotaDeg: number) {
+export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point, width: number, height: number, rotaDeg: number = 0,
+                         opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
   const rotation = deg2rad(rotaDeg)
-
   const halfW = width / 2
   const halfH = height / 2
-
   ctx.save()
   ctx.beginPath()
-
-  // rotate around the center, then draw rect centered at origin
   ctx.translate(ctr.x, ctr.y)
   ctx.rotate(rotation)
   ctx.rect(-halfW, -halfH, width, height)
-
+  applyStyleAndDraw(ctx, opts)
   ctx.restore()
-  ctx.stroke()
 }
 
-export function drawCircle(ctx: CanvasRenderingContext2D, ctr: Point, rad: number) {
+export function drawCircle(ctx: CanvasRenderingContext2D, pt: Point, rad: number,
+                           opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
   ctx.beginPath()
-  ctx.arc(ctr.x, ctr.y, rad, 0, 2 * Math.PI)
-  ctx.stroke()
+  ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI)
+  applyStyleAndDraw(ctx, opts)
 }
 
 export function drawEllipse(ctx: CanvasRenderingContext2D, ctr: Point, majorRad: number, minorRad: number, rotaDeg: number) {
@@ -215,5 +212,33 @@ export function drawEllipse(ctx: CanvasRenderingContext2D, ctr: Point, majorRad:
   ctx.arc(0, 0, 1, 0, 2 * Math.PI)
 
   ctx.restore()
+  ctx.stroke()
+}
+
+export function drawPolygon(ctx: CanvasRenderingContext2D, ctr: Point, n: number, rad: number, start: number = 0,
+                            opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
+  ctx.save();
+  const step = (Math.PI * 2) / n
+  for (let i = 0; i < n; i++) {
+    const a = start + i * step
+    const x = ctr.x + Math.cos(a) * rad
+    const y = ctr.y + Math.sin(a) * rad
+    if (i === 0) ctx.moveTo(x, y)
+    else ctx.lineTo(x, y)
+  }
+  ctx.closePath()
+  applyStyleAndDraw(ctx, opts)
+  ctx.restore()
+}
+
+function applyStyleAndDraw(ctx: CanvasRenderingContext2D, opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
+  if (opts?.lineWidth != null) ctx.lineWidth = opts.lineWidth
+  if (opts?.fillStyle) {
+    ctx.fillStyle = opts.fillStyle
+    ctx.fill()
+  }
+  if (opts?.strokeStyle) {
+    ctx.strokeStyle = opts.strokeStyle
+  }
   ctx.stroke()
 }

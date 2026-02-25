@@ -1,7 +1,7 @@
 import {watch} from "vue";
 import {OverlayMode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import {SplinePainter} from "@/scripts/SplinePainter.ts";
+import {SplinePainter} from "@/scripts/draw/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {
@@ -25,7 +25,7 @@ import {
   drawRect,
   drawText,
   drawLineAlt
-} from "@/scripts/draw.ts";
+} from "@/scripts/draw/basic.ts";
 import {generateGuid, getModMask, Mod} from "@/scripts/utils.ts";
 import {
   deg2rad,

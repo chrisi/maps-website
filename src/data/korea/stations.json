@@ -741,7 +741,7 @@
     "ocdIdx": 10,
     "name": "Icheon VOR (ICN)",
     "country": "South Korea",
-    "type": "n/a",
+    "type": "VOR",
     "posx": 2042,
     "posy": 2624,
     "details": {
@@ -843,7 +843,7 @@
     "ocdIdx": 10,
     "name": "Iwakuni TACAN (NEU) 35X",
     "country": "Japan",
-    "type": "n/a",
+    "type": "TACAN",
     "posx": 3799,
     "posy": 3934,
     "details": {

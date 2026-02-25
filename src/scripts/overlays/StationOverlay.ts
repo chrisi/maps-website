@@ -5,6 +5,8 @@ import {deg2rad} from "@/scripts/math.ts";
 import type {Station} from "@/model/station.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {watch} from "vue";
+import {drawAirbase, drawNavDme, drawNavTacan, drawNavVor, drawNavVorDme} from "@/scripts/draw/symbols.ts";
+import {drawCircle} from "@/scripts/draw/basic.ts";
 
 export class StationOverlay extends BaseOverlay {
 
@@ -43,130 +45,22 @@ export class StationOverlay extends BaseOverlay {
     this.stations.forEach(sta => {
       const pt = this.toCnv(sta.pt, cnv)
       if (sta.station.type === 'Airbase')
-        this.drawAirbase(cnv, pt, sta.orientation, smartScale, sta.doubleRwy);
+        drawAirbase(cnv.context, pt, sta.orientation, smartScale, sta.doubleRwy);
+      if (sta.station.type === 'Airstrip')
+        drawAirbase(cnv.context, pt, sta.orientation, smartScale, false, true);
       if (sta.station.type === 'VORTAC')
-        this.drawVor(cnv, pt, smartScale, true);
+        drawNavTacan(cnv.context, pt, smartScale, true)
+      if (sta.station.type === 'TACAN')
+        drawNavTacan(cnv.context, pt, smartScale)
+      if (sta.station.type === 'VOR')
+        drawNavVor(cnv.context, pt, smartScale)
+      if (sta.station.type === 'DME')
+        drawNavDme(cnv.context, pt, smartScale)
       if (sta.station.type === 'VOR/DME')
-        this.drawVor(cnv, pt, smartScale, false);
+        drawNavVorDme(cnv.context, pt, smartScale)
       if (sta.station.type === 'Range')
         this.drawRange(cnv, pt, smartScale);
     })
-  }
-
-  private drawAirbase(cnv: Canvas, pt: Point, orientation: number, scale: number = 1.0, dualRw: boolean = false) {
-    const ctx = cnv.context;
-
-    const oriRad = deg2rad(orientation + 90)
-
-    const length = 32 * scale
-    const rad = (dualRw ? 8 : 6) * scale
-    const inWidth = 3 * scale
-    const outWidth = 5 * scale
-    const cbWidth = 1.2 * scale
-    const gap = 5 * scale
-
-    const dxo = Math.cos(oriRad) * (length / 2)
-    const dyo = Math.sin(oriRad) * (length / 2)
-
-    const dxi = Math.cos(oriRad) * ((length - 2) / 2)
-    const dyi = Math.sin(oriRad) * ((length - 2) / 2)
-
-    let offsets = [{x: 0, y: 0}];
-
-    if (dualRw) {
-      const ox = Math.cos(oriRad + Math.PI / 2) * (gap / 2);
-      const oy = Math.sin(oriRad + Math.PI / 2) * (gap / 2);
-      offsets = [
-        {x: ox, y: oy},
-        {x: -ox, y: -oy}
-      ];
-    }
-
-    this.drawCircle(cnv, pt, rad, cbWidth, 'black', 'navy')
-
-    ctx.beginPath();
-    offsets.forEach(function (o) {
-      ctx.moveTo(pt.x + o.x - dxo, pt.y + o.y - dyo);
-      ctx.lineTo(pt.x + o.x + dxo, pt.y + o.y + dyo);
-    });
-    ctx.lineWidth = outWidth;
-    ctx.strokeStyle = '#000000';
-    ctx.stroke();
-
-    ctx.beginPath();
-    offsets.forEach(function (o) {
-      ctx.moveTo(pt.x + o.x - dxi, pt.y + o.y - dyi);
-      ctx.lineTo(pt.x + o.x + dxi, pt.y + o.y + dyi);
-    });
-    ctx.lineWidth = inWidth;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-  }
-
-  private drawVor(cnv: Canvas, pt: Point, scale: number = 1, isTac: boolean = false) {
-    const ctx = cnv.context;
-
-    const hexRad = 7 * scale;       // Radius of the hexagon
-    const tabLen = hexRad * 0.5;    // Length of the rectangular tabs
-    const circleRad = hexRad * 0.3; // Radius of the center circle
-    const apothem = hexRad * Math.sqrt(3) / 2; // Distance from center to side midpoint
-    const lineWidth = 0.8 * scale;
-
-    ctx.save();
-    ctx.translate(pt.x, pt.y);
-
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = 'black';
-
-    if (isTac) {
-      const tabAngles = [Math.PI / 2, (7 * Math.PI) / 6, (11 * Math.PI) / 6]; // 90, 210, 330 degrees
-
-      // draw the 3 Black Tabs
-      ctx.fillStyle = 'black';
-      tabAngles.forEach(function (angle) {
-        ctx.save();
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-        ctx.moveTo(apothem, -hexRad / 1.8);
-        ctx.lineTo(apothem + tabLen, -hexRad / 1.8);
-        ctx.lineTo(apothem + tabLen, hexRad / 1.8);
-        ctx.lineTo(apothem, hexRad / 1.8);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.restore();
-      })
-    } else {
-      // draw DME Box
-      ctx.beginPath();
-      ctx.rect(-hexRad * 1.1, -hexRad * 0.9, hexRad * 2.2, hexRad * 1.8);
-      ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    // flat-topped hexagon vertices at 0, 60, 120, etc.
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const angle = i * Math.PI / 3; // 0, 60, 120...
-      const hx = hexRad * Math.cos(angle);
-      const hy = hexRad * Math.sin(angle);
-      if (i === 0) ctx.moveTo(hx, hy);
-      else ctx.lineTo(hx, hy);
-    }
-    ctx.closePath();
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.stroke();
-
-    // draw center circle
-    ctx.beginPath();
-    ctx.arc(0, 0, circleRad, 0, 2 * Math.PI);
-    ctx.fillStyle = 'black';
-    ctx.fill();
-
-    ctx.restore();
   }
 
   private drawRange(cnv: Canvas, pt: Point, scale: number = 1) {
@@ -176,8 +70,8 @@ export class StationOverlay extends BaseOverlay {
     const lineWidth = 1.7 * scale;
     const crossSize = 11 * scale;
 
-    this.drawCircle(cnv, pt, ringRad, lineWidth, 'black', 'white');
-    this.drawCircle(cnv, pt, ringRad * 0.6, lineWidth, 'black');
+    drawCircle(cnv.context, pt, ringRad, {fillStyle: 'white', strokeStyle: 'black', lineWidth: lineWidth})
+    drawCircle(cnv.context, pt, ringRad * 0.6, {strokeStyle: 'black', lineWidth: lineWidth});
 
     ctx.save()
     ctx.translate(pt.x, pt.y)
@@ -190,20 +84,6 @@ export class StationOverlay extends BaseOverlay {
     ctx.lineTo(0, crossSize)
     ctx.stroke()
     ctx.restore()
-  }
-
-  private drawCircle(cnv: Canvas, pt: Point, rad: number,
-                     borderWidth: number = 1, strokeColor: string, fillColor?: string) {
-    const ctx = cnv.context;
-    ctx.beginPath()
-    ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI)
-    if (fillColor) {
-      ctx.fillStyle = fillColor
-      ctx.fill()
-    }
-    ctx.lineWidth = borderWidth
-    ctx.strokeStyle = strokeColor
-    ctx.stroke()
   }
 
   private prepareStation(s: Station) {
