@@ -20,9 +20,23 @@ watch(selectedStation, (newStation) => {
 
 const getStationsByCountryType = () => {
   const countryOrder = ["South Korea", "Japan", "North Korea", "China"];
+  const typeOrder = ["Airbases", "Airstrips", "Nav-Beacons"];
 
   const grouped = props.stations.reduce((obj, sta) => {
-    const typeLabel = sta.type === 'Airbase' ? 'Airbases' : 'Nav-Beacons';
+
+    let typeLabel: string
+    switch (sta.type) {
+      case 'Airbase':
+        typeLabel = 'Airbases';
+        break;
+      case 'Airstrip':
+        typeLabel = 'Airstrips';
+        break;
+      default:
+        typeLabel = 'Nav-Beacons';
+        break;
+    }
+
     const key = `${sta.country} - ${typeLabel}`;
     if (!obj[key]) {
       obj[key] = [];
@@ -42,7 +56,10 @@ const getStationsByCountryType = () => {
       return (countryIndexA === -1 ? 99 : countryIndexA) - (countryIndexB === -1 ? 99 : countryIndexB);
     }
 
-    return typeA === 'Airbases' ? -1 : 1;
+    const typeIndexA = typeOrder.indexOf(typeA!);
+    const typeIndexB = typeOrder.indexOf(typeB!);
+
+    return (typeIndexA === -1 ? 99 : typeIndexA) - (typeIndexB === -1 ? 99 : typeIndexB);
   });
 
   return sortedKeys.map(key => ({
@@ -57,7 +74,7 @@ function focus() {
   dropdownRef.value?.focus()
 }
 
-defineExpose({ focus })
+defineExpose({focus})
 
 </script>
 
