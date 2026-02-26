@@ -171,6 +171,11 @@ onMounted(() => {
   })
 })
 
+const showProfile = () => {
+  console.log("showProfile")
+
+}
+
 const prevWaypoint = () => {
   const idx = global.currentWaypoint!.no - 1
   if (idx > 0)
@@ -242,6 +247,7 @@ const type = computed(() => {
         <tool-spacer/>
       </template>
       <template #Radio>
+        <tool-button id="showProfile" icon="/common/icons/delete.png" @click="showProfile"/>
       </template>
       <template #Mission>
         <tool-section name="Flight 1"/>
