@@ -9,7 +9,7 @@
     "posy": 849,
     "details": {
       "name": "Anshan Airbase (ZYAS)",
-      "elev": "",
+      "elev": "48 ft",
       "range": "80 NM",
       "rwy": "02/20",
       "tcn": "021X",
@@ -72,7 +72,7 @@
     "posy": 464,
     "details": {
       "name": "Changbaishan Airport (ZYBS)",
-      "elev": "",
+      "elev": "2880 ft",
       "range": "80 NM",
       "rwy": "18/36",
       "tcn": "061X",
@@ -93,7 +93,7 @@
     "posy": 1220,
     "details": {
       "name": "Changjin-Up Airbase (ZKJN)",
-      "elev": "",
+      "elev": "3586 ft",
       "range": "",
       "rwy": "15/33",
       "tcn": "",
@@ -114,7 +114,7 @@
     "posy": 2841,
     "details": {
       "name": "Cheongju Intl Airport (RKTU)",
-      "elev": "",
+      "elev": "176 ft",
       "range": "",
       "rwy": "05L/23R - 05R/23L",
       "tcn": "",
@@ -156,7 +156,7 @@
     "posy": 3202,
     "details": {
       "name": "Daegu AB (RKTN)",
-      "elev": "",
+      "elev": "120 ft",
       "range": "70 NM",
       "rwy": "12R/30L - 12L/30R",
       "tcn": "125X",
@@ -198,7 +198,7 @@
     "posy": 1634,
     "details": {
       "name": "Dalian Sanshilipu (ZYLP)",
-      "elev": "",
+      "elev": "12 ft",
       "range": "70 NM",
       "rwy": "11/29",
       "tcn": "063X",
@@ -240,7 +240,7 @@
     "posy": 1351,
     "details": {
       "name": "Dandong Langtou Airbase (ZYDD)",
-      "elev": "",
+      "elev": "30 ft",
       "range": "80 NM",
       "rwy": "18/36",
       "tcn": "066X",
@@ -303,7 +303,7 @@
     "posy": 393,
     "details": {
       "name": "Fuxin Airbase",
-      "elev": "",
+      "elev": "800 ft",
       "range": "80 NM",
       "rwy": "08/26",
       "tcn": "067X",
@@ -324,7 +324,7 @@
     "posy": 398,
     "details": {
       "name": "Fuxin Airport (ZXFX)",
-      "elev": "",
+      "elev": "554 ft",
       "range": "80 NM",
       "rwy": "01R/19L - 01L/19R",
       "tcn": "068X",
@@ -345,7 +345,7 @@
     "posy": 2375,
     "details": {
       "name": "Gangneung AB (RKNN)",
-      "elev": "",
+      "elev": "19 ft",
       "range": "70 NM",
       "rwy": "07/25",
       "tcn": "056X",
@@ -387,7 +387,7 @@
     "posy": 3516,
     "details": {
       "name": "Gimhae Intl Airport (RKPK)",
-      "elev": "",
+      "elev": "14 ft",
       "range": "",
       "rwy": "17R/35L - 17L/35R",
       "tcn": "",
@@ -429,7 +429,7 @@
     "posy": 2467,
     "details": {
       "name": "Gimpo Intl Airport (RKSS)",
-      "elev": "",
+      "elev": "48 ft",
       "range": "70 NM",
       "rwy": "14R/32L - 14L/32R",
       "tcn": "083X",
@@ -481,7 +481,7 @@
     "posy": 3085,
     "details": {
       "name": "Gumi Highway Strip",
-      "elev": "",
+      "elev": "200 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -502,7 +502,7 @@
     "posy": 3198,
     "details": {
       "name": "Gunsan AB (RKJK)",
-      "elev": "",
+      "elev": "22 ft",
       "range": "",
       "rwy": "17/35",
       "tcn": "",
@@ -557,7 +557,7 @@
     "posy": 3542,
     "details": {
       "name": "Gwangju AB (RKJJ)",
-      "elev": "",
+      "elev": "42 ft",
       "range": "80 NM",
       "rwy": "03L/21R - 03R/21L",
       "tcn": "091X",
@@ -599,7 +599,7 @@
     "posy": 2262,
     "details": {
       "name": "Haeju Airstrip",
-      "elev": "",
+      "elev": "40 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
@@ -620,7 +620,7 @@
     "posy": 3795,
     "details": {
       "name": "Hiroshima Airport (RJOA)",
-      "elev": "",
+      "elev": "1080 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -662,7 +662,7 @@
     "posy": 1975,
     "details": {
       "name": "Hwangju Airbase",
-      "elev": "",
+      "elev": "48 ft",
       "range": "",
       "rwy": "12/30",
       "tcn": "",
@@ -683,7 +683,7 @@
     "posy": 1079,
     "details": {
       "name": "Hwangsuwon Airbase",
-      "elev": "",
+      "elev": "4026 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
@@ -704,7 +704,7 @@
     "posy": 1366,
     "details": {
       "name": "Hyangsan Airstrip",
-      "elev": "",
+      "elev": "331 ft",
       "range": "",
       "rwy": "12/30",
       "tcn": "",
@@ -725,7 +725,7 @@
     "posy": 1998,
     "details": {
       "name": "Hyon-Ni Airbase",
-      "elev": "",
+      "elev": "1930 ft",
       "range": "",
       "rwy": "01/19",
       "tcn": "",
@@ -741,7 +741,7 @@
     "ocdIdx": 10,
     "name": "Icheon VOR (ICN)",
     "country": "South Korea",
-    "type": "VOR",
+    "type": "n/a",
     "posx": 2042,
     "posy": 2624,
     "details": {
@@ -767,7 +767,7 @@
     "posy": 2501,
     "details": {
       "name": "Incheon Intl Airport (RKSI)",
-      "elev": "",
+      "elev": "18 ft",
       "range": "70 NM",
       "rwy": "15R/33L - 15L/33R",
       "tcn": "076X",
@@ -827,7 +827,7 @@
     "posy": 3940,
     "details": {
       "name": "Iwakuni MCAS (RJOI)",
-      "elev": "",
+      "elev": "6 ft",
       "range": "100 NM",
       "rwy": "01/19",
       "tcn": "126X",
@@ -843,7 +843,7 @@
     "ocdIdx": 10,
     "name": "Iwakuni TACAN (NEU) 35X",
     "country": "Japan",
-    "type": "TACAN",
+    "type": "n/a",
     "posx": 3799,
     "posy": 3934,
     "details": {
@@ -869,7 +869,7 @@
     "posy": 3711,
     "details": {
       "name": "Iwami Airport (RJOW)",
-      "elev": "",
+      "elev": "175 ft",
       "range": "150 NM",
       "rwy": "10/28",
       "tcn": "057X",
@@ -890,7 +890,7 @@
     "posy": 1220,
     "details": {
       "name": "Iwon Airbase",
-      "elev": "",
+      "elev": "70 ft",
       "range": "",
       "rwy": "10/28",
       "tcn": "",
@@ -932,7 +932,7 @@
     "posy": 2701,
     "details": {
       "name": "Jungwon AB (RKTI)",
-      "elev": "",
+      "elev": "290 ft",
       "range": "70 NM",
       "rwy": "18R/36L - 18L/36R",
       "tcn": "005X",
@@ -985,7 +985,7 @@
     "posy": 1488,
     "details": {
       "name": "Kaechon Airbase",
-      "elev": "",
+      "elev": "110 ft",
       "range": "",
       "rwy": "04/22",
       "tcn": "",
@@ -1006,7 +1006,7 @@
     "posy": 236,
     "details": {
       "name": "Kaiyuan-Tieling Airbase (ZYKT)",
-      "elev": "",
+      "elev": "275 ft",
       "range": "80 NM",
       "rwy": "02/20",
       "tcn": "069X",
@@ -1027,7 +1027,7 @@
     "posy": 1755,
     "details": {
       "name": "Kalma Airport (ZKWS)",
-      "elev": "",
+      "elev": "18 ft",
       "range": "70 NM",
       "rwy": "15R/33L - 15L/33R",
       "tcn": "054X",
@@ -1048,7 +1048,7 @@
     "posy": 1752,
     "details": {
       "name": "Kangdong Airstrip",
-      "elev": "",
+      "elev": "112 ft",
       "range": "",
       "rwy": "03/21",
       "tcn": "",
@@ -1069,7 +1069,7 @@
     "posy": 969,
     "details": {
       "name": "Kilchu Airstrip",
-      "elev": "",
+      "elev": "308 ft",
       "range": "",
       "rwy": "02/20",
       "tcn": "",
@@ -1090,7 +1090,7 @@
     "posy": 1962,
     "details": {
       "name": "Koksan Airbase",
-      "elev": "",
+      "elev": "800 ft",
       "range": "",
       "rwy": "06/24",
       "tcn": "",
@@ -1132,7 +1132,7 @@
     "posy": 819,
     "details": {
       "name": "Kuktong Airbase",
-      "elev": "",
+      "elev": "118 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -1174,7 +1174,7 @@
     "posy": 1885,
     "details": {
       "name": "Kuum-Ni Airbase",
-      "elev": "",
+      "elev": "86 ft",
       "range": "",
       "rwy": "05/23",
       "tcn": "",
@@ -1195,7 +1195,7 @@
     "posy": 2069,
     "details": {
       "name": "Kwail Airbase",
-      "elev": "",
+      "elev": "75 ft",
       "range": "",
       "rwy": "15/33",
       "tcn": "",
@@ -1216,7 +1216,7 @@
     "posy": 1490,
     "details": {
       "name": "Kwaksan Airbase",
-      "elev": "",
+      "elev": "56 ft",
       "range": "",
       "rwy": "04/22",
       "tcn": "",
@@ -1237,7 +1237,7 @@
     "posy": 1466,
     "details": {
       "name": "Laoohutun Airbase (ZYLN)",
-      "elev": "",
+      "elev": "42 ft",
       "range": "80 NM",
       "rwy": "05/23",
       "tcn": "070X",
@@ -1258,7 +1258,7 @@
     "posy": 777,
     "details": {
       "name": "Liaoyang Airbase  (ZYLY)",
-      "elev": "",
+      "elev": "56 ft",
       "range": "80 NM",
       "rwy": "02/20",
       "tcn": "071X",
@@ -1279,7 +1279,7 @@
     "posy": 873,
     "details": {
       "name": "Manpo Airbase",
-      "elev": "",
+      "elev": "820 ft",
       "range": "",
       "rwy": "02/20",
       "tcn": "",
@@ -1321,7 +1321,7 @@
     "posy": 1816,
     "details": {
       "name": "Mirim Airport",
-      "elev": "",
+      "elev": "60 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -1342,7 +1342,7 @@
     "posy": 3598,
     "details": {
       "name": "Muan Intl Airport (RKJB)",
-      "elev": "",
+      "elev": "38 ft",
       "range": "70 NM",
       "rwy": "18/36",
       "tcn": "047X",
@@ -1390,7 +1390,7 @@
     "posy": 2161,
     "details": {
       "name": "Nuchon-ni Airbase",
-      "elev": "",
+      "elev": "300 ft",
       "range": "",
       "rwy": "10/28",
       "tcn": "",
@@ -1411,7 +1411,7 @@
     "posy": 1706,
     "details": {
       "name": "Okpyongni Highwaystrip",
-      "elev": "",
+      "elev": "30 ft",
       "range": "",
       "rwy": "15/33",
       "tcn": "",
@@ -1432,7 +1432,7 @@
     "posy": 1863,
     "details": {
       "name": "Onchon Airbase",
-      "elev": "",
+      "elev": "50 ft",
       "range": "",
       "rwy": "01/19",
       "tcn": "",
@@ -1453,7 +1453,7 @@
     "posy": 739,
     "details": {
       "name": "Orang Airbase",
-      "elev": "",
+      "elev": "15 ft",
       "range": "",
       "rwy": "03/21",
       "tcn": "",
@@ -1474,7 +1474,7 @@
     "posy": 2677,
     "details": {
       "name": "Osan AB (RKSO)",
-      "elev": "",
+      "elev": "42 ft",
       "range": "",
       "rwy": "08L/26R - 08R/26L",
       "tcn": "",
@@ -1537,7 +1537,7 @@
     "posy": 1404,
     "details": {
       "name": "Panghyon Airbase",
-      "elev": "",
+      "elev": "290 ft",
       "range": "",
       "rwy": "12/30",
       "tcn": "",
@@ -1558,7 +1558,7 @@
     "posy": 1424,
     "details": {
       "name": "Panghyon Highwaystrip South",
-      "elev": "",
+      "elev": "348 ft",
       "range": "",
       "rwy": "11/29",
       "tcn": "",
@@ -1600,7 +1600,7 @@
     "posy": 3157,
     "details": {
       "name": "Pohang AB (RKTH)",
-      "elev": "",
+      "elev": "74 ft",
       "range": "80 NM",
       "rwy": "09/27",
       "tcn": "033X",
@@ -1647,7 +1647,7 @@
     "posy": 1597,
     "details": {
       "name": "Pukchang-up Airbase",
-      "elev": "",
+      "elev": "165 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
@@ -1668,7 +1668,7 @@
     "posy": 1568,
     "details": {
       "name": "Pulandian Airbase (ZYPD)",
-      "elev": "",
+      "elev": "85 ft",
       "range": "80 NM",
       "rwy": "02/20",
       "tcn": "079X",
@@ -1689,7 +1689,7 @@
     "posy": 2730,
     "details": {
       "name": "Pyeongtaek AAF (RKSG)",
-      "elev": "",
+      "elev": "48 ft",
       "range": "70 NM",
       "rwy": "13/31",
       "tcn": "019X",
@@ -1729,7 +1729,7 @@
     "posy": 1799,
     "details": {
       "name": "Pyongyang Elite Airstrip",
-      "elev": "",
+      "elev": "52 ft",
       "range": "",
       "rwy": "16/34",
       "tcn": "",
@@ -1750,7 +1750,7 @@
     "posy": 3564,
     "details": {
       "name": "Sacheon AB (RKPS)",
-      "elev": "",
+      "elev": "9 ft",
       "range": "",
       "rwy": "06L/24R - 06R/24L",
       "tcn": "",
@@ -1830,7 +1830,7 @@
     "posy": 534,
     "details": {
       "name": "Samjiyon Airport (ZKSE)",
-      "elev": "",
+      "elev": "4450 ft",
       "range": "100 NM",
       "rwy": "06/24",
       "tcn": "050X",
@@ -1851,7 +1851,7 @@
     "posy": 1928,
     "details": {
       "name": "Sangwon Highwaystrip",
-      "elev": "",
+      "elev": "368 ft",
       "range": "",
       "rwy": "15/33",
       "tcn": "",
@@ -1872,7 +1872,7 @@
     "posy": 467,
     "details": {
       "name": "Sanphuzen Liyoufangcun Airport (ZYPZ)",
-      "elev": "",
+      "elev": "1360 ft",
       "range": "80 NM",
       "rwy": "04/22",
       "tcn": "080X",
@@ -1893,7 +1893,7 @@
     "posy": 2842,
     "details": {
       "name": "Seosan AB (RKTP)",
-      "elev": "",
+      "elev": "42 ft",
       "range": "70 NM",
       "rwy": "03L/21R - 03R/21L",
       "tcn": "073X",
@@ -1945,7 +1945,7 @@
     "posy": 2514,
     "details": {
       "name": "Seoul AB (RKSM)",
-      "elev": "",
+      "elev": "90 ft",
       "range": "",
       "rwy": "01/19 - 18/36",
       "tcn": "",
@@ -2016,7 +2016,7 @@
     "posy": 520,
     "details": {
       "name": "Shenyang Beiling Airbase (ZYBG)",
-      "elev": "",
+      "elev": "185 ft",
       "range": "150 NM",
       "rwy": "01/19",
       "tcn": "084X",
@@ -2037,7 +2037,7 @@
     "posy": 559,
     "details": {
       "name": "Shenyang Dongta Airbase (ZYYY)",
-      "elev": "",
+      "elev": "164 ft",
       "range": "80 NM",
       "rwy": "05/23",
       "tcn": "088X",
@@ -2058,7 +2058,7 @@
     "posy": 538,
     "details": {
       "name": "Shenyang Yuhong Airport (ZYSQ)",
-      "elev": "",
+      "elev": "135 ft",
       "range": "80 NM",
       "rwy": "03/21",
       "tcn": "089X",
@@ -2079,7 +2079,7 @@
     "posy": 2579,
     "details": {
       "name": "Singal Highway Strip",
-      "elev": "",
+      "elev": "225 ft",
       "range": "",
       "rwy": "18/36",
       "tcn": "",
@@ -2121,7 +2121,7 @@
     "posy": 1495,
     "details": {
       "name": "Sondok Airbase",
-      "elev": "",
+      "elev": "18 ft",
       "range": "",
       "rwy": "01/19",
       "tcn": "",
@@ -2163,7 +2163,7 @@
     "posy": 2762,
     "details": {
       "name": "Songwhan Highway Strip",
-      "elev": "",
+      "elev": "125 ft",
       "range": "",
       "rwy": "18/36",
       "tcn": "",
@@ -2184,7 +2184,7 @@
     "posy": 630,
     "details": {
       "name": "Sugamni Airbase",
-      "elev": "",
+      "elev": "35 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
@@ -2205,7 +2205,7 @@
     "posy": 1720,
     "details": {
       "name": "Sunan Intl Airport (ZKPY)",
-      "elev": "",
+      "elev": "96 ft",
       "range": "150 NM",
       "rwy": "16/34 - 18/36",
       "tcn": "051X",
@@ -2226,7 +2226,7 @@
     "posy": 1638,
     "details": {
       "name": "Sunchon  (ZKSC)",
-      "elev": "",
+      "elev": "130 ft",
       "range": "",
       "rwy": "15/33",
       "tcn": "",
@@ -2268,7 +2268,7 @@
     "posy": 2611,
     "details": {
       "name": "Suwon AB (RKSW)",
-      "elev": "",
+      "elev": "94 ft",
       "range": "70 NM",
       "rwy": "14R/32L - 14L/32R",
       "tcn": "022X",
@@ -2289,7 +2289,7 @@
     "posy": 1418,
     "details": {
       "name": "Taechon Airbase",
-      "elev": "",
+      "elev": "120 ft",
       "range": "",
       "rwy": "11/29",
       "tcn": "",
@@ -2310,7 +2310,7 @@
     "posy": 2202,
     "details": {
       "name": "Taetan Airbase",
-      "elev": "",
+      "elev": "98 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -2331,7 +2331,7 @@
     "posy": 1203,
     "details": {
       "name": "Tanchon Airstrip",
-      "elev": "",
+      "elev": "10 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
@@ -2352,7 +2352,7 @@
     "posy": 623,
     "details": {
       "name": "Taoxian Airbase (ZYTX)",
-      "elev": "",
+      "elev": "184 ft",
       "range": "80 NM",
       "rwy": "05/23",
       "tcn": "092X",
@@ -2373,7 +2373,7 @@
     "posy": 1380,
     "details": {
       "name": "Toksan Airbase",
-      "elev": "",
+      "elev": "134 ft",
       "range": "",
       "rwy": "04/22",
       "tcn": "",
@@ -2394,7 +2394,7 @@
     "posy": 375,
     "details": {
       "name": "Tonghua Sanyuanpu Airport (ZYTN)",
-      "elev": "",
+      "elev": "1180 ft",
       "range": "80 NM",
       "rwy": "04/22",
       "tcn": "093X",
@@ -2415,7 +2415,7 @@
     "posy": 3912,
     "details": {
       "name": "Tsushima Airport (RJDT)",
-      "elev": "",
+      "elev": "196 ft",
       "range": "150 NM",
       "rwy": "14/32",
       "tcn": "051Y",
@@ -2436,7 +2436,7 @@
     "posy": 1296,
     "details": {
       "name": "Uiju Airbase (ZKUJ)",
-      "elev": "",
+      "elev": "42 ft",
       "range": "100 NM",
       "rwy": "04/22",
       "tcn": "055X",
@@ -2478,7 +2478,7 @@
     "posy": 2574,
     "details": {
       "name": "Weihai Dashuibo Airport (ZSWH)",
-      "elev": "",
+      "elev": "132 ft",
       "range": "80 NM",
       "rwy": "02/20",
       "tcn": "097X",
@@ -2520,7 +2520,7 @@
     "posy": 2517,
     "details": {
       "name": "Wonju AB (RKNW)",
-      "elev": "",
+      "elev": "364 ft",
       "range": "70 NM",
       "rwy": "03/21",
       "tcn": "039X",
@@ -2541,7 +2541,7 @@
     "posy": 4049,
     "details": {
       "name": "Yamaguchi-Ube Airport (RJDC)",
-      "elev": "",
+      "elev": "22 ft",
       "range": "150 NM",
       "rwy": "06/24",
       "tcn": "045X",
@@ -2583,7 +2583,7 @@
     "posy": 2239,
     "details": {
       "name": "Yangyang Intl Airport (RKNY)",
-      "elev": "",
+      "elev": "190 ft",
       "range": "",
       "rwy": "14/32",
       "tcn": "",
@@ -2625,7 +2625,7 @@
     "posy": 95,
     "details": {
       "name": "Yanji Airbase (ZYYJ)",
-      "elev": "",
+      "elev": "600 ft",
       "range": "80 NM",
       "rwy": "08/26",
       "tcn": "099X",
@@ -2646,7 +2646,7 @@
     "posy": 2877,
     "details": {
       "name": "Yecheon AB (RKTY)",
-      "elev": "",
+      "elev": "358 ft",
       "range": "",
       "rwy": "09/27",
       "tcn": "",
@@ -2688,7 +2688,7 @@
     "posy": 2784,
     "details": {
       "name": "Yeongju Highway Strip",
-      "elev": "",
+      "elev": "524 ft",
       "range": "",
       "rwy": "11/29",
       "tcn": "",
@@ -2730,7 +2730,7 @@
     "posy": 1090,
     "details": {
       "name": "Yingkou Langqi Airport (ZYYK)",
-      "elev": "",
+      "elev": "0 ft",
       "range": "80 NM",
       "rwy": "03/21",
       "tcn": "100X",
@@ -2751,7 +2751,7 @@
     "posy": 1587,
     "details": {
       "name": "Yonghung Highwaystrip",
-      "elev": "",
+      "elev": "32 ft",
       "range": "",
       "rwy": "10/28",
       "tcn": "",
@@ -2772,7 +2772,7 @@
     "posy": 1474,
     "details": {
       "name": "Yonpo Airbase",
-      "elev": "",
+      "elev": "15 ft",
       "range": "",
       "rwy": "13/31",
       "tcn": "",
