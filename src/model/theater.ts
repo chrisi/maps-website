@@ -4,6 +4,7 @@ import type {Station} from "@/model/station.ts";
 export interface Theater {
   name: string
   datum: Coord
+  projection: string
   feet: number
   pixels: number
   resolution: number

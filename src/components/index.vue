@@ -25,8 +25,8 @@ import TheaterLink from "@/components/theater-link.vue";
     <div class="flex">
       <theater-link link="/map/korea" name="KOREA" sub="IN DEVELOPMENT" image="04_kto-thumb.jpeg"/>
       <theater-link link="/map/balkans" name="BALKANS" sub="IN DEVELOPMENT" image="05_balkans-thumb.jpeg"/>
-      <theater-link name="ISRAEL" sub="PLANNED" image="06_ito-thumb.jpeg"/>
-      <theater-link name="HELLENIC" sub="PLANNED" image="07_hto-thumb.jpeg"/>
+      <theater-link link="/map/israel" name="ISRAEL" sub="IN DEVELOPMENT" image="06_ito-thumb.jpeg"/>
+      <theater-link link="/map/hellas" name="HELLENIC" sub="IN DEVELOPMENT" image="07_hto-thumb.jpeg"/>
     </div>
     <h2>Map Features</h2>
     The maps provide the following features:
