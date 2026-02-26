@@ -18,6 +18,7 @@ import type {Mission} from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
+import {createProfileAlongPath} from "@/scripts/flightpath.ts";
 
 const props = defineProps({
   visible: {
@@ -159,9 +160,13 @@ function btnClick(sender: string) {
   console.log(`btnClick: ${sender}`)
 }
 
+const baseUrl = import.meta.env.BASE_URL
+
 const global = useGlobalStore()
 
 const mission = ref<Mission>()
+const profileVisible = ref(false)
+const profileImage = ref("")
 
 onMounted(() => {
   props.missionManager.onDataCartridgeEvent(() => {
@@ -171,9 +176,27 @@ onMounted(() => {
   })
 })
 
-const showProfile = () => {
-  console.log("showProfile")
+const showProfile = async () => {
+  if (!global.currentWaypoint || !mission.value) return
 
+  const idx = global.currentWaypoint.no - 1
+  if (idx === 0) return // No profile for the first waypoint
+
+  const startWpt = mission.value.route[idx - 1]
+  const endWpt = global.currentWaypoint
+
+  const theaterName = global.map?.name || "korea"
+  const heightMaskPath = `${baseUrl}/heightmasks/${theaterName}.png`
+
+  const s = {x: startWpt!.tgt.x / 6144 * 1024, y: startWpt!.tgt.y / 6144 * 1024}
+  const e = {x: endWpt!.tgt.x / 6144 * 1024, y: endWpt!.tgt.y / 6144 * 1024}
+
+  try {
+    profileImage.value = await createProfileAlongPath(heightMaskPath, s, e)
+    profileVisible.value = true
+  } catch (e) {
+    console.error("Failed to generate profile", e)
+  }
 }
 
 const prevWaypoint = () => {
@@ -247,7 +270,7 @@ const type = computed(() => {
         <tool-spacer/>
       </template>
       <template #Radio>
-        <tool-button id="showProfile" icon="/common/icons/delete.png" @click="showProfile"/>
+        <tool-button id="showProfile" icon="/common/icons/rect.png" @click="showProfile"/>
       </template>
       <template #Mission>
         <tool-section name="Flight 1"/>
@@ -293,6 +316,13 @@ const type = computed(() => {
     </tool-tabs>
     <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>
   </tool-window>
+
+  <div v-if="profileVisible" class="profile-popup2">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <img :src="profileImage" alt="Profile" style="width: 200px; height: 200px; border: 1px solid #ccc;"/>
+      <tool-button id="btn-close-profile" text="Close" @click="profileVisible = false"/>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -306,6 +336,18 @@ const type = computed(() => {
 .btn {
   width: 16px;
   height: 16px;
+}
+
+.profile-popup {
+  position: fixed;
+  background-color: rgba(245, 245, 245, 1);
+  border: 1px solid black;
+  box-shadow: 6px 6px 9px #444;
+  padding: 8px;
+  left: 200px;
+  top: 300px;
+  width: 500px;
+  height: 200px;
 }
 
 </style>
