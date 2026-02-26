@@ -177,22 +177,21 @@ onMounted(() => {
 })
 
 const showProfile = async () => {
-  if (!global.currentWaypoint || !mission.value) return
+  if (!mission.value) return
 
-  const idx = global.currentWaypoint.no - 1
-  if (idx === 0) return // No profile for the first waypoint
+  const cutRoute = mission.value.route.filter(wpt =>true)
 
-  const startWpt = mission.value.route[idx - 1]
-  const endWpt = global.currentWaypoint
+  const waypoints = mission.value.route.map(wpt => ({
+    x: wpt.tgt.x / global.map!.pixels * 1024,
+    y: wpt.tgt.y / global.map!.pixels * 1024
+  }))
 
-  const theaterName = global.map?.name || "korea"
-  const heightMaskPath = `${baseUrl}/heightmasks/${theaterName}.png`
 
-  const s = {x: startWpt!.tgt.x / 6144 * 1024, y: startWpt!.tgt.y / 6144 * 1024}
-  const e = {x: endWpt!.tgt.x / 6144 * 1024, y: endWpt!.tgt.y / 6144 * 1024}
+
+  const heightMaskPath = `${baseUrl}/heightmasks/${global.map!.name}.png`
 
   try {
-    profileImage.value = await createProfileAlongPath(heightMaskPath, s, e)
+    profileImage.value = await createProfileAlongPath(heightMaskPath, waypoints)
     profileVisible.value = true
   } catch (e) {
     console.error("Failed to generate profile", e)
@@ -264,13 +263,14 @@ const type = computed(() => {
         </tool-dropdown>
         <tool-dropdown label="Action" :options="actions" v-model="steer.action"/>
         <tool-textfield label="Duration" v-model="steer.duration" unit="min"/>
-        <tool-spacer separator large/>
+        <tool-spacer />
+        <tool-button id="showProfile" icon="/common/icons/flight-profile.png" @click="showProfile"/>
+        <tool-spacer separator/>
         <tool-output label="AWACS" value="Lynx5"/>
         <tool-output label="Tanker" value="Texaco"/>
         <tool-spacer/>
       </template>
       <template #Radio>
-        <tool-button id="showProfile" icon="/common/icons/rect.png" @click="showProfile"/>
       </template>
       <template #Mission>
         <tool-section name="Flight 1"/>
@@ -317,9 +317,9 @@ const type = computed(() => {
     <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>
   </tool-window>
 
-  <div v-if="profileVisible" class="profile-popup2">
+  <div v-if="profileVisible" class="profile-popup">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-      <img :src="profileImage" alt="Profile" style="width: 200px; height: 200px; border: 1px solid #ccc;"/>
+      <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
       <tool-button id="btn-close-profile" text="Close" @click="profileVisible = false"/>
     </div>
   </div>
@@ -343,11 +343,11 @@ const type = computed(() => {
   background-color: rgba(245, 245, 245, 1);
   border: 1px solid black;
   box-shadow: 6px 6px 9px #444;
-  padding: 8px;
-  left: 200px;
-  top: 300px;
-  width: 500px;
-  height: 200px;
+  padding: 16px;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
 </style>
