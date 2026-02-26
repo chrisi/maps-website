@@ -179,14 +179,13 @@ onMounted(() => {
 const showProfile = async () => {
   if (!mission.value) return
 
-  const cutRoute = mission.value.route.filter(wpt =>true)
+  const cutIndex = mission.value.route.findIndex(wpt => wpt.tgt.action === 7)
+  const cutRoute = cutIndex !== -1 ? mission.value.route.slice(0, cutIndex + 1) : mission.value.route
 
-  const waypoints = mission.value.route.map(wpt => ({
+  const waypoints = cutRoute.map(wpt => ({
     x: wpt.tgt.x / global.map!.pixels * 1024,
     y: wpt.tgt.y / global.map!.pixels * 1024
   }))
-
-
 
   const heightMaskPath = `${baseUrl}/heightmasks/${global.map!.name}.png`
 
