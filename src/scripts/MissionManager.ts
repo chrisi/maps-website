@@ -78,6 +78,46 @@ export class MissionManager {
     }
   }
 
+  public getBounds(): { min: Point, max: Point } {
+    const padding = 0;
+    if (!this.mission || this.mission.route.length === 0) {
+      return {
+        min: {x: 0, y: 0},
+        max: {x: 0, y: 0}
+      }
+    }
+
+    const cutIndex = this.mission.route.findIndex(wpt => wpt.tgt.action === 7)
+    const cutRoute = cutIndex !== -1 ? this.mission.route.slice(0, cutIndex + 1) : this.mission.route
+
+    const firstTgt = cutRoute[0]!.tgt;
+    let minX = firstTgt.x;
+    let maxX = firstTgt.x;
+    let minY = firstTgt.y;
+    let maxY = firstTgt.y;
+
+    cutRoute.forEach(wp => {
+      minX = Math.min(minX, wp.tgt.x);
+      maxX = Math.max(maxX, wp.tgt.x);
+      minY = Math.min(minY, wp.tgt.y);
+      maxY = Math.max(maxY, wp.tgt.y);
+    });
+
+    const dx = maxX - minX;
+    const dy = maxY - minY;
+
+    return {
+      min: {
+        x: minX - (dx * padding),
+        y: minY - (dy * padding)
+      },
+      max: {
+        x: maxX + (dx * padding),
+        y: maxY + (dy * padding)
+      }
+    }
+  }
+
   public getSteerpointType(wp: Waypoint) {
     return (this.isTargetWaypoint(wp.tgt) ? "TGT" : "STPT");
   }

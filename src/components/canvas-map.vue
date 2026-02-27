@@ -26,6 +26,7 @@ const emit = defineEmits<{
 
 defineExpose({
   locatePosition,
+  locateArea,
   redrawOverlay
 })
 
@@ -270,6 +271,23 @@ function smoothZoomAt(x: number, y: number, zoomFactor: number) {
     isAnimating = true;
     requestAnimationFrame(animate);
   }
+}
+
+function locateArea(p1: Point, p2: Point) {
+  const rectWidth = Math.abs(p2.x - p1.x);
+  const rectHeight = Math.abs(p2.y - p1.y);
+
+  const centerPoint: Point = {
+    x: (p1.x + p2.x) / 2,
+    y: (p1.y + p2.y) / 2
+  };
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const scaleFactor = Math.min(vw / rectWidth, vh / rectHeight);
+  console.log(vw, vh, scaleFactor);
+  locatePosition(centerPoint, scaleFactor);
 }
 
 function locatePosition(pos: Point, newScale?: number) {

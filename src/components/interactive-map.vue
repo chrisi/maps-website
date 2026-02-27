@@ -149,9 +149,16 @@ const fetchFromLocalBms = async () => {
     const response = await axios.get(`http://${settings.settings.agent.host}:${settings.settings.agent.port}/ini`)
     const ini = response.data.split('\n')
     missionMgr.loadDataCartridge('Local BMS', ini)
+    zoomToMission()
   } catch (error) {
     console.error("Failed to fetch from local BMS", error)
   }
+}
+
+const zoomToMission = () => {
+  const bounds = missionMgr.getBounds()
+  if (bounds.min.x == bounds.max.x && bounds.min.y == bounds.max.y) return
+  canvasMapRef.value.locateArea(bounds.min, bounds.max)
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
