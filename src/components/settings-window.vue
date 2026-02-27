@@ -129,10 +129,18 @@ const cycles: ValueCaptionPair[] = [
         <tool-textfield id="imcs-session" name="session" label="Session" v-model="settings.settings.collab.session"/>
         <tool-textfield id="imcs-host" name="host" label="Host" v-model="settings.settings.collab.host"/>
         <tool-numberfield id="imcs-port" name="port" label="Port" v-model="settings.settings.collab.port" width="60px"/>
-        <tool-spacer/>
         <tool-row>
           <div style="text-align: end; width: 100%;">
-            <tool-button id="imcs-connection" :text="global.connected ? 'Disconnect' : 'Connect'" @click="btnClick"/>
+            <tool-button id="imcs-connection" icon="/common/icons/connect_server.png" :active="global.connectedImcs" @click="btnClick"/>
+          </div>
+        </tool-row>
+
+        <tool-section name="Falcon BMS Agent"/>
+        <tool-textfield id="agent-host" name="host" label="Host" v-model="settings.settings.agent.host"/>
+        <tool-numberfield id="agent-port" name="port" label="Port" v-model="settings.settings.agent.port" width="60px"/>
+        <tool-row>
+          <div style="text-align: end; width: 100%;">
+            <tool-button id="agent-connection" icon="/common/icons/connect_agent.png" :active="global.connectedAgent" @click="btnClick"/>
           </div>
         </tool-row>
 
@@ -143,9 +151,9 @@ const cycles: ValueCaptionPair[] = [
         <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles" v-model="gfs.cycle"/>
         <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" v-model="gfs.forecast" width="60px"/>
 
-        <tool-spacer medium/>
-        <tool-button id="download" icon="/common/assets/icon_download.png" @click="btnClick"/>
-        <tool-button id="export" icon="/common/assets/icon_save.png" @click="btnClick"/>
+<!--        <tool-spacer medium/>-->
+<!--        <tool-button id="download" icon="/common/assets/icon_download.png" @click="btnClick"/>-->
+<!--        <tool-button id="export" icon="/common/assets/icon_save.png" @click="btnClick"/>-->
         <!--<tool-button id="gfs-fetch" icon="common/assets/icon_fetch.png" @click="btnClick(event)"/>-->
       </template>
     </tool-tabs>

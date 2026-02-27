@@ -24,6 +24,10 @@ export interface CollabSettings {
   host: string;
   port: number;
 }
+export interface AgentSettings {
+  host: string;
+  port: number;
+}
 
 export interface WhiteboardSettings {
   line: {
@@ -46,5 +50,6 @@ export interface Settings {
   debug: boolean;
   bullseye: BullseyeSettings;
   collab: CollabSettings;
+  agent: AgentSettings;
   whiteboard: WhiteboardSettings;
 }

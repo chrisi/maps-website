@@ -23,11 +23,15 @@ export const useSettingsStore = defineStore('settings', () => {
         pos: {x: -1, y: -1}
       },
       collab: {
-        secure: false,
-        callsign: 'Joker',
-        session: '47df',
+        secure: true,
+        callsign: 'Viper',
+        session: '47DF',
+        host: 'collab.falcon-bms.com',
+        port: 443
+      },
+      agent: {
         host: 'localhost',
-        port: 4848
+        port: 8080
       },
       whiteboard: {
         line: {

@@ -41,6 +41,8 @@ import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import type {CollabSettings} from "@/model/settings.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 import {withCanvasCallCounters} from "@/scripts/utils.ts";
+import axios from "axios";
+import {AgentClient} from "@/scripts/AgentClient.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -58,6 +60,7 @@ const selectedStation = ref<Station | undefined>()
 const activeWindow = ref('')
 
 const imcsClient = new ImcsClient()
+const agentClient = new AgentClient();
 
 const overlayManager = new OverlayManager(imcsClient)
 
@@ -128,6 +131,28 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
+
+agentClient.onUpdateEvent(() => {
+  fetchFromLocalBms()
+})
+
+agentClient.onOpenEvent(() => {
+  global.connectedAgent = true
+})
+
+agentClient.onCloseEvent(() => {
+  global.connectedAgent = false
+})
+
+const fetchFromLocalBms = async () => {
+  try {
+    const response = await axios.get(`http://${settings.settings.agent.host}:${settings.settings.agent.port}/ini`)
+    const ini = response.data.split('\n')
+    missionMgr.loadDataCartridge('Local BMS', ini)
+  } catch (error) {
+    console.error("Failed to fetch from local BMS", error)
+  }
+}
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.ctrlKey && e.code == "KeyF") {
@@ -259,10 +284,17 @@ watch(() => global.currentWaypoint, (newValue) => {
 
 const settingsClick = (sender: string) => {
   if (sender == "imcs-connection") {
-    if (global.connected) {
+    if (global.connectedImcs) {
       imcsClient.disconnect()
     } else {
       imcsClient.connect(settings.settings.collab)
+    }
+  }
+  if (sender == "agent-connection") {
+    if (global.connectedAgent) {
+      agentClient.disconnect()
+    } else {
+      agentClient.connect(settings.settings.agent)
     }
   }
 }

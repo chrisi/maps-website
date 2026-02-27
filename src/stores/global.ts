@@ -10,7 +10,8 @@ export const useGlobalStore = defineStore('global', () => {
   const mode = ref<OverlayMode>(OverlayMode.None)
   const inputMode = ref<InputMode>(InputMode.Freehand)
   const map = ref<Theater>()
-  const connected = ref(false)
+  const connectedImcs = ref(false)
+  const connectedAgent = ref(false)
   const selectedSymbol = ref<string>()
   const currentWaypoint = ref<Waypoint>()
   const hotspots = ref<Hotspot[]>([])
@@ -19,7 +20,7 @@ export const useGlobalStore = defineStore('global', () => {
     symbols: []
   })
 
-  return {mode, inputMode, map, selectedSymbol, currentWaypoint, hotspots, whiteboard, connected}
+  return {mode, inputMode, map, selectedSymbol, currentWaypoint, hotspots, whiteboard, connectedImcs, connectedAgent}
 }, {
   persist: false
 })

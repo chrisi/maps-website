@@ -155,10 +155,10 @@ export class ImcsClient {
     if (this.socket?.readyState == WebSocket.OPEN) {
       this.imcsDebug("connected to IMCS");
       this.imcsMsgAuthSend();
-      this.global.connected = true;
+      this.global.connectedImcs = true;
     } else {
       this.imcsDebug("disconnected from IMCS");
-      this.global.connected = false;
+      this.global.connectedImcs = false;
       // cleanup that should happen after close is observed
       if (this.socket) {
         this.socket.removeEventListener("open", this.connectionHandler);

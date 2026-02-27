@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
-import {computed, onMounted, reactive, ref, watch} from "vue";
-import axios from "axios";
+import {computed, onMounted, reactive, ref} from "vue";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
@@ -231,16 +230,6 @@ const type = computed(() => {
   }
 )
 
-const fetchFromLocalBms = async () => {
-  try {
-    const response = await axios.get('http://localhost:8080/ini')
-    const ini = response.data.split('\n')
-    props.missionManager?.loadDataCartridge('Local BMS', ini)
-  } catch (error) {
-    console.error("Failed to fetch from local BMS", error)
-  }
-}
-
 </script>
 
 <template>
@@ -325,8 +314,6 @@ const fetchFromLocalBms = async () => {
       </template>
     </tool-tabs>
     <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>
-    <tool-spacer />
-    <tool-button id="showProfile" icon="/common/assets/icon_download.png" @click="fetchFromLocalBms"/>
   </tool-window>
 
   <div v-if="profileVisible" class="profile-popup">
