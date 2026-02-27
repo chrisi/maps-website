@@ -151,19 +151,16 @@ const pkg = reactive<Package>({
   fuel: 7000,
 });
 
-const emit = defineEmits(['close'])
-
-// 24h time format: HH:MM:SS
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
+const emit = defineEmits(['close', 'btnClick'])
 
 function btnClick(sender: string) {
-  console.log(`btnClick: ${sender}`)
+  emit('btnClick', sender)
 }
 
-const baseUrl = import.meta.env.BASE_URL
-
 const global = useGlobalStore()
-
+const baseUrl = import.meta.env.BASE_URL
+// 24h time format: HH:MM:SS
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 const mission = ref<Mission>()
 const profileVisible = ref(false)
 const profileImage = ref("")
@@ -171,8 +168,6 @@ const profileImage = ref("")
 onMounted(() => {
   props.missionManager.onDataCartridgeEvent(() => {
     mission.value = props.missionManager.getMission()
-    if (!global.currentWaypoint)
-      global.currentWaypoint = mission.value!.route![0]
   })
 })
 
@@ -262,8 +257,9 @@ const type = computed(() => {
         </tool-dropdown>
         <tool-dropdown label="Action" :options="actions" v-model="steer.action"/>
         <tool-textfield label="Duration" v-model="steer.duration" unit="min"/>
-        <tool-spacer />
+        <tool-spacer/>
         <tool-button id="showProfile" icon="/common/icons/flight-profile.png" @click="showProfile"/>
+        <tool-button id="zoomRoute" icon="/common/icons/route.png" @click="btnClick"/>
         <tool-spacer separator/>
         <tool-output label="AWACS" value="Lynx5"/>
         <tool-output label="Tanker" value="Texaco"/>

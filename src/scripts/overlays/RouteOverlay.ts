@@ -44,6 +44,7 @@ export class RouteOverlay extends BaseOverlay {
 
   public onClickOwnHotspot(hotspots: Hotspot[]) {
     this.global.currentWaypoint = hotspots[0]!.target as Waypoint
+    this.redraw()
   }
 
   public onDraw(cnv: Canvas): void {

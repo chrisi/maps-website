@@ -283,12 +283,6 @@ watch(selectedStation, (newValue) => {
   }
 })
 
-watch(() => global.currentWaypoint, (newValue) => {
-  if (newValue) {
-    canvasMapRef.value.locatePosition({x: newValue.tgt.x, y: newValue.tgt.y})
-  }
-})
-
 const settingsClick = (sender: string) => {
   if (sender == "imcs-connection") {
     if (global.connectedImcs) {
@@ -306,6 +300,12 @@ const settingsClick = (sender: string) => {
   }
 }
 
+const routeClick = (sender: string) => {
+  if (sender == "zoomRoute") {
+    zoomToMission()
+  }
+}
+
 const getMapUrl = (map: Theater) => {
   const baseUrl = import.meta.env.BASE_URL
   if (map.local)
@@ -317,7 +317,7 @@ const getMapUrl = (map: Theater) => {
 
 <template>
   <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
-  <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''"/>
+  <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"
                      :overlayManager="overlayManager" :imcsClient="imcsClient"/>

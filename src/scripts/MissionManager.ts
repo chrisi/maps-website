@@ -15,6 +15,8 @@ import {getCallsignByFreq} from "@/common/scripts/map_radio";
 
 export class MissionManager {
 
+  private boundsPadding = 0.1;
+
   private dataCartridge?: DataCardridge;
   private mission?: Mission;
   private global = useGlobalStore();
@@ -67,6 +69,8 @@ export class MissionManager {
     this.mission!.changed = true;
     this.missionLoaded = true;
 
+    this.global.currentWaypoint = this.mission.route![0]
+
     this.dataCartridgeEventHandler.forEach(cb => cb("loaded"))
   }
 
@@ -79,7 +83,6 @@ export class MissionManager {
   }
 
   public getBounds(): { min: Point, max: Point } {
-    const padding = 0;
     if (!this.mission || this.mission.route.length === 0) {
       return {
         min: {x: 0, y: 0},
@@ -108,12 +111,12 @@ export class MissionManager {
 
     return {
       min: {
-        x: minX - (dx * padding),
-        y: minY - (dy * padding)
+        x: minX - (dx * this.boundsPadding),
+        y: minY - (dy * this.boundsPadding)
       },
       max: {
-        x: maxX + (dx * padding),
-        y: maxY + (dy * padding)
+        x: maxX + (dx * this.boundsPadding),
+        y: maxY + (dy * this.boundsPadding)
       }
     }
   }
