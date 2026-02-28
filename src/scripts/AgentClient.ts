@@ -3,6 +3,18 @@ import type {AgentSettings} from "@/model/settings.ts";
 
 const socket = ref<WebSocket | null>(null)
 
+export interface AgentMessage {
+  type: string,
+  version?: string,
+  payload?: Ownship | undefined
+}
+
+export interface Ownship {
+  x: number,
+  y: number,
+  z: number
+}
+
 export class AgentClient {
   private socket: WebSocket | null = null
 
@@ -10,6 +22,12 @@ export class AgentClient {
 
   public onUpdateEvent(cb: (() => void)) {
     this.updateEventHandler.push(cb);
+  }
+
+  private posEventHandler: ((pos: Ownship) => void)[] = [];
+
+  public onPosEvent(cb: ((pos: Ownship) => void)) {
+    this.posEventHandler.push(cb);
   }
 
   private openEventHandler: (() => void)[] = [];
@@ -35,9 +53,20 @@ export class AgentClient {
     }
 
     this.socket.onmessage = (event) => {
-      if (event.data === 'update') {
-        console.log('Received "update" from BMS agent')
-        this.updateEventHandler.forEach(cb => cb());
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'pos' && message.payload) {
+          const ownship: Ownship = message.payload;
+          this.posEventHandler.forEach(cb => cb(ownship));
+        }
+
+        if (message.type === 'update') {
+          this.updateEventHandler.forEach(cb => cb());
+        }
+      } catch (e) {
+        if (event.data === 'update') {
+          this.updateEventHandler.forEach(cb => cb());
+        }
       }
     }
 
