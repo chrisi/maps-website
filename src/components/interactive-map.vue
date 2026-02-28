@@ -42,7 +42,8 @@ import type {CollabSettings} from "@/model/settings.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 import {withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
-import {AgentClient} from "@/scripts/AgentClient.ts";
+import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
+import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -103,6 +104,8 @@ onBeforeMount(() => {
   }
 })
 
+let ownShipOverlay: OwnshipOverlay
+
 onMounted(() => {
   overlayManager.registerOverlay(new HotspotOverlay())
   overlayManager.registerOverlay(new DebugOverlay())
@@ -123,6 +126,7 @@ onMounted(() => {
   overlayManager.registerOverlay(new MeasureOverlay())
   overlayManager.registerOverlay(new WhiteboardOverlay())
   overlayManager.registerOverlay(new PointerOverlay())
+  ownShipOverlay = overlayManager.registerOverlay(new OwnshipOverlay())
 
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
@@ -142,6 +146,10 @@ agentClient.onOpenEvent(() => {
 
 agentClient.onCloseEvent(() => {
   global.connectedAgent = false
+})
+
+agentClient.onPosEvent((ownship: Ownship) => {
+  ownShipOverlay.setPosition(ownship)
 })
 
 const fetchFromLocalBms = async () => {

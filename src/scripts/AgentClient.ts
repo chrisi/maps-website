@@ -1,5 +1,6 @@
 import {ref} from "vue";
 import type {AgentSettings} from "@/model/settings.ts";
+import type {Point} from "@/model/base.ts";
 
 const socket = ref<WebSocket | null>(null)
 
@@ -9,9 +10,7 @@ export interface AgentMessage {
   payload?: Ownship | undefined
 }
 
-export interface Ownship {
-  x: number,
-  y: number,
+export interface Ownship extends Point {
   z: number
 }
 
