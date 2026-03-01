@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {baseUrl} from "@/scripts/utils.ts";
+
 defineProps<{
   id: string
   text?: string
@@ -9,8 +11,6 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'click', sender: string): void
 }>()
-
-const baseUrl = import.meta.env.BASE_URL
 
 </script>
 
@@ -29,9 +29,11 @@ button {
   padding: 2px;
   display: inline-block;
 }
+
 img {
   display: block;
 }
+
 img.active {
   background-color: lightgreen;
 }

@@ -40,7 +40,7 @@ import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import type {CollabSettings} from "@/model/settings.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
-import {withCanvasCallCounters} from "@/scripts/utils.ts";
+import {baseUrl, withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
 import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
 import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
@@ -315,7 +315,6 @@ const routeClick = (sender: string) => {
 }
 
 const getMapUrl = (map: Theater) => {
-  const baseUrl = import.meta.env.BASE_URL
   if (map.local)
     return `${baseUrl}/maps/${map.mapFilename}`
   else

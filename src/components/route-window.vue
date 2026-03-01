@@ -19,6 +19,7 @@ import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {createProfileAlongPath} from "@/scripts/flightpath.ts";
+import {baseUrl} from "@/scripts/utils.ts";
 
 const props = defineProps({
   visible: {
@@ -158,7 +159,6 @@ function btnClick(sender: string) {
 }
 
 const global = useGlobalStore()
-const baseUrl = import.meta.env.BASE_URL
 // 24h time format: HH:MM:SS
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 const mission = ref<Mission>()

@@ -68,11 +68,11 @@ watch(
 )
 
 const createUrl = (chart: Chart) => {
-  const baseUrl = `${cdnUrl}/${global.map!.folder}/charts`
+  const chartBase = `${cdnUrl}/${global.map!.folder}/charts`
   if (chart.url.endsWith('.png'))
-    return `${baseUrl}/${chart.url}`
+    return `${chartBase}/${chart.url}`
   else
-    return `${baseUrl}/${chart.url}#page=${chart.page || 1}#&view=Fit&toolbar=0`
+    return `${chartBase}/${chart.url}#page=${chart.page || 1}#&view=Fit&toolbar=0`
 }
 
 function openChart(chart: Chart) {

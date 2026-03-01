@@ -4,8 +4,7 @@ import {computed, ref, watch} from "vue";
 import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
-
-const baseUrl = import.meta.env.BASE_URL
+import {baseUrl} from "@/scripts/utils.ts";
 
 const props = defineProps<{
   modelValue: OverlayMode
