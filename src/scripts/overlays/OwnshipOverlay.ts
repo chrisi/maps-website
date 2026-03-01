@@ -6,6 +6,13 @@ export class OwnshipOverlay extends BaseOverlay {
 
   private pos: Point | undefined
   private res = this.global.map!.resolution
+  private icon: HTMLImageElement | undefined
+
+  public init() {
+    this.icon = new Image()
+    this.icon.src = 'common/icons/f16-blue.png'
+    this.icon.onload = () => this.redraw()
+  }
 
   public setPosition(pos: Point) {
     this.pos = {
@@ -16,16 +23,16 @@ export class OwnshipOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.pos) return
+    if (!this.pos || !this.icon || !this.icon.complete) return
     const ctx = cnv.context
     const pt = this.toCnv(this.pos, cnv)
-    ctx.lineWidth = 1
-    ctx.strokeStyle = 'black'
-    ctx.beginPath()
-    ctx.fillStyle = '#9999ee'
-    ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI)
-    ctx.fill()
-    ctx.stroke()
+
+    const size = 32
+    ctx.save()
+    ctx.translate(pt.x, pt.y)
+    //ctx.rotate(this.pos.h * Math.PI / 180)
+    ctx.drawImage(this.icon, -size / 2, -size / 2, size, size)
+    ctx.restore()
   }
 
 }
