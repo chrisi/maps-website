@@ -4,9 +4,9 @@ import {useRoute} from "vue-router";
 
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {cdnUrl, findMap} from "@/data/map.ts";
+import {cdnUrl, findMap, MapSizeFeet} from "@/data/map.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import {map2LatLong} from "@/scripts/math.ts";
+import {feetToLatLong} from "@/scripts/math.ts";
 
 // Overlays
 import {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
@@ -53,7 +53,8 @@ const canvasMapRef = ref()
 //used only for debugging
 const ovlCtx = shallowRef<CanvasRenderingContext2D | null>(null)
 
-const pos = ref<Point>()
+const pos = ref<Point>({x: 0, y: 0})
+const feet = ref<Point>({x: 0, y: 0})
 const zoom = ref(1)
 const suspend = ref(false)
 
@@ -231,17 +232,9 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-const showPointerCoord = (pos: Point) => {
-  const strCrd = strLatLong(canvasPos2LatLong(pos))
+const createPointerLatLongStr = (feet: Point) => {
+  const strCrd = strLatLong(feetToLatLong(global.map!.projection, feet));
   coords.value = `${strCrd.lat}, ${strCrd.long}`
-}
-
-const canvasPos2LatLong = (point: Point): Coord => {
-  const map = global.map
-  if (!map) return {lat: 0, long: 0}
-  const dx = point.x * map.resolution;
-  const dy = (map.pixels - point.y) * map.resolution;
-  return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
 }
 
 const execTool = (tool: string) => {
@@ -269,20 +262,22 @@ const execTool = (tool: string) => {
 
 watch(pos, (newPos) => {
   if (newPos) {
-    showPointerCoord(newPos);
+    feet.value = {x: newPos.x * global.map!.resolution, y: (global.map!.pixels - newPos.y) * global.map!.resolution}
+    createPointerLatLongStr(feet.value);
   }
 })
 
 watch(selectedStation, (newValue) => {
   const ovl = overlayManager.getOverlay(LocateOverlay)!
+  const fac = 1 / MapSizeFeet * global.map!.pixels
   if (newValue) {
     ovl.highlightStation(newValue.name)
     if (!activeWindow.value)
       activeWindow.value = 'locate'
     if (!inhibitLocate) {
       const p = {
-        x: newValue.posx / global.map!.stationMappingSize * global.map!.pixels,
-        y: newValue.posy / global.map!.stationMappingSize * global.map!.pixels
+        x: newValue.pos.x * fac,
+        y: global.map!.pixels - (newValue.pos.y * fac)
       }
       canvasMapRef.value.locatePosition(p, 2)
     }
@@ -350,7 +345,8 @@ const getMapUrl = (map: Theater) => {
     <out-value caption="Input-Mode" :val="global.inputMode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
-    <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y"/>
+    <out-coord v-if="pos" caption="Pos in pixels" :x="pos.x" :y="pos.y" :decimal="0"/>
+    <out-coord v-if="pos" caption="Pos in feet" :x="feet.x" :y="feet.y"/>
   </div>
   <div id="position" v-if="settings.viz.xy">{{ coords }}&nbsp;</div>
   <div id="inputs">
@@ -367,7 +363,7 @@ const getMapUrl = (map: Theater) => {
   top: 40px;
   right: 0;
   height: 120px;
-  width: 240px;
+  width: 260px;
   color: white;
   padding: 5px;
   margin: 15px;

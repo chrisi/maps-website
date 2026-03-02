@@ -1,16 +1,18 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point} from "@/model/base.ts";
-import {deg2rad} from "@/scripts/math.ts";
 import type {Station} from "@/model/station.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {watch} from "vue";
 import {drawAirbase, drawNavDme, drawNavTacan, drawNavVor, drawNavVorDme} from "@/scripts/draw/symbols.ts";
 import {drawCircle} from "@/scripts/draw/basic.ts";
+import {MapSizeFeet} from "@/data/map.ts";
 
 export class StationOverlay extends BaseOverlay {
 
   private selectStationEventHandler: ((station: Station) => void)[] = [];
+
+  private fac = 1 / MapSizeFeet * this.global.map!.pixels
 
   private stations = this.global.map!.stations.map(s => this.prepareStation(s))
 
@@ -93,10 +95,9 @@ export class StationOverlay extends BaseOverlay {
       orientation = parseInt(s.details.rwy.substring(0, 2)) * 10
       doubleRwy = s.details.rwy.includes('-')
     }
-    const rescale = 1 / this.global.map!.stationMappingSize * this.global.map!.pixels
     return {
       station: s,
-      pt: {x: s.posx * rescale, y: s.posy * rescale},
+      pt: {x: s.pos.x * this.fac, y: this.global.map!.pixels - (s.pos.y * this.fac)},
       orientation: orientation,
       doubleRwy: doubleRwy
     };

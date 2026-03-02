@@ -1,11 +1,12 @@
+import type {Point} from "@/model/base.ts";
+
 export interface Station {
   campId: number,
   ocdIdx: number,
   name: string,
   country: string,
   type: string
-  posx: number,
-  posy: number,
+  pos: Point,
   details?: Details,
 }
 

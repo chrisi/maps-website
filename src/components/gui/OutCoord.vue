@@ -1,16 +1,17 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   caption: string;
   x: number;
   y: number;
-}>();
+  decimal?: number;
+}>(), {decimal: 2});
 </script>
 
 <template>
   <div class="wrapper row">
     <div class="caption col-4">{{ caption }}</div>
-    <div class="value col-4">{{ x.toFixed(2) }}</div>
-    <div class="value col-4">{{ y.toFixed(2) }}</div>
+    <div class="value col-4">{{ x.toFixed(decimal) }}</div>
+    <div class="value col-4">{{ y.toFixed(decimal) }}</div>
   </div>
 </template>
 

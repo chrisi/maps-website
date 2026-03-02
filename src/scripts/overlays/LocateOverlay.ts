@@ -2,12 +2,15 @@ import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import {MapSizeFeet} from "@/data/map.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
   private location: Point | undefined
 
   private highlightSize = 17; //TODO: settings
+
+  private fac = 1 / MapSizeFeet * this.global.map!.pixels
 
   public clearLocation = () => {
     this.location = undefined
@@ -20,7 +23,7 @@ export class LocateOverlay extends BaseOverlay {
       return (sta.name === ap)
     })
     if (res) {
-      this.location = {x: res.posx / map.stationMappingSize * map.pixels, y: res.posy / map.stationMappingSize * map.pixels}
+      this.location = {x: res.pos.x * this.fac, y: this.global.map!.pixels - (res.pos.y * this.fac)}
     } else
       this.location = undefined
     this.redraw()

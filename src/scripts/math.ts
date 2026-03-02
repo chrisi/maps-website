@@ -4,8 +4,25 @@
 // This file should not depend on anything else excpet core JS datatypes and functions
 //
 import type {Coord, Point, Vector} from "@/model/base.ts";
+import proj4 from "proj4";
 
+export const FeetToMeters = 0.30488
 export const FtPerNM = 6076.12
+
+const wgs84 = "EPSG:4326"
+
+/**
+ * Converts Falcon BMS X/Y (usually in feet) to WGS84 lat/long using the theater's proj4 string.
+ *
+ * IMPORTANT:
+ * - proj4 expects coordinates in meters as [x, y] and returns [lon, lat]
+ */
+export function feetToLatLong(proj: string, pos: Point): Coord {
+  const xm = pos.x * FeetToMeters
+  const ym = pos.y * FeetToMeters
+  const [lon, lat] = proj4(proj, wgs84, [xm, ym]) as [number, number];
+  return {lat, long: lon};
+}
 
 // Given two points return a vector with length and direction
 export function vector(point1: Point, point2: Point): Vector {

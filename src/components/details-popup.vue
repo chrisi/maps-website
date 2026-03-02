@@ -6,12 +6,12 @@ import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolListitem from "@/components/forms/tool-listitem.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {useGlobalStore} from "@/stores/global.ts";
-import {cdnUrl, maps} from "@/data/map.ts";
+import {cdnUrl} from "@/data/map.ts";
 import StationSelector from "@/components/station-selector.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
-import type {Coord, Point} from "@/model/base.ts";
+import type {Point} from "@/model/base.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import {map2LatLong} from "@/scripts/math.ts";
+import {feetToLatLong} from "@/scripts/math.ts";
 
 const props = defineProps<{
   modelValue: Station | undefined
@@ -56,8 +56,7 @@ watch(
       emit('update:modelValue', undefined)
     } else {
       data.value = newVal.details
-      const fac = 1 / global.map!.stationMappingSize * global.map!.pixels
-      showPointerCoord({x: newVal.posx * fac, y: newVal.posy * fac})
+      createLocationLatLongStr(newVal.pos)
       if (newVal.details?.charts && newVal.details.charts.length > 0)
         tabs.value = ['AIP', 'Charts']
       else
@@ -86,19 +85,10 @@ function openChart(chart: Chart) {
   return false
 }
 
-const showPointerCoord = (pos: Point) => {
-  const strCrd = strLatLong(canvasPos2LatLong(pos))
+const createLocationLatLongStr = (pos: Point) => {
+  const strCrd = strLatLong(feetToLatLong(global.map!.projection, pos));
   coords.value = `${strCrd.lat}, ${strCrd.long}`
 }
-
-const canvasPos2LatLong = (point: Point): Coord => {
-  const map = global.map
-  if (!map) return {lat: 0, long: 0}
-  const dx = point.x * map.resolution;
-  const dy = (map.pixels - point.y) * map.resolution;
-  return map2LatLong({lat: map.datum.lat, long: map.datum.long}, {x: dx, y: dy});
-}
-
 
 </script>
 
