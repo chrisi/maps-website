@@ -6,6 +6,7 @@ defineProps<{
   text?: string
   icon?: string
   active?: boolean
+  tooltip?: string
 }>()
 
 const emit = defineEmits<{
@@ -16,10 +17,10 @@ const emit = defineEmits<{
 
 <template>
   <template v-if="icon && !text">
-    <button><img :id="id" :src="`${baseUrl}${icon}`" width="32" height="32" :alt="id" :class="{ active }" @click="emit('click',id)"></button>
+    <button :title="tooltip"><img :id="id" :src="`${baseUrl}${icon}`" width="32" height="32" :alt="id" :class="{ active }" @click="emit('click',id)"></button>
   </template>
   <template v-if="text && !icon">
-    <button :id="id" @click="emit('click',id)">{{ text }}</button>
+    <button :id="id" :title="tooltip" @click="emit('click',id)">{{ text }}</button>
   </template>
 </template>
 

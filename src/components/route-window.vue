@@ -258,8 +258,8 @@ const type = computed(() => {
         <tool-dropdown label="Action" :options="actions" v-model="steer.action"/>
         <tool-textfield label="Duration" v-model="steer.duration" unit="min"/>
         <tool-spacer/>
-        <tool-button id="showProfile" icon="/common/icons/flight-profile.png" @click="showProfile"/>
-        <tool-button id="zoomRoute" icon="/common/icons/route.png" @click="btnClick"/>
+        <tool-button id="showProfile" icon="/common/icons/flight-profile.png" tooltip="Show Flight Profile" @click="showProfile"/>
+        <tool-button id="zoomRoute" icon="/common/icons/route.png" tooltip="Zoom to Route" @click="btnClick"/>
         <tool-spacer separator/>
         <tool-output label="AWACS" value="Lynx5"/>
         <tool-output label="Tanker" value="Texaco"/>
@@ -305,11 +305,13 @@ const type = computed(() => {
         </tool-input>
         <tool-numberfield variant="c" id="pkg-fuel" label="Fuel" :min="2000" :max="15000" :step="100" v-model="pkg.fuel" unit="lbs"/>
         <tool-spacer medium/>
-        <tool-button id="btn-flight" icon="/common/assets/icon_table1.png" @click="btnClick"/>
-        <tool-button id="btn-wx" icon="/common/assets/icon_table.png" @click="btnClick"/>
+        <tool-button id="btn-flight" icon="/common/assets/icon_table1.png" tooltip="Flight Table" @click="btnClick"/>
+        <tool-button id="btn-wx" icon="/common/assets/icon_table.png" tooltip="Weather Table" @click="btnClick"/>
       </template>
     </tool-tabs>
-    <div v-else style="text-align: center">Mission not loaded.<br>Drag an ini.-file onto the map.</div>
+    <div v-else style="text-align: center">Mission not loaded!<br><br>Drag an ini.-file onto the map<br>
+      or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon BMS.
+    </div>
   </tool-window>
 
   <div v-if="profileVisible" class="profile-popup">
