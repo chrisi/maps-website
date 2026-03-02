@@ -3,6 +3,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Point} from "@/model/base.ts";
 import {baseUrl} from "@/scripts/utils.ts";
 import {vector} from "@/scripts/math.ts";
+import {watch} from "vue";
 
 export class OwnshipOverlay extends BaseOverlay {
 
@@ -16,6 +17,13 @@ export class OwnshipOverlay extends BaseOverlay {
     this.icon = new Image()
     this.icon.src = `${baseUrl}common/icons/f16-blue.png`
     this.icon.onload = () => this.redraw()
+    watch(() => this.settings.viz.op, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.viz.op
   }
 
   public setPosition(pos: Point) {

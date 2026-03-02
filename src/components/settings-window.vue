@@ -114,6 +114,7 @@ const cycles: ValueCaptionPair[] = [
         <tool-checkbox id="whiteboard_show" label="Show Whiteboard" v-model="settings.viz.wb"/>
         <tool-checkbox id="stations_show" label="Show Stations" v-model="settings.viz.st"/>
         <tool-checkbox id="map_show" label="Show Map" v-model="settings.viz.mp"/>
+        <tool-checkbox id="pos_show" label="Show OwnShip Position" v-model="settings.viz.op"/>
         <!--        <tool-spacer medium/>-->
         <!--        <tool-button id="save" icon="/common/assets/icon_save.png" @click="btnClick"/>-->
         <!--        <tool-button id="clear" icon="/common/assets/icon_clear.png" @click="btnClick"/>-->
