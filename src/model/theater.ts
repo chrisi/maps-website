@@ -1,9 +1,7 @@
-import type {Coord} from "@/model/base.ts";
 import type {Station} from "@/model/station.ts";
 
 export interface Theater {
   name: string
-  datum: Coord
   projection: string
   feet: number
   pixels: number
@@ -12,6 +10,5 @@ export interface Theater {
   folder: string
   mapFilename: string
   stations: Station[]
-  stationMappingSize: number
   local: boolean
 }

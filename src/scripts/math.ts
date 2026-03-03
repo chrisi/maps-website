@@ -61,46 +61,46 @@ export function midpoint(point1: Point, point2: Point): Point {
   return {x: (point1.x + point2.x) / 2, y: (point1.y + point2.y) / 2};
 }
 
-export function offsetToLatLon(crd: Coord, xOffsetFt: number, yOffsetFt: number): Coord {
-  // Constants
-  const R = 6378137; // Earth radius in meters
-  const deg2rad = Math.PI / 180; // Degrees to radians conversion
-  const ftToM = 0.3048; // Feet to meters conversion
-  const metersPerDegreeLat = 111120; // Approximate meters per degree of latitude
+// export function offsetToLatLon(crd: Coord, xOffsetFt: number, yOffsetFt: number): Coord {
+//   // Constants
+//   const R = 6378137; // Earth radius in meters
+//   const deg2rad = Math.PI / 180; // Degrees to radians conversion
+//   const ftToM = 0.3048; // Feet to meters conversion
+//   const metersPerDegreeLat = 111120; // Approximate meters per degree of latitude
+//
+//   // Convert offsets from feet to meters with latitude correction
+//   const xM = xOffsetFt * ftToM;
+//   const yM = yOffsetFt * ftToM * 1.065; // Empirical correction for 0.910716° latitude error
+//
+//   // Estimate target latitude for longitude correction
+//   const deltaLat = yM / metersPerDegreeLat; // Approximate latitude change in degrees
+//   const latEst = crd.lat + deltaLat; // Estimated target latitude
+//   const scale = (1 / Math.cos(latEst * deg2rad)) * 1.002; // Longitude scale with correction for 0.710367° error
+//
+//   const xMCorrected = xM * scale;
+//
+//   // Convert origin (lat0, lon0) to Web Mercator coordinates
+//   const x0 = R * crd.long * deg2rad;
+//   const y0 = R * Math.log(Math.tan(Math.PI / 4 + crd.lat * deg2rad / 2));
+//
+//   // Apply corrected offsets
+//   const x = x0 + xMCorrected;
+//   const y = y0 + yM;
+//
+//   // Convert back to latitude and longitude
+//   const long = x / (R * deg2rad);
+//   const lat = (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) / deg2rad;
+//
+//   return {lat, long};
+// }
 
-  // Convert offsets from feet to meters with latitude correction
-  const xM = xOffsetFt * ftToM;
-  const yM = yOffsetFt * ftToM * 1.065; // Empirical correction for 0.910716° latitude error
-
-  // Estimate target latitude for longitude correction
-  const deltaLat = yM / metersPerDegreeLat; // Approximate latitude change in degrees
-  const latEst = crd.lat + deltaLat; // Estimated target latitude
-  const scale = (1 / Math.cos(latEst * deg2rad)) * 1.002; // Longitude scale with correction for 0.710367° error
-
-  const xMCorrected = xM * scale;
-
-  // Convert origin (lat0, lon0) to Web Mercator coordinates
-  const x0 = R * crd.long * deg2rad;
-  const y0 = R * Math.log(Math.tan(Math.PI / 4 + crd.lat * deg2rad / 2));
-
-  // Apply corrected offsets
-  const x = x0 + xMCorrected;
-  const y = y0 + yM;
-
-  // Convert back to latitude and longitude
-  const long = x / (R * deg2rad);
-  const lat = (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) / deg2rad;
-
-  return {lat, long};
-}
-
-export function map2LatLong(datum: Coord, loc: Point): Coord {
-  const KM_TO_FT = 3280.8399;
-  const x = loc.x - 512 * KM_TO_FT;
-  const y = loc.y - 512 * KM_TO_FT;
-  const result = offsetToLatLon(datum, x, y);
-  return {lat: result.lat, long: result.long};
-}
+// export function map2LatLong(datum: Coord, loc: Point): Coord {
+//   const KM_TO_FT = 3280.8399;
+//   const x = loc.x - 512 * KM_TO_FT;
+//   const y = loc.y - 512 * KM_TO_FT;
+//   const result = offsetToLatLon(datum, x, y);
+//   return {lat: result.lat, long: result.long};
+// }
 
 //
 // Basic Flight Computer stuff

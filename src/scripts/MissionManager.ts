@@ -10,7 +10,7 @@ import {
 } from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
-import {getFlightHours, map2LatLong, rad2deg, vector} from "@/scripts/math.ts";
+import {feetToLatLong, getFlightHours, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/common/scripts/map_radio";
 
 export class MissionManager {
@@ -217,7 +217,7 @@ export class MissionManager {
     const rx = parseFloat(data[1]!)
     const ry = parseFloat(data[0]!)
     if (rx == 0 && ry == 0) return;
-    const crd = map2LatLong(this.global.map!.datum, {x: rx, y: ry});
+    const crd = feetToLatLong(this.global.map!.projection, {x: rx, y: ry});
     const target: Target = {
       crd: crd,
       x: rx / res,
