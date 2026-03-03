@@ -8,6 +8,7 @@ export interface Visibility {
   xy: boolean;
   st: boolean;
   mp: boolean;
+  op: boolean;
 }
 
 export interface BullseyeSettings {
@@ -24,6 +25,7 @@ export interface CollabSettings {
   host: string;
   port: number;
 }
+
 export interface AgentSettings {
   host: string;
   port: number;

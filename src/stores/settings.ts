@@ -11,6 +11,7 @@ export const useSettingsStore = defineStore('settings', () => {
     xy: true,
     st: true,
     mp: true,
+    op: true,
   })
 
   const settings = reactive<Settings>(
