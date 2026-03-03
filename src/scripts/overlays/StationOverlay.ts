@@ -6,13 +6,12 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {watch} from "vue";
 import {drawAirbase, drawNavDme, drawNavTacan, drawNavVor, drawNavVorDme} from "@/scripts/draw/symbols.ts";
 import {drawCircle} from "@/scripts/draw/basic.ts";
-import {MapSizeFeet} from "@/data/map.ts";
 
 export class StationOverlay extends BaseOverlay {
 
   private selectStationEventHandler: ((station: Station) => void)[] = [];
 
-  private fac = 1 / MapSizeFeet * this.global.map!.pixels
+  private fac = 1 / this.global.map!.feet * this.global.map!.pixels
 
   private stations = this.global.map!.stations.map(s => this.prepareStation(s))
 

@@ -4,7 +4,7 @@ import {useRoute} from "vue-router";
 
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {cdnUrl, findMap, MapSizeFeet} from "@/data/map.ts";
+import {cdnUrl, findMap} from "@/data/map.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {feetToLatLong} from "@/scripts/math.ts";
 
@@ -269,7 +269,7 @@ watch(pos, (newPos) => {
 
 watch(selectedStation, (newValue) => {
   const ovl = overlayManager.getOverlay(LocateOverlay)!
-  const fac = 1 / MapSizeFeet * global.map!.pixels
+  const fac = 1 / global.map!.feet * global.map!.pixels
   if (newValue) {
     ovl.highlightStation(newValue.name)
     if (!activeWindow.value)
