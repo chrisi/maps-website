@@ -7,7 +7,6 @@ import type {Coord, Point, Vector} from "@/model/base.ts";
 import proj4 from "proj4";
 
 export const FeetToMeters = 0.30488
-export const FtPerNM = 6076.12
 
 const wgs84 = "EPSG:4326"
 
