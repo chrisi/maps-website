@@ -1,4 +1,5 @@
 import {createCanvas, loadImage} from 'canvas';
+import {distance} from "@/scripts/math.ts";
 
 /**
  * Creates a height profile image along a given path and returns it as a base64 data URL.
@@ -26,9 +27,7 @@ export async function createProfileAlongPath(
   const segmentDistances: number[] = [];
   let totalDistance = 0;
   for (let i = 0; i < waypoints.length - 1; i++) {
-    const dx = waypoints[i + 1]!.x - waypoints[i]!.x;
-    const dy = waypoints[i + 1]!.y - waypoints[i]!.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dist = distance(waypoints[i + 1]!,waypoints[i]!)
     segmentDistances.push(dist);
     totalDistance += dist;
   }

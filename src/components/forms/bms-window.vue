@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from 'vue'
+import {onUnmounted, ref} from 'vue'
 import {baseUrl} from "@/scripts/utils.ts";
 
 const position = ref({x: 100, y: 100})
