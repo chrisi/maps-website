@@ -20,6 +20,7 @@ import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {createProfileAlongPath} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
+import BmsWindow from "@/components/forms/bms-window.vue";
 
 const props = defineProps({
   visible: {
@@ -314,6 +315,10 @@ const type = computed(() => {
     </div>
   </tool-window>
 
+  <bms-window title="Height-Profile" :visible="profileVisible" @close="profileVisible = false">
+    <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
+  </bms-window>
+
   <div v-if="profileVisible" class="profile-popup">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
       <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
@@ -342,7 +347,7 @@ const type = computed(() => {
   box-shadow: 6px 6px 9px #444;
   padding: 16px;
   left: 50%;
-  top: 20%;
+  top: 40%;
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
