@@ -19,6 +19,7 @@ const Px6k = 6144
 export const maps: Theater[] = [
   {
     name: "korea",
+    // defaultBullseye: {x: 1562, y: 2237},
     projection: "+proj=tmerc +lon_0=127.5 +ellps=WGS84 +k=0.9996 +units=m +x_0=512000 +y_0=-3749290",
     feet: MapSizeFt, // theater size, 1024 km (3358699.5)
     pixels: Px6k, // map image size
@@ -31,6 +32,7 @@ export const maps: Theater[] = [
   },
   {
     name: "balkans",
+    // defaultBullseye: {x: 1000, y: 500},
     projection: "+proj=tmerc +lon_0=16.4191 +ellps=WGS84 +k=0.9996 +units=m +x_0=512000 +y_0=-4119200",
     feet: MapSizeFt, // theater size, 1024 km
     pixels: Px6k, // map image size
@@ -43,6 +45,7 @@ export const maps: Theater[] = [
   },
   {
     name: "israel",
+    // defaultBullseye: {x: 1800, y: 1400},
     projection: "+proj=tmerc +lon_0=35 +ellps=WGS84 +k=0.9996 +units=m +x_0=512000 +y_0=-3028440",
     feet: MapSizeFt, // theater size, 1024 km
     pixels: Px6k, // map image size
@@ -55,6 +58,7 @@ export const maps: Theater[] = [
   },
   {
     name: "hellas",
+    // defaultBullseye: {x: 1000, y: 1000},
     projection: "+proj=tmerc +lon_0=25 +ellps=WGS84 +k=0.9996 +units=m +x_0=512000 +y_0=-3693820",
     feet: MapSizeFt, // theater size, 1024 km
     pixels: Px6k, // map image size
