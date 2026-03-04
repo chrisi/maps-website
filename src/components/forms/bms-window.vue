@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onUnmounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import {baseUrl} from "@/scripts/utils.ts";
 
 const position = ref({x: 100, y: 100})
@@ -56,7 +56,7 @@ onUnmounted(() => {
     <div ref="titlebarRef" class="titlebar" @mousedown="onMouseDown">
       <div class="title">{{ title }}</div>
       <div class="controls">
-        <img :src="`${baseUrl}/common/icons/close.png`" alt="Close" class="control" @click="emit('close')"/>
+        <img :src="`${baseUrl}common/icons/close.png`" alt="Close" class="control" @click="emit('close')"/>
       </div>
     </div>
     <div class="content">
@@ -124,6 +124,7 @@ onUnmounted(() => {
   height: 16px;
   cursor: pointer;
 }
+
 .controls {
   display: flex;
   gap: 8px;
