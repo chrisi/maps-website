@@ -315,16 +315,9 @@ const type = computed(() => {
     </div>
   </tool-window>
 
-  <bms-window title="Height-Profile" :visible="profileVisible" @close="profileVisible = false">
+  <bms-window title="Flight-Profile" :visible="profileVisible" @close="profileVisible = false">
     <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
   </bms-window>
-
-  <div v-if="profileVisible" class="profile-popup">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-      <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
-      <tool-button id="btn-close-profile" text="Close" @click="profileVisible = false"/>
-    </div>
-  </div>
 </template>
 
 <style scoped>
@@ -339,17 +332,4 @@ const type = computed(() => {
   width: 16px;
   height: 16px;
 }
-
-.profile-popup {
-  position: fixed;
-  background-color: rgba(245, 245, 245, 1);
-  border: 1px solid black;
-  box-shadow: 6px 6px 9px #444;
-  padding: 16px;
-  left: 50%;
-  top: 40%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-}
-
 </style>
