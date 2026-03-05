@@ -48,5 +48,13 @@ export class DebugOverlay extends BaseOverlay {
     drawAirbase(cnv.context, {x: 350, y: 100}, 45, 1.5, false)
     drawAirbase(cnv.context, {x: 400, y: 100}, 45, 1.5, true)
     drawAirbase(cnv.context, {x: 450, y: 100}, 45, 1.5, false, true)
+
+    const p = new Path2D("M 0 -32 L 3 -21 L 4 -14 L 7 -2 L 21 9 L 21 3 L 22 3 L 22 15 L 21 15 L 21 14 L 5 14 L 5 19 L 12 25 L 12 29 L 5 29 L 5 28 L 3 28 L 2 29 L -2 29 L -3 28 L -5 28 L -5 29 L -12 29 L -12 25 L -5 19 L -5 14 L -21 14 L -21 15 L -22 15 L -22 3 L -21 3 L -21 9 L -7 -2 L -4 -14 L -3 -21 Z")
+    cnv.context.save()
+    cnv.context.translate(500, 100)
+    cnv.context.scale(1,1 )
+    cnv.context.rotate(Math.PI / 4)
+    cnv.context.fill(p)
+    cnv.context.restore()
   }
 }

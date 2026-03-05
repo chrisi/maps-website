@@ -11,12 +11,14 @@ export class OwnshipOverlay extends BaseOverlay {
   private heading: number = 0
   private prevWorldPos: Point | undefined
   private res = this.global.map!.resolution
-  private icon: HTMLImageElement | undefined
+  private ownship: Path2D
+
+  constructor() {
+    super();
+    this.ownship = new Path2D("M 0 -32 L 3 -21 L 4 -14 L 7 -2 L 21 9 L 21 3 L 22 3 L 22 15 L 21 15 L 21 14 L 5 14 L 5 19 L 12 25 L 12 29 L 5 29 L 5 28 L 3 28 L 2 29 L -2 29 L -3 28 L -5 28 L -5 29 L -12 29 L -12 25 L -5 19 L -5 14 L -21 14 L -21 15 L -22 15 L -22 3 L -21 3 L -21 9 L -7 -2 L -4 -14 L -3 -21 Z")
+  }
 
   public init() {
-    this.icon = new Image()
-    this.icon.src = `${baseUrl}common/icons/f16-blue.png`
-    this.icon.onload = () => this.redraw()
     watch(() => this.settings.viz.op, () => {
       this.redraw()
     })
@@ -40,14 +42,15 @@ export class OwnshipOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.pos || !this.icon || !this.icon.complete) return
+    if (!this.pos) return
     const ctx = cnv.context
     const pt = this.toCnv(this.pos, cnv)
     const size = 32
     ctx.save()
     ctx.translate(pt.x, pt.y)
     ctx.rotate(this.heading * Math.PI / 180)
-    ctx.drawImage(this.icon, -size / 2, -size / 2, size, size)
+    ctx.fill(this.ownship)
+    ctx.stroke(this.ownship)
     ctx.restore()
   }
 
