@@ -1,7 +1,6 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Point} from "@/model/base.ts";
-import {baseUrl} from "@/scripts/utils.ts";
 import {vector} from "@/scripts/math.ts";
 import {watch} from "vue";
 
@@ -12,6 +11,9 @@ export class OwnshipOverlay extends BaseOverlay {
   private prevWorldPos: Point | undefined
   private res = this.global.map!.resolution
   private ownship: Path2D
+
+  private colUS = "#00F800"
+  private colROK = "#00F8F8"
 
   constructor() {
     super();
@@ -45,9 +47,12 @@ export class OwnshipOverlay extends BaseOverlay {
     if (!this.pos) return
     const ctx = cnv.context
     const pt = this.toCnv(this.pos, cnv)
-    const size = 32
     ctx.save()
+    ctx.lineWidth = 2
+    ctx.strokeStyle = 'black'
+    ctx.fillStyle = this.colUS
     ctx.translate(pt.x, pt.y)
+    ctx.scale(0.5, 0.5)
     ctx.rotate(this.heading * Math.PI / 180)
     ctx.fill(this.ownship)
     ctx.stroke(this.ownship)
