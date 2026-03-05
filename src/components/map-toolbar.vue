@@ -26,6 +26,10 @@ interface Tool {
 
 const {viz} = storeToRefs(useSettingsStore())
 
+const collapsed = ref(false)
+
+const activeTool = ref<Tool | undefined>(undefined)
+
 const tools = ref<Tool[]>([
   {
     name: "locate", caption: "Locate", activeIcon: "icon_locate.png", icons: ["icon_locate.png", "icon_locate1.png"],
@@ -33,7 +37,7 @@ const tools = ref<Tool[]>([
   },
   {
     name: "move", caption: "Move", activeIcon: "icon_move.png", icons: ["icon_move.png", "icon_move1.png"],
-    desc: "Move the map view around the map.", show: () => true
+    desc: "Move the map view around the map.", show: () => false
   },
   {
     name: "measure", caption: "Measure", activeIcon: "icon_ruler.png", icons: ["icon_ruler.png", "icon_ruler1.png"],
@@ -48,60 +52,64 @@ const tools = ref<Tool[]>([
     desc: "Draw lines on the map.", show: () => viz.value.wb
   },
   {
-    name: "route", caption: "Route", activeIcon: "icon_compass.png",
+    name: "route", caption: "Route", activeIcon: "icon_compass.png", icons: ["icon_compass.png", "icon_compass1.png"],
     desc: "Draw the mission route on the map.", show: () => viz.value.ms
   },
   {
-    name: "settings", caption: "Settings", activeIcon: "icon_menu.png",
+    name: "settings", caption: "Settings", activeIcon: "icon_settings.png", icons: ["icon_settings.png", "icon_settings1.png"],
     desc: "Change the map view settings.", show: () => true
   },
 ])
 
+const toggleCollapsed = () => {
+  collapsed.value = !collapsed.value
+}
+
 watch(
   () => props.modelValue,
   (newVal) => {
-    resetTools()
+    resetIcons()
     activateTool(newVal)
   }
 );
 
 const headerIcon = computed(() => {
   const icon = collapsed.value ? "tb_expand.png" : "tb_collapse.png"
-  return `${baseUrl}/icons/toolbar/${icon}`
+  return `${baseUrl}icons/toolbar/${icon}`
 })
 
-const resetTools = () => {
+const activateTool = (name: string) => {
+  const tool = tools.value.find(tool => tool.name == name)
+  if (!tool) return
+  if (tool.icons) {
+    tool.activeIcon = tool.icons![1]!
+    activeTool.value = tool
+  }
+}
+
+const clickTool = (tool: Tool) => {
+  resetIcons()
+  let cmd = 'move'
+  if (tool.name == activeTool.value?.name) {
+    activeTool.value = undefined
+  } else if (tool.icons) {
+    tool.activeIcon = tool.icons[1]!
+    cmd = tool.name
+  }
+  emit('toolClick', cmd)
+  if (tool.icons) {
+    // if icons are defined, the tool is a toggle button with an active state (mode)
+    // switch the global mode using two-way data binding
+    emit('update:modelValue', cmd)
+  }
+}
+
+const resetIcons = () => {
   tools.value.filter(tool => tool.icons).forEach(tool => {
     tool.activeIcon = tool.icons![0]!
   })
 }
 
-const activateTool = (name: string) => {
-  const tool = tools.value.find(tool => tool.name == name)
-  if (tool && tool.icons) {
-    console.log(`activate tool ${tool.name}`)
-    tool.activeIcon = tool.icons![1]!
-  }
-}
-
-const collapsed = ref(false)
-
-const toggleCollapsed = () => {
-  collapsed.value = !collapsed.value
-}
-
-const clickTool = (tool: Tool) => {
-  resetTools()
-  if (tool.icons) {
-    tool.activeIcon = tool.icons[1]!
-  }
-  emit('toolClick', tool.name)
-  if (tool.icons) {
-    // if icons are defined, the tool is a toggle button with an active state (mode)
-    // switch the global mode using two-way data binding
-    emit('update:modelValue', tool.name)
-  }
-}
 //TODO: emit mouseup on toolbar enter
 </script>
 
@@ -113,7 +121,7 @@ const clickTool = (tool: Tool) => {
     <transition name="list">
       <div v-show="!collapsed" class="toolbar-content">
         <div v-for="tool in tools.filter(t => t.show && t.show())" :key="tool.name">
-          <img :src="`${baseUrl}/icons/toolbar/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
+          <img :src="`${baseUrl}icons/toolbar/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
                class="tool-button" @click.stop="clickTool(tool)">
         </div>
       </div>

@@ -246,18 +246,28 @@ const execTool = (tool: string) => {
       selectedStation.value = undefined
       break;
     case "settings":
+      suspend.value = false
+      activeWindow.value = tool
+      selectedStation.value = undefined
+      break;
     case "route":
     case "symbol":
-    case "bullseye":
     case "whiteboard":
     case "locate":
       activeWindow.value = tool
       suspend.value = true
       break;
+    case "bullseye":
     case "measure":
       suspend.value = true
       break;
   }
+}
+
+const resetModes = () => {
+  activeWindow.value = ''
+  suspend.value = false
+  selectedStation.value = undefined
 }
 
 watch(pos, (newPos) => {

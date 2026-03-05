@@ -56,7 +56,7 @@ onUnmounted(() => {
     <div ref="titlebarRef" class="titlebar" @mousedown="onMouseDown">
       <div class="title">{{ title }}</div>
       <div class="controls">
-        <img :src="`${baseUrl}common/icons/close.png`" alt="Close" class="control" @click="emit('close')"/>
+        <img :src="`${baseUrl}icons/buttons/close.png`" alt="Close" class="control" @click="emit('close')"/>
       </div>
     </div>
     <div class="content">
