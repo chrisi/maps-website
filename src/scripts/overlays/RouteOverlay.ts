@@ -27,6 +27,9 @@ export class RouteOverlay extends BaseOverlay {
     watch(() => this.settings.viz.ms, () => {
       this.redraw()
     })
+    watch(() => this.global.currentWaypoint, () => {
+      this.redraw()
+    })
   }
 
   public isEnabled(): boolean {
@@ -43,7 +46,6 @@ export class RouteOverlay extends BaseOverlay {
 
   public onClickOwnHotspot(hotspots: Hotspot[]) {
     this.global.currentWaypoint = hotspots[0]!.target as Waypoint
-    this.redraw()
   }
 
   public onDraw(cnv: Canvas): void {
