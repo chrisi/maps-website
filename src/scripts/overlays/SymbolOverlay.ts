@@ -109,7 +109,7 @@ export class SymbolOverlay extends BaseOverlay {
       img.onerror = () => {
         console.warn(`Failed to load icon for ${symbol}`)
       }
-      img.src = `../common/assets/${symbol}.ico`;
+      img.src = `../icons/mil/${symbol}.ico`;
       this.iconCache.set(symbol, img);
     }
 

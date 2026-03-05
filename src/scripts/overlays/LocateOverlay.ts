@@ -1,7 +1,7 @@
-import {drawHighlight} from "@/common/scripts/map_draw";
 import type {Point} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
+import {drawHighlight} from "@/scripts/draw/basic.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
@@ -32,7 +32,7 @@ export class LocateOverlay extends BaseOverlay {
     if (!this.location) return;
     const pos = this.toCnv(this.location, cnv)
     const smartScale = cnv.scale + (1 - cnv.scale) * 0.7
-    drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize * smartScale);
+    drawHighlight(cnv.context, pos, this.highlightSize * smartScale);
   }
 
 }

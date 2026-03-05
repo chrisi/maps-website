@@ -11,7 +11,7 @@ import {
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point} from "@/model/base.ts";
 import {feetToLatLong, getFlightHours, rad2deg, vector} from "@/scripts/math.ts";
-import {getCallsignByFreq} from "@/common/scripts/map_radio";
+import {getCallsignByFreq} from "@/data/radio.ts";
 
 export class MissionManager {
 
@@ -172,7 +172,8 @@ export class MissionManager {
     for (let i = 0; i < 5; i++) {
       // Set Values
       const callsign = getCallsignByFreq(this.dataCartridge!.radio[34 + i]!.freq);
-      this.mission!.package.flights.push(callsign);
+      if (callsign)
+        this.mission!.package.flights.push(callsign);
     }
   }
 
@@ -241,13 +242,8 @@ export class MissionManager {
 
   // Parse and create Radio object
   private addRadio(line: string) {
-    const data = line.split("=");
-    const freq = (parseFloat(data[1]!) / 1000).toFixed(3);
-    const entry: Radio = {
-      id: data[0]!,
-      freq: freq
-    };
-    this.dataCartridge!.radio.push(entry);
+    const data = line.split("=")
+    this.dataCartridge!.radio.push({id: data[0]!, freq: parseInt(data[1]!)})
   }
 
   // Add title if found in file (Mission.ini)

@@ -242,3 +242,12 @@ function applyStyleAndDraw(ctx: CanvasRenderingContext2D, opts?: { fillStyle?: s
   }
   ctx.stroke()
 }
+
+export function drawHighlight(ctx: CanvasRenderingContext2D, pt: Point, rad: number = 15) {
+  ctx.beginPath();
+  ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI, false);
+  ctx.strokeStyle = '#ff0000';
+  ctx.lineWidth = 3;
+  ctx.closePath();
+  ctx.stroke();
+}

@@ -115,10 +115,6 @@ const cycles: ValueCaptionPair[] = [
         <tool-checkbox id="stations_show" label="Show Stations" v-model="settings.viz.st"/>
         <tool-checkbox id="map_show" label="Show Map" v-model="settings.viz.mp"/>
         <tool-checkbox id="pos_show" label="Show OwnShip Position" v-model="settings.viz.op"/>
-        <!--        <tool-spacer medium/>-->
-        <!--        <tool-button id="save" icon="/common/assets/icon_save.png" @click="btnClick"/>-->
-        <!--        <tool-button id="clear" icon="/common/assets/icon_clear.png" @click="btnClick"/>-->
-        <!--        <tool-button id="reset" icon="/common/assets/icon_reset.png" @click="btnClick"/>-->
       </template>
 
       <template #Connectivity>
@@ -144,16 +140,12 @@ const cycles: ValueCaptionPair[] = [
         <tool-spacer/>
         <tool-row>
           <div style="text-align: end; width: 100%;">
-            <tool-button id="imcs-connection" icon="/common/icons/connect_server.png" :active="global.connectedImcs"
+            <tool-button id="imcs-connection" icon="/icons/buttons/connect_server.png" :active="global.connectedImcs"
                          tooltip="Connect to Collaboration Server" @click="btnClick"/>
-            <tool-button id="agent-connection" icon="/common/icons/connect_agent.png" :active="global.connectedAgent"
+            <tool-button id="agent-connection" icon="/icons/buttons/connect_agent.png" :active="global.connectedAgent"
                          tooltip="Connect to Falcon BMS Agent" @click="btnClick"/>
           </div>
         </tool-row>
-        <!--        <tool-spacer medium/>-->
-        <!--        <tool-button id="download" icon="/common/assets/icon_download.png" @click="btnClick"/>-->
-        <!--        <tool-button id="export" icon="/common/assets/icon_save.png" @click="btnClick"/>-->
-        <!--<tool-button id="gfs-fetch" icon="common/assets/icon_fetch.png" @click="btnClick(event)"/>-->
       </template>
     </tool-tabs>
   </tool-window>

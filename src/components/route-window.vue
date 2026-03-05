@@ -259,8 +259,8 @@ const type = computed(() => {
         <tool-dropdown label="Action" :options="actions" v-model="steer.action"/>
         <tool-textfield label="Duration" v-model="steer.duration" unit="min"/>
         <tool-spacer/>
-        <tool-button id="showProfile" icon="/common/icons/flight-profile.png" tooltip="Show Flight Profile" @click="showProfile"/>
-        <tool-button id="zoomRoute" icon="/common/icons/route.png" tooltip="Zoom to Route" @click="btnClick"/>
+        <tool-button id="showProfile" icon="/icons/buttons/flight-profile.png" tooltip="Show Flight Profile" @click="showProfile"/>
+        <tool-button id="zoomRoute" icon="/icons/buttons/route.png" tooltip="Zoom to Route" @click="btnClick"/>
         <tool-spacer separator/>
         <tool-output label="AWACS" value="Lynx5"/>
         <tool-output label="Tanker" value="Texaco"/>

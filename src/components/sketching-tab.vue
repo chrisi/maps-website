@@ -56,15 +56,15 @@ const btnDrawModeClick = (sender: string) => {
 </script>
 
 <template>
-  <tool-button id="drawMode_freehand" icon="/common/icons/freehand.png" tooltip="Freehand"
+  <tool-button id="drawMode_freehand" icon="/icons/buttons/freehand.png" tooltip="Freehand"
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Freehand"/>
-  <tool-button id="drawMode_line" icon="/common/icons/line.png" tooltip="Line"
+  <tool-button id="drawMode_line" icon="/icons/buttons/line.png" tooltip="Line"
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Line"/>
-  <tool-button id="drawMode_rect" icon="/common/icons/rect.png" tooltip="Rectangle"
+  <tool-button id="drawMode_rect" icon="/icons/buttons/rect.png" tooltip="Rectangle"
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Rect"/>
-  <tool-button id="drawMode_ellipse" icon="/common/icons/circle.png" tooltip="Circle"
+  <tool-button id="drawMode_ellipse" icon="/icons/buttons/circle.png" tooltip="Circle"
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Ellipse"/>
-  <tool-button id="drawMode_text" icon="/common/icons/text.png" tooltip="Text"
+  <tool-button id="drawMode_text" icon="/icons/buttons/text.png" tooltip="Text"
                @click="btnDrawModeClick" :active="global.inputMode == InputMode.Text"/>
   <tool-spacer/>
   <template v-if="global.inputMode == InputMode.Text">

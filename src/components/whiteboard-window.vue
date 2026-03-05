@@ -100,9 +100,9 @@ const tabChanged = (sender: string) => {
     <tool-spacer/>
     <div style="display: flex; justify-content: space-between;">
       <tool-button id="saveSketch" icon="/common/assets/icon_save.png" @click="btnSaveClick"/>
-      <tool-button id="inputMode_delete" icon="/common/icons/eraser.png" @click="btnInputModeClick"
+      <tool-button id="inputMode_delete" icon="/icons/buttons/eraser.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
-      <tool-button id="clearSketch" icon="/common/icons/delete.png" @click="btnClearClick"/>
+      <tool-button id="clearSketch" icon="/icons/buttons/delete.png" @click="btnClearClick"/>
     </div>
   </tool-window>
   <confirmation-dialog :visible="showClearConfirm" message="Really clear whiteboard?"

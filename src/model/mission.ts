@@ -31,9 +31,10 @@ export const Action = {
   Jamming: 26,
 };
 
+//TODO: duplicate? see radio.ts
 export interface Radio {
   id: string,
-  freq: string
+  freq: number
 }
 
 export interface LineStpt extends Point {

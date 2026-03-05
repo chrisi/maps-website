@@ -4,9 +4,8 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {MissionManager} from "@/scripts/MissionManager.ts";
 import {watch} from "vue";
 import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
-import {drawOutlined, drawTextOutlined} from "@/scripts/draw/basic.ts";
+import {drawHighlight, drawOutlined, drawTextOutlined} from "@/scripts/draw/basic.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
-import {drawHighlight} from "@/common/scripts/map_draw";
 import {drawTextBoxed} from "@/scripts/draw/basic.ts";
 import {pointOffsetRad} from "@/scripts/utils.ts";
 
@@ -56,7 +55,7 @@ export class RouteOverlay extends BaseOverlay {
 
     if (this.global.currentWaypoint) {
       const pos = this.toCnv(this.global.currentWaypoint.tgt, cnv)
-      drawHighlight(cnv.context, pos.x, pos.y, this.highlightSize)
+      drawHighlight(cnv.context, pos, this.highlightSize)
     }
   }
 

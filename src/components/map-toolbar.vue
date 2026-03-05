@@ -28,7 +28,7 @@ const {viz} = storeToRefs(useSettingsStore())
 
 const tools = ref<Tool[]>([
   {
-    name: "locate", caption: "Locate", activeIcon: "icon_zoom.png", icons: ["icon_zoom.png", "icon_zoom.png"],
+    name: "locate", caption: "Locate", activeIcon: "icon_locate.png", icons: ["icon_locate.png", "icon_locate1.png"],
     desc: "Locate stations on the map.", show: () => viz.value.st
   },
   {
@@ -67,7 +67,7 @@ watch(
 
 const headerIcon = computed(() => {
   const icon = collapsed.value ? "tb_expand.png" : "tb_collapse.png"
-  return `${baseUrl}/common/icons/${icon}`
+  return `${baseUrl}/icons/toolbar/${icon}`
 })
 
 const resetTools = () => {
@@ -108,13 +108,12 @@ const clickTool = (tool: Tool) => {
 <template>
   <div class="toolbar-wrapper">
     <div class="toolbar-toggle" @click="toggleCollapsed">
-      <!--      <img :src="collapsed ? '/common/icons/tb_collapse.png' : '/common/icons/tb_expand.png'" class="toolbar-header" alt="">-->
       <img :src="headerIcon" class="toolbar-header" alt="">
     </div>
     <transition name="list">
       <div v-show="!collapsed" class="toolbar-content">
         <div v-for="tool in tools.filter(t => t.show && t.show())" :key="tool.name">
-          <img :src="`${baseUrl}/common/assets/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
+          <img :src="`${baseUrl}/icons/toolbar/${tool.activeIcon}`" :id="tool.name" :alt="tool.caption" :title="tool.desc"
                class="tool-button" @click.stop="clickTool(tool)">
         </div>
       </div>
