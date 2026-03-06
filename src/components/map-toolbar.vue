@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
@@ -110,6 +110,43 @@ const resetIcons = () => {
   })
 }
 
+const handleKeyDown = (e: KeyboardEvent) => {
+  // if (e.ctrlKey && e.code == "KeyF") {
+  //   activeWindow.value = "locate"
+  //   suspend.value = true
+  //   e.preventDefault()
+  // }
+  //
+  // switch (e.key) {
+  //   case '1':
+  //     global.mode = OverlayMode.Measure
+  //     suspend.value = true
+  //     break
+  //   case '2':
+  //     global.mode = OverlayMode.Bullseye
+  //     suspend.value = true
+  //     break
+  //   case '3':
+  //     global.mode = OverlayMode.Whiteboard
+  //     suspend.value = true
+  //     break
+  //   case 'Escape':
+  //     global.mode = OverlayMode.Move
+  //     activeWindow.value = ''
+  //     selectedStation.value = undefined
+  //     suspend.value = false
+  //     break
+  // }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
 //TODO: emit mouseup on toolbar enter
 </script>
 
@@ -132,6 +169,10 @@ const resetIcons = () => {
 <style scoped>
 
 .toolbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 15px;
   display: inline-flex;
   flex-direction: column;
   pointer-events: auto;
@@ -139,6 +180,7 @@ const resetIcons = () => {
   border: 1px solid #555;
   box-shadow: 2px 2px 5px #555;
   background-color: white;
+  z-index: 1 /* Sit on top */
 }
 
 .toolbar-toggle {

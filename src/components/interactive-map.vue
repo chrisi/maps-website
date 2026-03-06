@@ -19,6 +19,8 @@ import {SymbolOverlay} from "@/scripts/overlays/SymbolOverlay.ts";
 import {BullseyeOverlay} from "@/scripts/overlays/BullseyeOverlay.ts";
 import {PointerOverlay} from "@/scripts/overlays/PointerOverlay.ts";
 import {WhiteboardOverlay} from "@/scripts/overlays/WhiteboardOverlay.ts";
+import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
+import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 //Toolwindows
 import DetailsPopup from "@/components/details-popup.vue";
 import SettingsWindow from "@/components/settings-window.vue";
@@ -28,22 +30,21 @@ import WhiteboardWindow from "@/components/whiteboard-window.vue";
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
-import {OverlayMode} from "@/model/mode.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
-import type {Coord, Point} from "@/model/base.ts";
+import type {Point} from "@/model/base.ts";
 import CanvasMap from "@/components/canvas-map.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import HotspotList from "@/components/hotspot-list.vue";
 import OutValue from "@/components/gui/OutValue.vue";
 import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
-import type {CollabSettings} from "@/model/settings.ts";
-import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 import {baseUrl, withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
 import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
-import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
+import Position from "@/components/position.vue";
+
+const route = useRoute()
 
 const global = useGlobalStore()
 const settings = useSettingsStore()
@@ -54,7 +55,6 @@ const canvasMapRef = ref()
 const ovlCtx = shallowRef<CanvasRenderingContext2D | null>(null)
 
 const pos = ref<Point>({x: 0, y: 0})
-const feet = ref<Point>({x: 0, y: 0})
 const zoom = ref(1)
 const suspend = ref(false)
 
@@ -62,14 +62,15 @@ const selectedStation = ref<Station | undefined>()
 const activeWindow = ref('')
 
 const imcsClient = new ImcsClient()
-const agentClient = new AgentClient();
+const agentClient = new AgentClient()
 
 const overlayManager = new OverlayManager(imcsClient)
 
 const dropFileHandler = new DropFileHandler()
 const missionMgr = new MissionManager()
 
-const coords = ref("N00°00.000', E00°00.000'")
+let inhibitLocate = false
+let ownShipOverlay: OwnshipOverlay
 
 dropFileHandler.onIniLoaded((filename, content) => {
   missionMgr.loadDataCartridge(filename, content.split("\n"))
@@ -93,9 +94,21 @@ imcsClient.onMissionEvent((title, ini) => {
   missionMgr.loadDataCartridge(title, ini)
 })
 
-const route = useRoute()
+agentClient.onUpdateEvent(() => {
+  fetchFromLocalBms()
+})
 
-let inhibitLocate = false
+agentClient.onOpenEvent(() => {
+  global.connectedAgent = true
+})
+
+agentClient.onCloseEvent(() => {
+  global.connectedAgent = false
+})
+
+agentClient.onPosEvent((ownship: Ownship) => {
+  ownShipOverlay.setPosition(ownship)
+})
 
 onBeforeMount(() => {
   const name = route.params['name']
@@ -104,8 +117,6 @@ onBeforeMount(() => {
     global.map = findMap(mapName)
   }
 })
-
-let ownShipOverlay: OwnshipOverlay
 
 onMounted(() => {
   overlayManager.registerOverlay(new HotspotOverlay())
@@ -137,20 +148,24 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
 
-agentClient.onUpdateEvent(() => {
-  fetchFromLocalBms()
-})
-
-agentClient.onOpenEvent(() => {
-  global.connectedAgent = true
-})
-
-agentClient.onCloseEvent(() => {
-  global.connectedAgent = false
-})
-
-agentClient.onPosEvent((ownship: Ownship) => {
-  ownShipOverlay.setPosition(ownship)
+watch(selectedStation, (newValue) => {
+  const ovl = overlayManager.getOverlay(LocateOverlay)!
+  const fac = 1 / global.map!.feet * global.map!.pixels
+  if (newValue) {
+    ovl.highlightStation(newValue.name)
+    if (!activeWindow.value) {
+      activeWindow.value = 'locate'
+    }
+    if (!inhibitLocate) {
+      const p = {
+        x: newValue.pos.x * fac,
+        y: global.map!.pixels - (newValue.pos.y * fac)
+      }
+      canvasMapRef.value.locatePosition(p, 2)
+    }
+  } else {
+    ovl.clearLocation()
+  }
 })
 
 const fetchFromLocalBms = async () => {
@@ -171,31 +186,7 @@ const zoomToMission = () => {
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.ctrlKey && e.code == "KeyF") {
-    activeWindow.value = "locate"
-    suspend.value = true
-    e.preventDefault()
-  }
-
   switch (e.key) {
-    case '1':
-      global.mode = OverlayMode.Measure
-      suspend.value = true
-      break
-    case '2':
-      global.mode = OverlayMode.Bullseye
-      suspend.value = true
-      break
-    case '3':
-      global.mode = OverlayMode.Whiteboard
-      suspend.value = true
-      break
-    case 'Escape':
-      global.mode = OverlayMode.Move
-      activeWindow.value = ''
-      selectedStation.value = undefined
-      suspend.value = false
-      break
     case '#':
       settings.settings.debug = !settings.settings.debug
       break
@@ -208,33 +199,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       )
       console.table(Object.fromEntries(counts))
       break
-    case 'c':
-      imcsClient.connect({
-        host: settings.settings.collab.host ?? "localhost",
-        port: settings.settings.collab.port ?? 8080,
-        secure: settings.settings.collab.secure,
-        callsign: "Debug1",
-        session: settings.settings.collab.session ?? "47df",
-      } as CollabSettings)
-      break
-    case 'C':
-      imcsClient.connect({
-        host: settings.settings.collab.host ?? "localhost",
-        port: settings.settings.collab.port ?? 8080,
-        secure: settings.settings.collab.secure,
-        callsign: "Debug2",
-        session: settings.settings.collab.session ?? "47df",
-      } as CollabSettings)
-      break
-    case 'd':
-      imcsClient.disconnect()
-      break
   }
-}
-
-const createPointerLatLongStr = (feet: Point) => {
-  const strCrd = strLatLong(feetToLatLong(global.map!.projection, feet));
-  coords.value = `${strCrd.lat}, ${strCrd.long}`
 }
 
 const execTool = (tool: string) => {
@@ -245,6 +210,10 @@ const execTool = (tool: string) => {
       activeWindow.value = ''
       selectedStation.value = undefined
       break;
+    case "locate":
+      suspend.value = false
+      activeWindow.value = tool
+      break;
     case "settings":
       suspend.value = false
       activeWindow.value = tool
@@ -253,9 +222,8 @@ const execTool = (tool: string) => {
     case "route":
     case "symbol":
     case "whiteboard":
-    case "locate":
-      activeWindow.value = tool
       suspend.value = true
+      activeWindow.value = tool
       break;
     case "bullseye":
     case "measure":
@@ -263,38 +231,6 @@ const execTool = (tool: string) => {
       break;
   }
 }
-
-const resetModes = () => {
-  activeWindow.value = ''
-  suspend.value = false
-  selectedStation.value = undefined
-}
-
-watch(pos, (newPos) => {
-  if (newPos) {
-    feet.value = {x: newPos.x * global.map!.resolution, y: (global.map!.pixels - newPos.y) * global.map!.resolution}
-    createPointerLatLongStr(feet.value);
-  }
-})
-
-watch(selectedStation, (newValue) => {
-  const ovl = overlayManager.getOverlay(LocateOverlay)!
-  const fac = 1 / global.map!.feet * global.map!.pixels
-  if (newValue) {
-    ovl.highlightStation(newValue.name)
-    if (!activeWindow.value)
-      activeWindow.value = 'locate'
-    if (!inhibitLocate) {
-      const p = {
-        x: newValue.pos.x * fac,
-        y: global.map!.pixels - (newValue.pos.y * fac)
-      }
-      canvasMapRef.value.locatePosition(p, 2)
-    }
-  } else {
-    ovl.clearLocation()
-  }
-})
 
 const settingsClick = (sender: string) => {
   if (sender == "imcs-connection") {
@@ -328,6 +264,8 @@ const getMapUrl = (map: Theater) => {
 </script>
 
 <template>
+  <position v-if="settings.viz.xy" :pos="pos"/>
+  <map-toolbar @toolClick="execTool" v-model="global.mode"/>
   <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
@@ -355,12 +293,7 @@ const getMapUrl = (map: Theater) => {
     <out-value caption="Input-Mode" :val="global.inputMode"/>
     <out-value caption="Zoom" :val="zoom"/>
     <out-value caption="Suspended" :val="suspend.toString()"/>
-    <out-coord v-if="pos" caption="Pos in pixels" :x="pos.x" :y="pos.y" :decimal="0"/>
-    <out-coord v-if="pos" caption="Pos in feet" :x="feet.x" :y="feet.y"/>
-  </div>
-  <div id="position" v-if="settings.viz.xy">{{ coords }}&nbsp;</div>
-  <div id="inputs">
-    <map-toolbar @toolClick="execTool" v-model="global.mode"/>
+    <out-coord v-if="pos" caption="Pos" :x="pos.x" :y="pos.y" :decimal="0"/>
   </div>
   <hotspot-list/>
   <skyvector-logo/>
@@ -380,29 +313,6 @@ const getMapUrl = (map: Theater) => {
   background-color: navy;
   opacity: 0.8;
   border-radius: 4px;
-}
-
-#inputs {
-  pointer-events: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 15px;
-}
-
-#position {
-  pointer-events: none;
-  position: fixed;
-  top: 0;
-  right: 0;
-  margin: 15px;
-  font-family: JetBrains Mono, monospace;
-  font-size: 12px;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: black;
-  padding: 4px 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 </style>
