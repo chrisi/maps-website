@@ -15,11 +15,11 @@ export interface Overlay {
   init?(): void
 
   // is the overlay enabled?
-  // if false, overlay will not be drawn and no pointer events will be forwarded to it.
+  // if false, the overlay will not be drawn and no pointer events will be forwarded to it.
   isEnabled(): boolean
 
   // is the overlay active in the current mode?
-  // if false, no pointer events will be forwarded to it but it will still be drawn.
+  // if false, no pointer events will be forwarded to it, but it will still be drawn.
   isActive(mode: OverlayMode): boolean
 
   onDraw(cnv: Canvas): void
