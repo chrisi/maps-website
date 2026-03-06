@@ -198,7 +198,7 @@ watch(activeTool, (newValue) => {
       suspend.value = false
       break
     case 'settings':
-      activeWindow.value = ''
+      activeWindow.value = 'settings'
       global.mode = OverlayMode.Move
       suspend.value = false
       break

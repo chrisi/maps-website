@@ -107,26 +107,42 @@ const resetIcons = () => {
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.ctrlKey && e.code == "KeyF") {
-    findAndActivateTool("locate")
-    e.preventDefault()
-  }
-  switch (e.key) {
-    case '1':
-      findAndActivateTool("measure")
-      break
-    case '2':
-      findAndActivateTool("bullseye")
-      break
-    case '3':
-      findAndActivateTool("whiteboard")
-      break
-    case '4':
-      findAndActivateTool("route")
-      break
-    case 'Escape':
-      findAndActivateTool("move")
-      break
+  if (e.ctrlKey) {
+    switch (e.code) {
+      case 'KeyF':
+        findAndActivateTool("locate")
+        e.preventDefault()
+        break;
+      case 'Comma':
+        findAndActivateTool("settings")
+        break;
+    }
+  } else {
+    switch (e.key) {
+      case '1':
+      case 'm':
+        findAndActivateTool("measure")
+        break
+      case '2':
+      case 'b':
+        findAndActivateTool("bullseye")
+        break
+      case '3':
+      case 'w':
+        findAndActivateTool("whiteboard")
+        break
+      case '4':
+      case 'r':
+        findAndActivateTool("route")
+        break
+      case '5':
+      case 's':
+        findAndActivateTool("settings")
+        break
+      case 'Escape':
+        findAndActivateTool("move")
+        break
+    }
   }
 }
 

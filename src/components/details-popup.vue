@@ -31,14 +31,15 @@ const selectorRef = ref<{ focus: () => void } | null>(null)
 const tabs = ref(['AIP', 'Charts'])
 const coords = ref('')
 
-watch(
-  () => props.visible,
-  async (isVisible) => {
-    if (!isVisible) return
-    await nextTick()
-    selectorRef.value?.focus()
-  }
-)
+//TODO: find a way to focus the selector when the popup is opened without activating the dropdown on ipads automatically
+// watch(
+//   () => props.visible,
+//   async (isVisible) => {
+//     if (!isVisible) return
+//     await nextTick()
+//     selectorRef.value?.focus()
+//   }
+// )
 
 watch(
   () => props.modelValue,
