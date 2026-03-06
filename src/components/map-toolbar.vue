@@ -110,37 +110,37 @@ const handleKeyDown = (e: KeyboardEvent) => {
   if (e.ctrlKey) {
     switch (e.code) {
       case 'KeyF':
-        findAndActivateTool("locate")
+        findAndActivateTool('locate')
         e.preventDefault()
         break;
       case 'Comma':
-        findAndActivateTool("settings")
+        findAndActivateTool('settings')
         break;
     }
   } else {
     switch (e.key) {
       case '1':
       case 'm':
-        findAndActivateTool("measure")
+        findAndActivateTool('measure')
         break
       case '2':
       case 'b':
-        findAndActivateTool("bullseye")
+        findAndActivateTool('bullseye')
         break
       case '3':
       case 'w':
-        findAndActivateTool("whiteboard")
+        findAndActivateTool('whiteboard')
         break
       case '4':
       case 'r':
-        findAndActivateTool("route")
+        findAndActivateTool('route')
         break
       case '5':
       case 's':
-        findAndActivateTool("settings")
+        findAndActivateTool('settings')
         break
       case 'Escape':
-        findAndActivateTool("move")
+        findAndActivateTool('move')
         break
     }
   }

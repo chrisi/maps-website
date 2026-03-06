@@ -149,8 +149,8 @@ watch(selectedStation, (newValue) => {
   const fac = 1 / global.map!.feet * global.map!.pixels
   if (newValue) {
     ovl.highlightStation(newValue.name)
-    if (!activeWindow.value) {
-      activeWindow.value = 'locate'
+    if (global.mode == 'move') {
+      activeTool.value = 'locate'
     }
     if (!inhibitLocate) {
       const p = {
