@@ -269,8 +269,7 @@ const getMapUrl = (map: Theater) => {
   <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
-  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''"
-                     :overlayManager="overlayManager" :imcsClient="imcsClient"/>
+  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager" :imcsClient="imcsClient"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"

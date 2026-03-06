@@ -9,7 +9,6 @@ import {useGlobalStore} from "@/stores/global.ts";
 import {cdnUrl} from "@/data/map.ts";
 import StationSelector from "@/components/station-selector.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
-import type {Point} from "@/model/base.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {feetToLatLong} from "@/scripts/math.ts";
 
@@ -55,8 +54,9 @@ watch(
       data.value = undefined
       emit('update:modelValue', undefined)
     } else {
+      const strCrd = strLatLong(feetToLatLong(global.map!.projection, newVal.pos));
+      coords.value = `${strCrd.lat}, ${strCrd.long}`
       data.value = newVal.details
-      createLocationLatLongStr(newVal.pos)
       if (newVal.details?.charts && newVal.details.charts.length > 0)
         tabs.value = ['AIP', 'Charts']
       else
@@ -83,11 +83,6 @@ function openChart(chart: Chart) {
   const features = `width=${w},height=${h},left=${x},top=${y}`
   window.open(url, 'popup', features)
   return false
-}
-
-const createLocationLatLongStr = (pos: Point) => {
-  const strCrd = strLatLong(feetToLatLong(global.map!.projection, pos));
-  coords.value = `${strCrd.lat}, ${strCrd.long}`
 }
 
 </script>
