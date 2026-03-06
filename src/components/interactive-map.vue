@@ -43,6 +43,7 @@ import {baseUrl, withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
 import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
 import Position from "@/components/position.vue";
+import {OverlayMode} from "@/model/mode.ts";
 
 const route = useRoute()
 
@@ -60,6 +61,7 @@ const suspend = ref(false)
 
 const selectedStation = ref<Station | undefined>()
 const activeWindow = ref('')
+const activeTool = ref('move')
 
 const imcsClient = new ImcsClient()
 const agentClient = new AgentClient()
@@ -121,25 +123,19 @@ onBeforeMount(() => {
 onMounted(() => {
   overlayManager.registerOverlay(new HotspotOverlay())
   overlayManager.registerOverlay(new DebugOverlay())
-
   overlayManager.registerOverlay(new BullseyeOverlay())
-
-  overlayManager.registerOverlay(new StationOverlay())
-    .addSelectStationEventHandler(station => {
-      inhibitLocate = true
-      selectedStation.value = station
-      nextTick(() => inhibitLocate = false)
-    })
-
+  overlayManager.registerOverlay(new StationOverlay()).addSelectStationEventHandler(station => {
+    inhibitLocate = true
+    selectedStation.value = station
+    nextTick(() => inhibitLocate = false)
+  })
   overlayManager.registerOverlay(new RouteOverlay(missionMgr))
-
   overlayManager.registerOverlay(new LocateOverlay())
   overlayManager.registerOverlay(new SymbolOverlay())
   overlayManager.registerOverlay(new MeasureOverlay())
   overlayManager.registerOverlay(new WhiteboardOverlay())
   overlayManager.registerOverlay(new PointerOverlay())
   ownShipOverlay = overlayManager.registerOverlay(new OwnshipOverlay())
-
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
 })
@@ -166,6 +162,48 @@ watch(selectedStation, (newValue) => {
   } else {
     ovl.clearLocation()
   }
+})
+
+watch(activeTool, (newValue) => {
+  switch (newValue) {
+    case 'move':
+      activeWindow.value = ''
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      selectedStation.value = undefined
+      break
+    case 'locate':
+      activeWindow.value = 'locate'
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      break
+    case 'bullseye':
+      activeWindow.value = ''
+      global.mode = OverlayMode.Bullseye
+      suspend.value = true
+      break
+    case 'measure':
+      activeWindow.value = ''
+      global.mode = OverlayMode.Measure
+      suspend.value = true
+      break
+    case 'whiteboard':
+      activeWindow.value = 'whiteboard'
+      global.mode = OverlayMode.Whiteboard
+      suspend.value = true
+      break
+    case 'route':
+      activeWindow.value = 'route'
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      break
+    case 'settings':
+      activeWindow.value = ''
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      break
+  }
+
 })
 
 const fetchFromLocalBms = async () => {
@@ -265,11 +303,12 @@ const getMapUrl = (map: Theater) => {
 
 <template>
   <position v-if="settings.viz.xy" :pos="pos"/>
-  <map-toolbar @toolClick="execTool" v-model="global.mode"/>
+  <map-toolbar v-model="activeTool"/>
   <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
-  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager" :imcsClient="imcsClient"/>
+  <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"
+                     :imcsClient="imcsClient"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
@@ -287,7 +326,8 @@ const getMapUrl = (map: Theater) => {
     />
   </div>
   <div id="debug" v-if="settings.settings.debug">
-    <out-value caption="Tool-Window" :val="activeWindow"/>
+    <out-value caption="Tool" :val="activeTool"/>
+    <out-value caption="Window" :val="activeWindow"/>
     <out-value caption="Overlay-Mode" :val="global.mode"/>
     <out-value caption="Input-Mode" :val="global.inputMode"/>
     <out-value caption="Zoom" :val="zoom"/>

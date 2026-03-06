@@ -7,11 +7,10 @@ import {storeToRefs} from "pinia";
 import {baseUrl} from "@/scripts/utils.ts";
 
 const props = defineProps<{
-  modelValue: OverlayMode
+  modelValue: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'toolClick', value: string): void
   (e: 'update:modelValue', value: string): void
 }>()
 
@@ -68,8 +67,7 @@ const toggleCollapsed = () => {
 watch(
   () => props.modelValue,
   (newVal) => {
-    resetIcons()
-    activateTool(newVal)
+    findAndActivateTool(newVal)
   }
 );
 
@@ -78,29 +76,27 @@ const headerIcon = computed(() => {
   return `${baseUrl}icons/toolbar/${icon}`
 })
 
-const activateTool = (name: string) => {
+const findAndActivateTool = (name: string) => {
   const tool = tools.value.find(tool => tool.name == name)
-  if (!tool) return
+  if (tool) activateTool(tool)
+}
+
+const activateTool = (tool: Tool) => {
+  resetIcons()
   if (tool.icons) {
     tool.activeIcon = tool.icons![1]!
-    activeTool.value = tool
   }
+  activeTool.value = tool
+  emit('update:modelValue', tool.name)
 }
 
 const clickTool = (tool: Tool) => {
-  resetIcons()
-  let cmd = 'move'
   if (tool.name == activeTool.value?.name) {
+    resetIcons()
     activeTool.value = undefined
+    emit('update:modelValue', 'move')
   } else if (tool.icons) {
-    tool.activeIcon = tool.icons[1]!
-    cmd = tool.name
-  }
-  emit('toolClick', cmd)
-  if (tool.icons) {
-    // if icons are defined, the tool is a toggle button with an active state (mode)
-    // switch the global mode using two-way data binding
-    emit('update:modelValue', cmd)
+    activateTool(tool)
   }
 }
 
@@ -111,32 +107,27 @@ const resetIcons = () => {
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  // if (e.ctrlKey && e.code == "KeyF") {
-  //   activeWindow.value = "locate"
-  //   suspend.value = true
-  //   e.preventDefault()
-  // }
-  //
-  // switch (e.key) {
-  //   case '1':
-  //     global.mode = OverlayMode.Measure
-  //     suspend.value = true
-  //     break
-  //   case '2':
-  //     global.mode = OverlayMode.Bullseye
-  //     suspend.value = true
-  //     break
-  //   case '3':
-  //     global.mode = OverlayMode.Whiteboard
-  //     suspend.value = true
-  //     break
-  //   case 'Escape':
-  //     global.mode = OverlayMode.Move
-  //     activeWindow.value = ''
-  //     selectedStation.value = undefined
-  //     suspend.value = false
-  //     break
-  // }
+  if (e.ctrlKey && e.code == "KeyF") {
+    findAndActivateTool("locate")
+    e.preventDefault()
+  }
+  switch (e.key) {
+    case '1':
+      findAndActivateTool("measure")
+      break
+    case '2':
+      findAndActivateTool("bullseye")
+      break
+    case '3':
+      findAndActivateTool("whiteboard")
+      break
+    case '4':
+      findAndActivateTool("route")
+      break
+    case 'Escape':
+      findAndActivateTool("move")
+      break
+  }
 }
 
 onMounted(() => {
