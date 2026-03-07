@@ -7,7 +7,7 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Whiteboard} from "@/model/overlays.ts";
 
 export const useGlobalStore = defineStore('global', () => {
-  const mode = ref<OverlayMode>(OverlayMode.None)
+  const mode = ref<OverlayMode>(OverlayMode.Move)
   const inputMode = ref<InputMode>(InputMode.Freehand)
   const map = ref<Theater>()
   const connectedImcs = ref(false)

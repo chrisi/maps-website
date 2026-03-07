@@ -1,5 +1,4 @@
 export enum OverlayMode {
-  None = "none",
   Move = "move",
   Bullseye = "bullseye",
   Measure = "measure",
