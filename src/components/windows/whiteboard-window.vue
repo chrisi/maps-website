@@ -3,8 +3,8 @@
 import {ref} from "vue";
 import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolTabs from "@/components/forms/tool-tabs.vue";
-import SketchingTab from "@/components/sketching-tab.vue";
-import SymbolsTab from "@/components/symbols-tab.vue";
+import SketchingTab from "@/components/windows/sketching-tab.vue";
+import SymbolsTab from "@/components/windows/symbols-tab.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {InputMode, OverlayMode} from "@/model/mode.ts";

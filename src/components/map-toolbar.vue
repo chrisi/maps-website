@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import type {OverlayMode} from "@/model/mode.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {storeToRefs} from "pinia";
 import {baseUrl} from "@/scripts/utils.ts";

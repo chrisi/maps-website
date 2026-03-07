@@ -5,8 +5,6 @@ import {useRoute} from "vue-router";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {cdnUrl, findMap} from "@/data/map.ts";
-import {strLatLong} from "@/scripts/conv.ts";
-import {feetToLatLong} from "@/scripts/math.ts";
 
 // Overlays
 import {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
@@ -22,10 +20,10 @@ import {WhiteboardOverlay} from "@/scripts/overlays/WhiteboardOverlay.ts";
 import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 //Toolwindows
-import DetailsPopup from "@/components/details-popup.vue";
-import SettingsWindow from "@/components/settings-window.vue";
-import RouteWindow from "@/components/route-window.vue";
-import WhiteboardWindow from "@/components/whiteboard-window.vue";
+import AipWindow from "@/components/windows/aip-window.vue";
+import SettingsWindow from "@/components/windows/settings-window.vue";
+import RouteWindow from "@/components/windows/route-window.vue";
+import WhiteboardWindow from "@/components/windows/whiteboard-window.vue";
 
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
@@ -304,7 +302,7 @@ const getMapUrl = (map: Theater) => {
 <template>
   <position v-if="settings.viz.xy" :pos="pos"/>
   <map-toolbar v-model="activeTool"/>
-  <details-popup v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
+  <aip-window v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"
