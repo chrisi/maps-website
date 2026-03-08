@@ -54,6 +54,10 @@ const tools = ref<Tool[]>([
     desc: "Draw the mission route on the map.", show: () => viz.value.ms
   },
   {
+    name: "aircraft", caption: "Aircraft", activeIcon: "icon_aircraft.png", icons: ["icon_aircraft.png", "icon_aircraft1.png"],
+    desc: "Show aircraft position on the map.", show: () => viz.value.op
+  },
+  {
     name: "settings", caption: "Settings", activeIcon: "icon_settings.png", icons: ["icon_settings.png", "icon_settings1.png"],
     desc: "Change the map view settings.", show: () => true
   },
