@@ -1,5 +1,5 @@
 import {watch} from "vue";
-import {OverlayMode} from "@/model/mode.ts";
+import {InputMode, OverlayMode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/draw/SplinePainter.ts";
 import type {Point} from "@/model/base.ts";
@@ -177,7 +177,7 @@ export class WhiteboardOverlay extends BaseOverlay {
   }
 
   public onPointerDown(e: PointerEvent) {
-    if (e.button == 0 && this.global.inputMode != "delete") {
+    if (e.button == 0 && this.global.inputMode != InputMode.Delete) {
       this.startPoint = this.fromCnv({x: e.pageX, y: e.pageY})
 
       const cnv = this.getCanvas()
@@ -224,7 +224,7 @@ export class WhiteboardOverlay extends BaseOverlay {
 
   public onPointerUp(e: PointerEvent) {
     const pt = this.fromCnv({x: e.pageX, y: e.pageY})
-    if ((e.button == 0) && this.startPoint && this.global.inputMode != "delete") {
+    if ((e.button == 0) && this.startPoint && this.global.inputMode != InputMode.Delete) {
 
       if (this.dragShape) {
         this.imcsClient!.msgSendDraw([this.dragShape])
@@ -335,7 +335,7 @@ export class WhiteboardOverlay extends BaseOverlay {
       this.drawMode = undefined
     }
 
-    if (e.button == 2 || this.global.inputMode == "delete") {
+    if (e.button == 2 || this.global.inputMode == InputMode.Delete) {
       const del = this.global.whiteboard.shapes.findLast(s => {
         switch (s.type) {
           case WbShapeType.Line:

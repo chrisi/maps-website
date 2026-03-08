@@ -6,6 +6,8 @@ import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {useGlobalStore} from "@/stores/global.ts";
+import {InputMode} from "@/model/mode.ts";
+import ToolButton from "@/components/forms/tool-button.vue";
 
 defineProps({
   visible: {
@@ -97,6 +99,15 @@ onMounted(() => {
   genIconCode()
 })
 
+const btnDrawModeClick = (sender: string) => {
+  switch (sender) {
+    case "drawMode_symbol":
+      global.inputMode = InputMode.Symbol
+      break
+    default:
+  }
+}
+
 </script>
 
 <template>
@@ -112,7 +123,8 @@ onMounted(() => {
   <tool-spacer/>
   <div class="symbol" v-if="global.selectedSymbol">
     <div>
-      <img id="sidc-symbol" :src="`../icons/mil/${global.selectedSymbol}.ico`" width="32" height="32" alt="symbol">
+      <tool-button id="drawMode_symbol" :icon="`/icons/mil/${global.selectedSymbol}.ico`" tooltip="Freehand"
+                   @click="btnDrawModeClick" :active="global.inputMode == InputMode.Symbol"/>
     </div>
     <div>{{ global.selectedSymbol }}</div>
   </div>

@@ -3,7 +3,7 @@ import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {MilSymbol} from "@/model/overlays.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import {OverlayMode} from "@/model/mode.ts";
+import {InputMode, OverlayMode} from "@/model/mode.ts";
 import {generateGuid} from "@/scripts/utils.ts";
 import {watch} from "vue";
 
@@ -67,7 +67,7 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public onPointerUp(e: PointerEvent, _: Hotspot[], isClick?: boolean): void {
-    if (e.button == 0 && this.global.inputMode != "delete") {
+    if (e.button == 0 && this.global.inputMode == InputMode.Symbol) {
       if (isClick && !this.dragSymbol) {
         const s: MilSymbol = {
           guid: generateGuid(),
@@ -84,7 +84,7 @@ export class SymbolOverlay extends BaseOverlay {
       }
     }
 
-    if (e.button == 2 || this.global.inputMode == "delete") {
+    if (e.button == 2 || this.global.inputMode == InputMode.Delete) {
       const delTgt = this.getHotspots().pop()
       if (delTgt) {
         const del = delTgt.target as MilSymbol

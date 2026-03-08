@@ -27,11 +27,6 @@ defineProps({
 
 const variant = ref("d")
 
-watch(() => global.inputMode, value => {
-  // TODO placeholder
-  console.log(`drawMode changed to ${value}`)
-})
-
 const btnDrawModeClick = (sender: string) => {
   switch (sender) {
     case "drawMode_freehand":

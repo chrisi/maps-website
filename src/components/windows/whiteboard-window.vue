@@ -70,12 +70,12 @@ const btnInputModeClick = (sender: string) => {
 const tabChanged = (sender: string) => {
   switch (sender) {
     case "C2-Symbols":
-      //global.inputMode = InputMode.Symbol
       global.mode = OverlayMode.Symbol
+      global.inputMode = InputMode.Symbol
       break
     case "Sketching":
-      //global.inputMode = InputMode.Freehand
       global.mode = OverlayMode.Whiteboard
+      global.inputMode = InputMode.Freehand
       break
     default:
   }
@@ -99,7 +99,7 @@ const tabChanged = (sender: string) => {
     </tool-tabs>
     <tool-spacer/>
     <div style="display: flex; justify-content: space-between;">
-      <tool-button id="saveSketch" icon="/common/assets/icon_save.png" @click="btnSaveClick"/>
+      <tool-button id="saveSketch" icon="/icons/buttons/save.png" @click="btnSaveClick"/>
       <tool-button id="inputMode_delete" icon="/icons/buttons/eraser.png" @click="btnInputModeClick"
                    :active="global.inputMode == InputMode.Delete"/>
       <tool-button id="clearSketch" icon="/icons/buttons/delete.png" @click="btnClearClick"/>

@@ -237,8 +237,8 @@ const type = computed(() => {
           <div>{{ type }}</div>
           <div>{{ global.currentWaypoint!.no }}</div>
           <div style="display: flex; gap: 8px;">
-            <img class="btn" src="/common/assets/icon_left.png" alt="left" @click="prevWaypoint">
-            <img class="btn" src="/common/assets/icon_right.png" alt="right" @click="nextWaypoint">
+            <img class="btn" src="/icons/buttons/icon_left.png" alt="left" @click="prevWaypoint">
+            <img class="btn" src="/icons/buttons/icon_right.png" alt="right" @click="nextWaypoint">
           </div>
         </div>
         <tool-spacer separator/>
