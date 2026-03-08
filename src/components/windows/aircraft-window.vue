@@ -12,7 +12,7 @@ defineProps({
     required: true
   }
 })
-const lo = ref(false)
+const lo = ref(true)
 const sa1 = ref(false)
 const sa2 = ref(false)
 
@@ -20,16 +20,14 @@ const emit = defineEmits(['close'])
 </script>
 
 <template>
-  <template>
-    <tool-window :visible="visible" @close="emit('close')">
-      <tool-title text="Aircraft Position"/>
-      <tool-section name="Ownship"/>
-      <tool-checkbox id="lock" label="Lock to Aircraft" v-model="lo"/>
-      <tool-section name="Other Aircraft"/>
-      <tool-checkbox id="show_1" label="Show Maverick" v-model="sa1"/>
-      <tool-checkbox id="show_2" label="Show Viper" v-model="sa2"/>
-    </tool-window>
-  </template>
+  <tool-window :visible="visible" @close="emit('close')">
+    <tool-title text="Aircraft Position"/>
+    <tool-section name="Ownship"/>
+    <tool-checkbox id="lock" label="Follow Aircraft" v-model="lo"/>
+    <tool-section name="Other Aircraft"/>
+    <tool-checkbox id="show_1" label="Show Maverick" v-model="sa1"/>
+    <tool-checkbox id="show_2" label="Show Viper" v-model="sa2"/>
+  </tool-window>
 </template>
 
 <style scoped>
