@@ -90,16 +90,14 @@ const activateTool = (tool: Tool) => {
     tool.activeIcon = tool.icons![1]!
   }
   activeTool.value = tool
-  emit('update:modelValue', tool.name)
 }
-
 const clickTool = (tool: Tool) => {
   if (tool.name == activeTool.value?.name) {
     resetIcons()
     activeTool.value = undefined
     emit('update:modelValue', 'move')
-  } else if (tool.icons) {
-    activateTool(tool)
+  } else {
+    emit('update:modelValue', tool.name)
   }
 }
 
@@ -113,37 +111,37 @@ const handleKeyDown = (e: KeyboardEvent) => {
   if (e.ctrlKey) {
     switch (e.code) {
       case 'KeyF':
-        findAndActivateTool('locate')
+        emit('update:modelValue', 'locate')
         e.preventDefault()
         break;
       case 'Comma':
-        findAndActivateTool('settings')
+        emit('update:modelValue', 'settings')
         break;
     }
   } else {
     switch (e.key) {
       case '1':
       case 'm':
-        findAndActivateTool('measure')
+        emit('update:modelValue', 'measure')
         break
       case '2':
       case 'b':
-        findAndActivateTool('bullseye')
+        emit('update:modelValue', 'bullseye')
         break
       case '3':
       case 'w':
-        findAndActivateTool('whiteboard')
+        emit('update:modelValue', 'whiteboard')
         break
       case '4':
       case 'r':
-        findAndActivateTool('route')
+        emit('update:modelValue', 'route')
         break
       case '5':
       case 's':
-        findAndActivateTool('settings')
+        emit('update:modelValue', 'settings')
         break
       case 'Escape':
-        findAndActivateTool('move')
+        emit('update:modelValue', 'move')
         break
     }
   }

@@ -23,6 +23,7 @@ import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 import AipWindow from "@/components/windows/aip-window.vue";
 import SettingsWindow from "@/components/windows/settings-window.vue";
 import RouteWindow from "@/components/windows/route-window.vue";
+import AircraftWindow from "@/components/windows/aircraft-window.vue";
 import WhiteboardWindow from "@/components/windows/whiteboard-window.vue";
 
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
@@ -195,6 +196,11 @@ watch(activeTool, (newValue) => {
       global.mode = OverlayMode.Move
       suspend.value = false
       break
+    case 'aircraft':
+      activeWindow.value = 'aircraft'
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      break
     case 'settings':
       activeWindow.value = 'settings'
       global.mode = OverlayMode.Move
@@ -238,36 +244,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-const execTool = (tool: string) => {
-  console.log(`activated tool '${tool}'`);
-  switch (tool) {
-    case "move":
-      suspend.value = false
-      activeWindow.value = ''
-      selectedStation.value = undefined
-      break;
-    case "locate":
-      suspend.value = false
-      activeWindow.value = tool
-      break;
-    case "settings":
-      suspend.value = false
-      activeWindow.value = tool
-      selectedStation.value = undefined
-      break;
-    case "route":
-    case "symbol":
-    case "whiteboard":
-      suspend.value = true
-      activeWindow.value = tool
-      break;
-    case "bullseye":
-    case "measure":
-      suspend.value = true
-      break;
-  }
-}
-
 const settingsClick = (sender: string) => {
   if (sender == "imcs-connection") {
     if (global.connectedImcs) {
@@ -304,9 +280,10 @@ const getMapUrl = (map: Theater) => {
   <map-toolbar v-model="activeTool"/>
   <aip-window v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
-  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"
                      :imcsClient="imcsClient"/>
+  <aircraft-window :visible="activeWindow=='aircraft'" @close="activeWindow=''"/>
+  <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
     <canvas-map
       ref="canvasMapRef" v-if="global.map" :src="getMapUrl(global.map)"
