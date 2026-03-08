@@ -137,6 +137,10 @@ const handleKeyDown = (e: KeyboardEvent) => {
         emit('update:modelValue', 'route')
         break
       case '5':
+      case 'a':
+        emit('update:modelValue', 'aircraft')
+        break
+      case '6':
       case 's':
         emit('update:modelValue', 'settings')
         break
