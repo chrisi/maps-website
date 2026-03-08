@@ -55,7 +55,7 @@ export class SymbolOverlay extends BaseOverlay {
   }
 
   public onPointerDown(e: PointerEvent, ownHotspots: Hotspot[]): void {
-    if (e.button == 0 && ownHotspots.length > 0) {
+    if (e.button == 0 && this.global.inputMode != InputMode.Delete && ownHotspots.length > 0) {
       this.dragSymbol = ownHotspots[0]!.target as MilSymbol
     }
   }
