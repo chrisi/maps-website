@@ -70,7 +70,7 @@ const sec1: ValueCaptionPair[] = [
   {value: "50", caption: "Radar"},
 ]
 
-const sidcDocUrl = "https://www.jcs.mil/Portals/36/Documents/Doctrine/Other_Pubs/ms_2525d.pdf"
+const sidcDocUrl = "https://www.jcs.mil/Portals/36/Documents/Doctrine/allied_doctrine/ms_2525d.pdf"
 
 const selectedEntity = ref("")
 const selectedIdent = ref("1006")
