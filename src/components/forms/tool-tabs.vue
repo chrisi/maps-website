@@ -58,44 +58,46 @@ onMounted(() => {
   </div>
 </template>
 
+
 <style scoped>
-/* Style the tab */
 .tab {
-  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
   padding: 0;
   margin: 0;
-  border-style: none;
-  background-color: #ccc;
+}
+.tab::before {
+  width: 6px;
+  content: "";
+  border-bottom: 1px solid #999;
 }
 
-/* Style the buttons inside the tab */
+.tab::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #999;
+}
+
 .tab button {
-  background-color: inherit;
-  float: left;
+  color: #888;
+  background-color: #ccc;
   border: 1px solid #ccc;
-  border-bottom: none;
-  /*outline: none; */
+  border-bottom: 1px solid #777;
+  border-radius: 4px 4px 0 0;
   cursor: pointer;
   padding: 4px 8px;
   transition: 0.3s;
   font-size: 15px;
 }
 
-/* Change background color of buttons on hover */
 .tab button:hover {
   background-color: #ddd;
 }
 
-/* Create an active/current tablink class */
 .tab button.active {
+  color: #333;
   background-color: rgba(245, 245, 245, 1);
+  border: 1px solid #777;
+  border-bottom: 1px solid rgba(245, 245, 245, 1);
 }
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 4px 0;
-  border-style: none;
-}
-
 </style>

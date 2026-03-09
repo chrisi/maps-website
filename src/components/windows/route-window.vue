@@ -21,6 +21,7 @@ import {strLatLong} from "@/scripts/conv.ts";
 import {createProfileAlongPath} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
 import BmsWindow from "@/components/forms/bms-window.vue";
+import ToolTitle from "@/components/forms/tool-title.vue";
 
 const props = defineProps({
   visible: {
@@ -230,6 +231,8 @@ const type = computed(() => {
 
 <template>
   <tool-window :visible="visible" @close="emit('close')">
+    <tool-title text="Mission Planner"/>
+    <tool-spacer/>
     <tool-tabs v-if="mission" :tabs="['Route','Radio','Mission']">
       <template #Route>
         <tool-spacer medium/>
@@ -310,7 +313,7 @@ const type = computed(() => {
         <tool-button id="btn-wx" icon="/common/assets/icon_table.png" tooltip="Weather Table" @click="btnClick"/>
       </template>
     </tool-tabs>
-    <div v-else style="text-align: center">Mission not loaded!<br><br>Drag an ini.-file onto the map<br>
+    <div class="message" v-else style="text-align: center">Mission not loaded!<br><br>Drag an ini.-file onto the map<br>
       or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon BMS.
     </div>
   </tool-window>
@@ -321,6 +324,14 @@ const type = computed(() => {
 </template>
 
 <style scoped>
+
+.message {
+  border-radius: 5px;
+  border: 2px solid rgba(0, 0, 128, 0.4);
+  padding: 10px;
+  background-color: rgba(0, 0, 128, 0.1);
+}
+
 .coord {
   font-size: 14px;
   font-weight: bolder;

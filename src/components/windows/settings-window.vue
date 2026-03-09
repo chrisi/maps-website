@@ -14,6 +14,7 @@ import ToolSpacer from "@/components/forms/tool-spacer.vue";
 import {reactive, ref} from "vue";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {useGlobalStore} from "@/stores/global.ts";
+import ToolTitle from "@/components/forms/tool-title.vue";
 
 const settings = useSettingsStore()
 const global = useGlobalStore()
@@ -95,8 +96,10 @@ const cycles: ValueCaptionPair[] = [
 
 <template>
   <tool-window :visible="visible" @close="emit('close')">
-    <tool-tabs :tabs="['Connectivity','Settings']">
-      <template #Settings>
+    <tool-title text="Settings"/>
+    <tool-spacer/>
+    <tool-tabs :tabs="['Connectivity','Display']">
+      <template #Display>
         <tool-section name="Common"/>
         <tool-checkbox id="unit" name="imperial" label="Imperial Units" v-model="imperialUnits"/>
 
