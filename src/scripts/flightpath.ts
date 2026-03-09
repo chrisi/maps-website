@@ -1,17 +1,18 @@
 import {createCanvas, loadImage} from 'canvas';
+import {type CanvasRenderingContext2D as Context2D} from 'canvas'
 import {distance} from "@/scripts/math.ts";
 
 /**
- * Creates a height profile image along a given path and returns it as a base64 data URL.
+ * Generates a profile visualization along a given path based on height mask data.
  *
- * @param heightMaskPath Path to the heightmask image (e.g., 'public/heightmasks/balkans.png')
- * @param waypoints Array of { x: number, y: number } coordinates on the map
- * @returns A PNG data URL string (e.g., "data:image/png;base64,.....")
+ * @param {string} heightMaskPath - The path to the height mask image file used as the source for height data.
+ * @param {{ x: number, y: number }[]} waypoints - An array of coordinates representing the path for which the profile will be created. At least two waypoints are required.
+ * @param {number} [profileWidth=800] - The width of the generated profile visualization canvas, in pixels.
+ * @param {number} [profileHeight=600] - The height of the generated profile visualization canvas, in pixels.
+ * @return {Promise<string>} - A Promise that resolves with the base64-encoded data URL representing the generated profile as a PNG image.
  */
-export async function createProfileAlongPath(
-  heightMaskPath: string,
-  waypoints: { x: number, y: number }[]
-) {
+export async function createProfileAlongPath(heightMaskPath: string, waypoints: { x: number, y: number }[],
+                                             profileWidth: number = 800, profileHeight: number = 600): Promise<string> {
   if (waypoints.length < 2) {
     throw new Error("At least two waypoints are required to create a profile.");
   }
@@ -27,15 +28,13 @@ export async function createProfileAlongPath(
   const segmentDistances: number[] = [];
   let totalDistance = 0;
   for (let i = 0; i < waypoints.length - 1; i++) {
-    const dist = distance(waypoints[i + 1]!,waypoints[i]!)
+    const dist = distance(waypoints[i + 1]!, waypoints[i]!)
     segmentDistances.push(dist);
     totalDistance += dist;
   }
 
-  const profileWidth = 800;
-  const profileHeight = 300; // Adjusted height to match common profile displays
   const profileCanvas = createCanvas(profileWidth, profileHeight);
-  const profileCtx = profileCanvas.getContext('2d');
+  const profileCtx: Context2D = profileCanvas.getContext('2d');
 
   const heights: number[] = [];
   const waypointXPositions: number[] = [0];
@@ -90,6 +89,8 @@ export async function createProfileAlongPath(
   profileCtx.fillStyle = 'lightblue'; // Dark background
   profileCtx.fillRect(0, 0, profileWidth, profileHeight);
 
+  // createAltitudeBackground(profileCtx)
+
   // Draw the profile area
   profileCtx.beginPath();
   profileCtx.moveTo(0, profileHeight);
@@ -130,4 +131,134 @@ export async function createProfileAlongPath(
 
   // Return as base64 data URL
   return profileCanvas.toDataURL('image/png');
+}
+
+type AltitudeBackgroundOptions = {
+  width?: number
+  height?: number
+  maxFeet?: number
+  stepFeet?: number
+  backgroundBottomColor?: string
+  backgroundTopColor?: string
+  lineColor?: string
+  labelColor?: string
+  font?: string
+  paddingLeft?: number
+  paddingRight?: number
+  paddingTop?: number
+  paddingBottom?: number
+}
+
+/**
+ * Paints a scalable altitude background image with logarithmic vertical spacing.
+ */
+export function createAltitudeBackground(ctx: Context2D, options: AltitudeBackgroundOptions = {}) {
+  const {
+    width = 800,
+    height = 600,
+    maxFeet = 10,
+    stepFeet = 2,
+    backgroundBottomColor = '#182870',
+    backgroundTopColor = '#000030',
+    lineColor = '#808080',
+    labelColor = '#b0b0b0',
+    font = '16px Arial',
+    paddingLeft = 56,
+    paddingRight = 0,
+    paddingTop = 0,
+    paddingBottom = 0
+  } = options
+
+  const plotLeft = paddingLeft
+  const plotTop = paddingTop
+  const plotRight = width - paddingRight
+  const plotBottom = height - paddingBottom
+  const plotWidth = plotRight - plotLeft
+  const plotHeight = plotBottom - plotTop
+
+  const steps: number[] = []
+  for (let feet = 0; feet <= maxFeet; feet += stepFeet) {
+    steps.push(feet)
+  }
+  if (steps[steps.length - 1] !== maxFeet) {
+    steps.push(maxFeet)
+  }
+
+  const hexToRgb = (hex: string) => {
+    const normalized = hex.replace('#', '')
+    const value = normalized.length === 3
+      ? normalized.split('').map((c) => c + c).join('')
+      : normalized
+
+    return {
+      r: parseInt(value.slice(0, 2), 16),
+      g: parseInt(value.slice(2, 4), 16),
+      b: parseInt(value.slice(4, 6), 16)
+    }
+  }
+
+  const rgbToHex = (r: number, g: number, b: number) =>
+    `#${[r, g, b].map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')}`
+
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+
+  const mixColor = (c1: string, c2: string, t: number) => {
+    const a = hexToRgb(c1)
+    const b = hexToRgb(c2)
+    return rgbToHex(
+      lerp(a.r, b.r, t),
+      lerp(a.g, b.g, t),
+      lerp(a.b, b.b, t)
+    )
+  }
+
+  const altitudeToY = (feet: number) => {
+    const normalized = Math.log1p(feet) / Math.log1p(maxFeet)
+    return plotBottom - normalized * plotHeight
+  }
+
+  // Base fill
+  ctx.fillStyle = backgroundBottomColor
+  ctx.fillRect(0, 0, width, height)
+
+  // Draw logarithmic bands
+  for (let i = 0; i < steps.length - 1; i++) {
+    const bottomFeet = steps[i]!
+    const topFeet = steps[i + 1]!
+
+    const y1 = altitudeToY(bottomFeet)
+    const y2 = altitudeToY(topFeet)
+
+    const t = bottomFeet / maxFeet
+    ctx.fillStyle = mixColor(backgroundBottomColor, backgroundTopColor, t)
+    ctx.fillRect(plotLeft, y2, plotWidth, y1 - y2)
+  }
+
+  // Draw border area background behind labels if you want a cleaner left margin
+  ctx.fillStyle = '#101020'
+  ctx.fillRect(0, 0, plotLeft, height)
+
+  // Grid lines + labels
+  ctx.strokeStyle = lineColor
+  ctx.fillStyle = labelColor
+  ctx.font = font
+  ctx.lineWidth = 1
+  ctx.textAlign = 'right'
+  ctx.textBaseline = 'middle'
+
+  for (const feet of steps) {
+    const y = altitudeToY(feet)
+
+    ctx.beginPath()
+    ctx.moveTo(plotLeft, y)
+    ctx.lineTo(plotRight, y)
+    ctx.stroke()
+
+    const label = feet === 0 ? '0K' : `${Math.round(feet / 1000)}K`
+    ctx.fillText(label, plotLeft - 8, y)
+  }
+
+  // Outer frame
+  ctx.strokeStyle = '#606060'
+  ctx.strokeRect(plotLeft, plotTop, plotWidth, plotHeight)
 }

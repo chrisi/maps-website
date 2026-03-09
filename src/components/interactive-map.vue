@@ -76,6 +76,8 @@ let ownShipOverlay: OwnshipOverlay
 dropFileHandler.onIniLoaded((filename, content) => {
   missionMgr.loadDataCartridge(filename, content.split("\n"))
   imcsClient.msgSendMission(filename, content.split("\n"))
+  zoomToMission()
+  activeTool.value = 'route'
 })
 
 dropFileHandler.onWbLoaded((filename, content) => {
