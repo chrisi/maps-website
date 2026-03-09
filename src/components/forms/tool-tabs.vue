@@ -39,7 +39,7 @@ watch(() => props.tabs, async (newTabs) => {
       openTab(newTabs[0]!)
     }
   }
-}, { deep: true })
+}, {deep: true})
 
 onMounted(() => {
   if (props.tabs.length > 0) {
@@ -65,7 +65,9 @@ onMounted(() => {
   align-items: flex-end;
   padding: 0;
   margin: 0;
+  /*background-color: #ddd;*/
 }
+
 .tab::before {
   width: 6px;
   content: "";
@@ -79,9 +81,9 @@ onMounted(() => {
 }
 
 .tab button {
-  color: #888;
+  color: #777;
   background-color: #ccc;
-  border: 1px solid #ccc;
+  border: 1px solid #aaa;
   border-bottom: 1px solid #777;
   border-radius: 4px 4px 0 0;
   cursor: pointer;
