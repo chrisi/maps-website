@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BmsWindow from "@/components/forms/bms-window.vue";
-import {useTemplateRef} from "vue";
+import {onUpdated, useTemplateRef} from "vue";
 
 defineProps({
   visible: {
@@ -19,6 +19,10 @@ function onResize() {
   }
 }
 
+onUpdated(() => {
+  onResize()
+})
+
 </script>
 
 <template>
@@ -31,7 +35,6 @@ function onResize() {
 
 <style scoped>
 .profile {
-  background-color: #4caf50;
   height: 100%;
   width: 100%;
 }

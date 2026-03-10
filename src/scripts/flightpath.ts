@@ -1,28 +1,36 @@
-import {createCanvas, loadImage} from 'canvas';
-import {type CanvasRenderingContext2D as Context2D} from 'canvas'
 import {distance} from "@/scripts/math.ts";
 
 /**
  * Generates a profile visualization along a given path based on height mask data.
  *
+ * @param {HTMLCanvasElement} profileCanvas - The canvas element to draw the profile on.
  * @param {string} heightMaskPath - The path to the height mask image file used as the source for height data.
  * @param {{ x: number, y: number }[]} waypoints - An array of coordinates representing the path for which the profile will be created. At least two waypoints are required.
- * @param {number} [profileWidth=800] - The width of the generated profile visualization canvas, in pixels.
- * @param {number} [profileHeight=600] - The height of the generated profile visualization canvas, in pixels.
- * @return {Promise<string>} - A Promise that resolves with the base64-encoded data URL representing the generated profile as a PNG image.
  */
-export async function createProfileAlongPath(heightMaskPath: string, waypoints: { x: number, y: number }[],
-                                             profileWidth: number = 800, profileHeight: number = 600): Promise<string> {
+export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, heightMaskPath: string, waypoints: { x: number, y: number }[]): Promise<void> {
   if (waypoints.length < 2) {
     throw new Error("At least two waypoints are required to create a profile.");
   }
 
-  const image = await loadImage(heightMaskPath);
-  const canvas = createCanvas(image.width, image.height);
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
+  const profileWidth = profileCanvas.width;
+  const profileHeight = profileCanvas.height;
 
-  const imageData = ctx.getImageData(0, 0, image.width, image.height);
+  // Use a temporary off-screen canvas to load the height mask and get its data
+  const image = new Image();
+  image.src = heightMaskPath;
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = reject;
+  });
+
+  const offscreenCanvas = document.createElement('canvas');
+  offscreenCanvas.width = image.width;
+  offscreenCanvas.height = image.height;
+  const offscreenCtx = offscreenCanvas.getContext('2d');
+  if (!offscreenCtx) throw new Error("Could not get 2d context for offscreen canvas");
+  offscreenCtx.drawImage(image, 0, 0);
+
+  const imageData = offscreenCtx.getImageData(0, 0, image.width, image.height);
   const data = imageData.data;
 
   const segmentDistances: number[] = [];
@@ -33,8 +41,8 @@ export async function createProfileAlongPath(heightMaskPath: string, waypoints: 
     totalDistance += dist;
   }
 
-  const profileCanvas = createCanvas(profileWidth, profileHeight);
-  const profileCtx: Context2D = profileCanvas.getContext('2d');
+  const profileCtx = profileCanvas.getContext('2d');
+  if (!profileCtx) throw new Error("Could not get 2d context for profile canvas");
 
   const heights: number[] = [];
   const waypointXPositions: number[] = [0];
@@ -128,9 +136,6 @@ export async function createProfileAlongPath(heightMaskPath: string, waypoints: 
   const topLabel = `${Math.round(maxHeight)} ft`;
   profileCtx.fillText(topLabel, 5, 12);
   profileCtx.fillText('0 ft', 5, profileHeight - 5);
-
-  // Return as base64 data URL
-  return profileCanvas.toDataURL('image/png');
 }
 
 type AltitudeBackgroundOptions = {
@@ -152,7 +157,7 @@ type AltitudeBackgroundOptions = {
 /**
  * Paints a scalable altitude background image with logarithmic vertical spacing.
  */
-export function createAltitudeBackground(ctx: Context2D, options: AltitudeBackgroundOptions = {}) {
+export function createAltitudeBackground(ctx: CanvasRenderingContext2D, options: AltitudeBackgroundOptions = {}) {
   const {
     width = 800,
     height = 600,

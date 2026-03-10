@@ -18,7 +18,7 @@ import type {Mission} from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import {createProfileAlongPath} from "@/scripts/flightpath.ts";
+import {drawProfileAlongPath} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import FlightProfile from "@/components/windows/flight-profile.vue";
@@ -165,7 +165,6 @@ const global = useGlobalStore()
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/
 const mission = ref<Mission>()
 const profileVisible = ref(false)
-const profileImage = ref("")
 
 onMounted(() => {
   props.missionManager.onDataCartridgeEvent(() => {
@@ -173,22 +172,34 @@ onMounted(() => {
   })
 })
 
-const showProfile = async () => {
-  if (!mission.value) return
+const getProfileWaypoints = () => {
+  if (!mission.value) return []
 
   const cutIndex = mission.value.route.findIndex(wpt => wpt.tgt.action === 7)
   const cutRoute = cutIndex !== -1 ? mission.value.route.slice(0, cutIndex + 1) : mission.value.route
 
-  const waypoints = cutRoute.map(wpt => ({
+  return cutRoute.map(wpt => ({
     x: wpt.tgt.x / global.map!.pixels * 1024,
     y: wpt.tgt.y / global.map!.pixels * 1024
   }))
+}
 
+const showProfile = async () => {
+  if (!mission.value) return
+  profileVisible.value = true
+}
+
+async function onResize(canvas: HTMLCanvasElement) {
+  if (!mission.value) return
+
+  const waypoints = getProfileWaypoints()
   const heightMaskPath = `${baseUrl}/heightmasks/${global.map!.name}.png`
 
   try {
-    profileImage.value = await createProfileAlongPath(heightMaskPath, waypoints)
-    profileVisible.value = true
+    // Ensure canvas internal dimensions match its displayed size
+    canvas.width = canvas.clientWidth
+    canvas.height = canvas.clientHeight
+    await drawProfileAlongPath(canvas, heightMaskPath, waypoints)
   } catch (e) {
     console.error("Failed to generate profile", e)
   }
@@ -318,7 +329,7 @@ const type = computed(() => {
     </div>
   </tool-window>
 
-  <flight-profile :visible="profileVisible" @close="profileVisible = false"/>
+  <flight-profile :visible="profileVisible" @close="profileVisible = false" @resize="onResize"/>
 </template>
 
 <style scoped>
