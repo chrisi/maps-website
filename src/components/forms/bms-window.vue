@@ -20,7 +20,7 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'resize'])
 
 function onMouseDown(e: MouseEvent) {
   isDragging.value = true
@@ -74,6 +74,7 @@ function onResizeMouseMove(e: MouseEvent) {
       width: Math.min(Math.max(200, resizeStart.value.width + (e.clientX - resizeStart.value.x)), maxWidth),
       height: Math.min(Math.max(100, resizeStart.value.height + (e.clientY - resizeStart.value.y)), maxHeight),
     }
+    emit('resize')
   }
 }
 
