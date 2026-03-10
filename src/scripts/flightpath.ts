@@ -108,7 +108,8 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
   profileCtx.moveTo(plotLeft, profileHeight);
   for (let i = 0; i < heights.length; i++) {
     const x = plotLeft + (i / (heights.length - 1)) * (plotWidth - 1);
-    const normalized = Math.log1p(heights[i]!) / Math.log1p(maxHeight);
+    const k = 15000;
+    const normalized = (Math.log(heights[i]! + k) - Math.log(k)) / (Math.log(maxHeight + k) - Math.log(k));
     const y = profileHeight - normalized * plotHeight;
     profileCtx.lineTo(x, y);
   }
@@ -216,8 +217,9 @@ export function createAltitudeBackground(ctx: CanvasRenderingContext2D, options:
   }
 
   const altitudeToY = (feet: number) => {
-    const normalized = Math.log1p(feet) / Math.log1p(maxFeet)
-    return plotBottom - normalized * plotHeight
+    const k = 15000;
+    const normalized = (Math.log(feet + k) - Math.log(k)) / (Math.log(maxFeet + k) - Math.log(k));
+    return plotBottom - normalized * plotHeight;
   }
 
   // Base fill
