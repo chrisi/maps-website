@@ -15,6 +15,12 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
   const profileWidth = profileCanvas.width;
   const profileHeight = profileCanvas.height;
 
+  const maxHeight = 45000;
+  const paddingLeft = 56;
+  const plotLeft = paddingLeft;
+  const plotWidth = profileWidth - paddingLeft;
+  const plotHeight = profileHeight;
+
   // Use a temporary off-screen canvas to load the height mask and get its data
   const image = new Image();
   image.src = heightMaskPath;
@@ -45,7 +51,7 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
   if (!profileCtx) throw new Error("Could not get 2d context for profile canvas");
 
   const heights: number[] = [];
-  const waypointXPositions: number[] = [0];
+  const waypointXPositions: number[] = [plotLeft];
   let currentDistance = 0;
 
   for (let i = 0; i < segmentDistances.length; i++) {
@@ -57,7 +63,7 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
 
     // Determine how many steps for this segment relative to its share of total distance
     // We use a minimum of 1 step per segment to ensure it's at least represented
-    const segmentWidth = (dist / totalDistance) * (profileWidth - 1);
+    const segmentWidth = (dist / totalDistance) * (plotWidth - 1);
     const steps = Math.max(1, Math.ceil(segmentWidth));
 
     for (let j = 0; j < steps; j++) {
@@ -86,29 +92,28 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
       }
     }
     currentDistance += dist;
-    waypointXPositions.push((currentDistance / totalDistance) * (profileWidth - 1));
+    waypointXPositions.push(plotLeft + (currentDistance / totalDistance) * (plotWidth - 1));
   }
 
-  // Determine max height for scaling
-  //const maxHeight = heights.length > 0 ? Math.max(...heights) : 10000;
-  const maxHeight = 25000;
-
-  // Background
-  profileCtx.fillStyle = 'lightblue'; // Dark background
-  profileCtx.fillRect(0, 0, profileWidth, profileHeight);
-
-  // createAltitudeBackground(profileCtx)
+  createAltitudeBackground(profileCtx, {
+    width: profileWidth,
+    height: profileHeight,
+    maxFeet: maxHeight,
+    stepFeet: 5000,
+    paddingLeft: paddingLeft
+  })
 
   // Draw the profile area
   profileCtx.beginPath();
-  profileCtx.moveTo(0, profileHeight);
+  profileCtx.moveTo(plotLeft, profileHeight);
   for (let i = 0; i < heights.length; i++) {
-    const x = (i / (heights.length - 1)) * (profileWidth - 1);
-    const displayHeight = (heights[i]! / maxHeight) * (profileHeight - 1);
-    const y = profileHeight - displayHeight;
+    const x = plotLeft + (i / (heights.length - 1)) * (plotWidth - 1);
+    const normalized = Math.log1p(heights[i]!) / Math.log1p(maxHeight);
+    const y = profileHeight - normalized * plotHeight;
     profileCtx.lineTo(x, y);
   }
   profileCtx.lineTo(profileWidth, profileHeight);
+  profileCtx.lineTo(plotLeft, profileHeight);
   profileCtx.closePath();
 
   profileCtx.fillStyle = 'green';
@@ -129,13 +134,6 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
     profileCtx.stroke();
   }
   profileCtx.setLineDash([]);
-
-  // Draw some labels or scale
-  profileCtx.fillStyle = 'white';
-  profileCtx.font = '10px Arial';
-  const topLabel = `${Math.round(maxHeight)} ft`;
-  profileCtx.fillText(topLabel, 5, 12);
-  profileCtx.fillText('0 ft', 5, profileHeight - 5);
 }
 
 type AltitudeBackgroundOptions = {
