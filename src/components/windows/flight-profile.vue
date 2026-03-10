@@ -26,7 +26,8 @@ onUpdated(() => {
 </script>
 
 <template>
-  <bms-window title="Flight-Profile" :visible="visible" @close="emit('close')" @resize="onResize">
+  <bms-window title="Flight-Profile" :top="100" :left="400" :height="600" :width="800"
+              :visible="visible" @close="emit('close')" @resize="onResize">
     <div class="profile">
       <canvas ref="canvas" class="profile-canvas"/>
     </div>
@@ -42,7 +43,7 @@ onUpdated(() => {
 .profile-canvas {
   width: 100%;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 6px;
   display: block;
 }
 </style>

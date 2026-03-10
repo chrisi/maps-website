@@ -2,8 +2,10 @@
 import {onUnmounted, ref} from 'vue'
 import {baseUrl} from "@/scripts/utils.ts";
 
-const position = ref({x: 100, y: 100})
-const size = ref({width: 400, height: 200})
+const left = defineModel<number>('left', {default: 100})
+const top = defineModel<number>('top', {default: 100})
+const width = defineModel<number>('width', {default: 400})
+const height = defineModel<number>('height', {default: 200})
 const isDragging = ref(false)
 const dragOffset = ref({x: 0, y: 0})
 const isResizing = ref(false)
@@ -25,8 +27,8 @@ const emit = defineEmits(['close', 'resize'])
 function onMouseDown(e: MouseEvent) {
   isDragging.value = true
   dragOffset.value = {
-    x: e.clientX - position.value.x,
-    y: e.clientY - position.value.y,
+    x: e.clientX - left.value,
+    y: e.clientY - top.value,
   }
 
   window.addEventListener('mousemove', onMouseMove)
@@ -35,13 +37,11 @@ function onMouseDown(e: MouseEvent) {
 
 function onMouseMove(e: MouseEvent) {
   if (isDragging.value) {
-    const maxX = window.innerWidth - size.value.width - 2
-    const maxY = window.innerHeight - size.value.height - 2
+    const maxX = window.innerWidth - width.value - 2
+    const maxY = window.innerHeight - height.value - 2
 
-    position.value = {
-      x: Math.min(Math.max(0, e.clientX - dragOffset.value.x), maxX),
-      y: Math.min(Math.max(0, e.clientY - dragOffset.value.y), maxY),
-    }
+    left.value = Math.min(Math.max(0, e.clientX - dragOffset.value.x), maxX)
+    top.value = Math.min(Math.max(0, e.clientY - dragOffset.value.y), maxY)
   }
 }
 
@@ -56,8 +56,8 @@ function onResizeMouseDown(e: MouseEvent) {
   resizeStart.value = {
     x: e.clientX,
     y: e.clientY,
-    width: size.value.width,
-    height: size.value.height,
+    width: width.value,
+    height: height.value,
   }
 
   window.addEventListener('mousemove', onResizeMouseMove)
@@ -67,13 +67,11 @@ function onResizeMouseDown(e: MouseEvent) {
 
 function onResizeMouseMove(e: MouseEvent) {
   if (isResizing.value) {
-    const maxWidth = window.innerWidth - position.value.x - 2
-    const maxHeight = window.innerHeight - position.value.y - 2
+    const maxWidth = window.innerWidth - left.value - 2
+    const maxHeight = window.innerHeight - top.value - 2
 
-    size.value = {
-      width: Math.min(Math.max(200, resizeStart.value.width + (e.clientX - resizeStart.value.x)), maxWidth),
-      height: Math.min(Math.max(100, resizeStart.value.height + (e.clientY - resizeStart.value.y)), maxHeight),
-    }
+    width.value = Math.min(Math.max(200, resizeStart.value.width + (e.clientX - resizeStart.value.x)), maxWidth)
+    height.value = Math.min(Math.max(100, resizeStart.value.height + (e.clientY - resizeStart.value.y)), maxHeight)
     emit('resize')
   }
 }
@@ -94,7 +92,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="visible" ref="windowRef" class="draggable-window"
-       :style="{ left: position.x + 'px', top: position.y + 'px', width: size.width + 'px', height: size.height + 'px' }">
+       :style="{ left: left + 'px', top: top + 'px', width: width + 'px', height: height + 'px' }">
     <div ref="titlebarRef" class="titlebar" @mousedown="onMouseDown">
       <div class="title">{{ title }}</div>
       <div class="controls">
