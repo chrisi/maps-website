@@ -1,13 +1,14 @@
 import {distance} from "@/scripts/math.ts";
+import type {Point} from "@/model/base.ts";
 
 /**
  * Generates a profile visualization along a given path based on height mask data.
  *
  * @param {HTMLCanvasElement} profileCanvas - The canvas element to draw the profile on.
  * @param {string} heightMaskPath - The path to the height mask image file used as the source for height data.
- * @param {{ x: number, y: number }[]} waypoints - An array of coordinates representing the path for which the profile will be created. At least two waypoints are required.
+ * @param {Point[]} waypoints - An array of coordinates representing the path for which the profile will be created. At least two waypoints are required.
  */
-export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, heightMaskPath: string, waypoints: { x: number, y: number }[]): Promise<void> {
+export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, heightMaskPath: string, waypoints: Point[]): Promise<void> {
   if (waypoints.length < 2) {
     throw new Error("At least two waypoints are required to create a profile.");
   }
@@ -16,7 +17,7 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
   const profileHeight = profileCanvas.height;
 
   const maxHeight = 45000;
-  const paddingLeft = 56;
+  const paddingLeft = 32;
   const plotLeft = paddingLeft;
   const plotWidth = profileWidth - paddingLeft;
   const plotHeight = profileHeight;
@@ -158,16 +159,16 @@ type AltitudeBackgroundOptions = {
  */
 export function createAltitudeBackground(ctx: CanvasRenderingContext2D, options: AltitudeBackgroundOptions = {}) {
   const {
-    width = 800,
-    height = 600,
+    width = 400,
+    height = 300,
     maxFeet = 10,
     stepFeet = 2,
     backgroundBottomColor = '#182870',
     backgroundTopColor = '#000030',
     lineColor = '#808080',
     labelColor = '#b0b0b0',
-    font = '16px Arial',
-    paddingLeft = 56,
+    font = '11px Arial',
+    paddingLeft = 0,
     paddingRight = 0,
     paddingTop = 0,
     paddingBottom = 0
@@ -259,8 +260,11 @@ export function createAltitudeBackground(ctx: CanvasRenderingContext2D, options:
     ctx.lineTo(plotRight, y)
     ctx.stroke()
 
-    const label = feet === 0 ? '0K' : `${Math.round(feet / 1000)}K`
-    ctx.fillText(label, plotLeft - 8, y)
+    // Don't draw the 0K and the last height label as they don't fit
+    if (feet !== 0 && feet !== maxFeet) {
+      const label = feet === 0 ? '0K' : `${Math.round(feet / 1000)}K`
+      ctx.fillText(label, plotLeft - 6, y)
+    }
   }
 
   // Outer frame
