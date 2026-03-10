@@ -20,8 +20,8 @@ import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {createProfileAlongPath} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
-import BmsWindow from "@/components/forms/bms-window.vue";
 import ToolTitle from "@/components/forms/tool-title.vue";
+import FlightProfile from "@/components/windows/flight-profile.vue";
 
 const props = defineProps({
   visible: {
@@ -314,13 +314,11 @@ const type = computed(() => {
       </template>
     </tool-tabs>
     <div class="message" v-else style="text-align: center">Mission not loaded!<br><br>Drag an ini.-file onto the map<br>
-      or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon BMS.
+      or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon BMS
     </div>
   </tool-window>
 
-  <bms-window title="Flight-Profile" :visible="profileVisible" @close="profileVisible = false">
-    <img :src="profileImage" alt="Profile" style="width: 800px; height: 300px; border: 1px solid #ccc;"/>
-  </bms-window>
+  <flight-profile :visible="profileVisible" @close="profileVisible = false"/>
 </template>
 
 <style scoped>

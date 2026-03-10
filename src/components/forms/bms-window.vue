@@ -112,12 +112,10 @@ onUnmounted(() => {
   position: absolute;
   left: 80%;
   top: 50%;
-  //transform: translate(-50%, -50%);
   min-width: 200px;
   min-height: 100px;
   background-color: #98A8A8;
   border-radius: 12px;
-  //box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   box-shadow: 6px 6px 12px #444;
   border: 1px solid #000;
   border-top: 1px solid #888;
@@ -173,7 +171,7 @@ onUnmounted(() => {
 }
 
 .content {
-  padding: 14px;
+  padding: 10px;
   color: #444;
   flex: 1;
   overflow: auto;
