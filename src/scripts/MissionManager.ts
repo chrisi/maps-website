@@ -4,11 +4,11 @@ import {
   type LineStpt,
   type Mission,
   type Ppt,
-  type Radio,
   type Target,
   type Waypoint
 } from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 import type {Point} from "@/model/base.ts";
 import {feetToLatLong, getFlightHours, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/data/radio.ts";
@@ -20,6 +20,7 @@ export class MissionManager {
   private dataCartridge?: DataCardridge;
   private mission?: Mission;
   private global = useGlobalStore();
+  private settings = useSettingsStore();
 
   private missionLoaded: boolean = false;
 
@@ -70,6 +71,7 @@ export class MissionManager {
     this.missionLoaded = true;
 
     this.global.currentWaypoint = this.mission.route![0]
+    this.settings.viz.ms = true;
 
     this.dataCartridgeEventHandler.forEach(cb => cb("loaded"))
   }

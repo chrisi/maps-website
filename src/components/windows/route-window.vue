@@ -154,6 +154,10 @@ const pkg = reactive<Package>({
   fuel: 7000,
 });
 
+const radioNames: string[] =
+  ["OPS", "GND", "TWR", "DEP", "CHK", "TAC", "APP", "TWR", "GND", "APP", "TWR",
+    "GND", "AAR", "CMN", "FLT1", "FLT2", "FLT3", "FLT4", "FLT5", "LSO"]
+
 const emit = defineEmits(['close', 'btnClick'])
 
 function btnClick(sender: string) {
@@ -238,6 +242,14 @@ const type = computed(() => {
   }
 )
 
+const radioFreq = (idx: number): string => {
+  const freqStr = props.missionManager?.getDatacartridge()?.radio[idx]?.freq
+  if (freqStr)
+    return (freqStr / 1000).toFixed(3)
+  else
+    return "n/a"
+}
+
 </script>
 
 <template>
@@ -281,6 +293,17 @@ const type = computed(() => {
         <tool-spacer/>
       </template>
       <template #Radio>
+        <div style="display: flex; flex-direction: row; margin: 6px 0;">
+          <div style="flex: 3" class="radioHeader">Preset</div>
+          <div style="flex: 3" class="radioHeader">UHF</div>
+          <div style="flex: 3" class="radioHeader">VHF</div>
+        </div>
+        <div style="display: flex; flex-direction: row; margin: 2px 0;" v-for="(name, index) in radioNames">
+          <div style="flex: 1; text-align: right; font-weight: bold" class="radioColumn">{{ index + 1 }}</div>
+          <div style="flex: 2" class="radioColumn">{{ name }}</div>
+          <div style="flex: 3" class="radioColumn">{{ radioFreq(index) }}</div>
+          <div style="flex: 3" class="radioColumn">{{ radioFreq(index + 20) }}</div>
+        </div>
       </template>
       <template #Mission>
         <tool-section name="Flight 1"/>
@@ -325,7 +348,8 @@ const type = computed(() => {
       </template>
     </tool-tabs>
     <div class="message" v-else style="text-align: center">Mission not loaded!<br><br>Drag an ini.-file onto the map<br>
-      or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon BMS
+      or use <a target="_blank" href="https://github.com/chrisi/maps-agent/releases">Agent</a> mode to directly feed missions from Falcon
+      BMS
     </div>
   </tool-window>
 
@@ -352,4 +376,15 @@ const type = computed(() => {
   width: 16px;
   height: 16px;
 }
+
+.radioHeader {
+  text-align: center;
+  font-weight: bold;
+}
+
+.radioColumn {
+  text-align: center;
+}
+
+
 </style>
