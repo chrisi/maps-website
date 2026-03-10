@@ -286,7 +286,6 @@ function locateArea(p1: Point, p2: Point) {
   const vh = window.innerHeight;
 
   const scaleFactor = Math.min(vw / rectWidth, vh / rectHeight);
-  console.log(vw, vh, scaleFactor);
   locatePosition(centerPoint, scaleFactor);
 }
 
