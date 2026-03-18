@@ -9,6 +9,7 @@ export interface Visibility {
   st: boolean;
   mp: boolean;
   op: boolean;
+  ow: boolean;
 }
 
 export interface BullseyeSettings {

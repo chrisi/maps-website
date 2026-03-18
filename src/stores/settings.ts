@@ -12,6 +12,7 @@ export const useSettingsStore = defineStore('settings', () => {
     st: true,
     mp: true,
     op: true,
+    ow: false,
   })
 
   const settings = reactive<Settings>(
