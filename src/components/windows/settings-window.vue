@@ -98,7 +98,7 @@ const cycles: ValueCaptionPair[] = [
   <tool-window :visible="visible" @close="emit('close')">
     <tool-title text="Settings"/>
     <tool-spacer/>
-    <tool-tabs :tabs="['Connectivity','Display']">
+    <tool-tabs :tabs="['Connectivity','Display']" :adaptive="true">
       <template #Display>
         <tool-section name="Common"/>
         <tool-checkbox id="unit" name="imperial" label="Imperial Units" v-model="imperialUnits"/>

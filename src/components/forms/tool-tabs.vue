@@ -8,6 +8,10 @@ const props = defineProps({
   tabs: {
     type: Array as PropType<string[]>,
     required: true
+  },
+  adaptive: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -50,10 +54,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tab">
+  <div :class="['tab', { 'adaptive-tab': adaptive }]">
     <button v-for="t in tabs" v-bind:key="t" class="tablinks" :name="t" @click.stop="openTab(t)">{{ t }}</button>
   </div>
-  <div class="tab-dropdown">
+  <div v-if="adaptive" class="tab-dropdown">
     <select :value="currentTab" @change="openTab(($event.target as HTMLSelectElement).value)">
       <option v-for="t in tabs" :key="t" :value="t">{{ t }}</option>
     </select>
@@ -102,7 +106,7 @@ onMounted(() => {
 }
 
 @media screen and (max-width: 600px) {
-  .tab {
+  .adaptive-tab {
     display: none;
   }
   .tab-dropdown {
