@@ -19,20 +19,6 @@ const currentTab = ref<string | null>(null)
 
 function openTab(tabName: string) {
   currentTab.value = tabName
-  const tabcontent = document.getElementsByClassName("tabcontent") as HTMLCollectionOf<HTMLDivElement>;
-  for (let i = 0; i < tabcontent.length; i++) {
-    tabcontent[i]!.style.display = "none";
-  }
-  const tablinks = document.getElementsByClassName("tablinks") as HTMLCollectionOf<HTMLButtonElement>;
-  for (let i = 0; i < tablinks.length; i++) {
-    const tab = tablinks[i]!
-    tab.className = tab.className.replace(" active", "");
-    if (tab.name == tabName) tab.className += " active";
-  }
-  const element = document.getElementById(tabName);
-  if (element) {
-    element.style.display = "block";
-  }
   emit('tab-changed', tabName)
 }
 
@@ -55,15 +41,25 @@ onMounted(() => {
 
 <template>
   <div :class="['tab', { 'adaptive-tab': adaptive }]">
-    <button v-for="t in tabs" v-bind:key="t" class="tablinks" :name="t" @click.stop="openTab(t)">{{ t }}</button>
+    <button
+        v-for="t in tabs"
+        :key="t"
+        :class="['tablinks', { active: currentTab === t }]"
+        :name="t"
+        @click.stop="openTab(t)"
+    >
+      {{ t }}
+    </button>
   </div>
   <div v-if="adaptive" class="tab-dropdown">
     <select :value="currentTab" @change="openTab(($event.target as HTMLSelectElement).value)">
       <option v-for="t in tabs" :key="t" :value="t">{{ t }}</option>
     </select>
   </div>
-  <div v-for="t in tabs" v-bind:key="t" :id="t" class="tabcontent">
-    <slot :name="t"/>
+  <div v-for="t in tabs" :key="t">
+    <div v-show="currentTab === t" class="tabcontent">
+      <slot :name="t"/>
+    </div>
   </div>
 </template>
 
