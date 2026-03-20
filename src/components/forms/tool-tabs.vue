@@ -53,6 +53,11 @@ onMounted(() => {
   <div class="tab">
     <button v-for="t in tabs" v-bind:key="t" class="tablinks" :name="t" @click.stop="openTab(t)">{{ t }}</button>
   </div>
+  <div class="tab-dropdown">
+    <select :value="currentTab" @change="openTab(($event.target as HTMLSelectElement).value)">
+      <option v-for="t in tabs" :key="t" :value="t">{{ t }}</option>
+    </select>
+  </div>
   <div v-for="t in tabs" v-bind:key="t" :id="t" class="tabcontent">
     <slot :name="t"/>
   </div>
@@ -78,6 +83,31 @@ onMounted(() => {
   content: "";
   flex: 1;
   border-bottom: 1px solid #999;
+}
+
+.tab-dropdown {
+  display: none;
+  padding: 8px;
+  border-bottom: 1px solid #999;
+}
+
+.tab-dropdown select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+}
+
+@media screen and (max-width: 600px) {
+  .tab {
+    display: none;
+  }
+  .tab-dropdown {
+    display: block;
+  }
 }
 
 .tab button {
