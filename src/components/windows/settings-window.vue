@@ -110,15 +110,17 @@ const cycles: ValueCaptionPair[] = [
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
-        <tool-checkbox id="coordinates_show" label="Show Coordinates" v-model="settings.viz.xy"/>
-        <tool-checkbox id="bullseye_show" label="Show Bullseye" v-model="settings.viz.be"/>
-        <tool-checkbox id="mission_show" label="Show Mission" v-model="settings.viz.ms"/>
-        <tool-checkbox id="weather_show" label="Show Weather" v-model="settings.viz.wx"/>
-        <tool-checkbox id="whiteboard_show" label="Show Whiteboard" v-model="settings.viz.wb"/>
-        <tool-checkbox id="stations_show" label="Show Stations" v-model="settings.viz.st"/>
-        <tool-checkbox id="owner_show" label="Show Owner" v-model="settings.viz.ow"/>
-        <tool-checkbox id="map_show" label="Show Map" v-model="settings.viz.mp"/>
-        <tool-checkbox id="pos_show" label="Show Aircraft Position" v-model="settings.viz.op"/>
+        <div class="checkbox-grid">
+          <tool-checkbox id="coordinates_show" label="Coordinates" v-model="settings.viz.xy"/>
+          <tool-checkbox id="bullseye_show" label="Bullseye" v-model="settings.viz.be"/>
+          <tool-checkbox id="mission_show" label="Mission" v-model="settings.viz.ms"/>
+          <tool-checkbox id="weather_show" label="Weather" v-model="settings.viz.wx"/>
+          <tool-checkbox id="whiteboard_show" label="Whiteboard" v-model="settings.viz.wb"/>
+          <tool-checkbox id="stations_show" label="Stations" v-model="settings.viz.st"/>
+          <tool-checkbox id="owner_show" label="Owner" v-model="settings.viz.ow"/>
+          <tool-checkbox id="map_show" label="Map" v-model="settings.viz.mp"/>
+          <tool-checkbox id="pos_show" label="Aircraft" v-model="settings.viz.op"/>
+        </div>
       </template>
 
       <template #Connectivity>
@@ -156,5 +158,8 @@ const cycles: ValueCaptionPair[] = [
 </template>
 
 <style scoped>
-
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 </style>

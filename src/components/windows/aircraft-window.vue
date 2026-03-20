@@ -15,6 +15,7 @@ defineProps({
 const lo = ref(true)
 const sa1 = ref(false)
 const sa2 = ref(false)
+const sa3 = ref(false)
 
 const emit = defineEmits(['close'])
 </script>
@@ -25,11 +26,17 @@ const emit = defineEmits(['close'])
     <tool-section name="Ownship"/>
     <tool-checkbox id="lock" label="Follow Aircraft" v-model="lo"/>
     <tool-section name="Other Aircraft"/>
-    <tool-checkbox id="show_1" label="Show Maverick" v-model="sa1"/>
-    <tool-checkbox id="show_2" label="Show Viper" v-model="sa2"/>
+    <div class="checkbox-grid">
+      <tool-checkbox id="show_1" label="Maverick" v-model="sa1"/>
+      <tool-checkbox id="show_2" label="Viper" v-model="sa2"/>
+      <tool-checkbox id="show_3" label="Tech" v-model="sa3"/>
+    </div>
   </tool-window>
 </template>
 
 <style scoped>
-
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 </style>
