@@ -17,7 +17,7 @@ import type {
 
 export function parseGeneratedAt(line: string): Date | null {
   const parts = line.split(' generated at ');
-  if (parts.length !== 2) {
+  if (parts.length !== 2 || !parts[1]) {
     return null;
   }
   let ts = parts[1].trim();
@@ -33,7 +33,7 @@ export function parseGeneratedAt(line: string): Date | null {
   const timePart = ts.slice(spaceIndex + 1);
 
   const dateParts = datePart.split('/');
-  if (dateParts.length !== 3) {
+  if (dateParts.length !== 3 || !dateParts[0] || !dateParts[1] || !dateParts[2]) {
     return null;
   }
   const month = parseInt(dateParts[0], 10);
@@ -41,7 +41,7 @@ export function parseGeneratedAt(line: string): Date | null {
   const year = parseInt(dateParts[2], 10);
 
   const timeParts = timePart.split(':');
-  if (timeParts.length !== 3) {
+  if (timeParts.length !== 3 || !timeParts[0] || !timeParts[1] || !timeParts[2]) {
     return null;
   }
   const hour = parseInt(timeParts[0], 10);
@@ -100,40 +100,38 @@ export function parseMissionOverview(lines?: string[]): MissionOverview | null {
     throw new Error(`Mission-Overview-line invalid: ${lines[9]}`);
   }
 
-  const mo: MissionOverview = {
-    flight: mt[1],
-    missionType: mt[2],
-    package: mp[2],
-    packageType: mp[3],
-    mission: md1[2],
-    target: md2[2],
-    timeOnTarget: md3[2],
-    sunriseZulu: mzl1[2],
-    sunriseLocal: mzl1[3],
-    sunsetZulu: mzl2[2],
-    sunsetLocal: mzl2[3],
+  return {
+    flight: mt[1] || '',
+    missionType: mt[2] || '',
+    package: mp[2] || '',
+    packageType: mp[3] || '',
+    mission: md1[2] || '',
+    target: md2[2] || '',
+    timeOnTarget: md3[2] || '',
+    sunriseZulu: mzl1[2] || '',
+    sunriseLocal: mzl1[3] || '',
+    sunsetZulu: mzl2[2] || '',
+    sunsetLocal: mzl2[3] || '',
   };
-  return mo;
 }
 
-const reCommLine = /^\s*(.+):\t([^\t(]+)(?:\s\(TCN:\s(.+)\)\s*)?\t(?:(.+) MHz (?:\[(\d+)\])?|--)\t(?:(.+) MHz (?:\[(\d+)\])?|--)\t(.+)$/;
+const reCommLine = /^\s*(.+):\t([^\t(]+)(?:\s\(TCN:\s(.+)\)\s*)?\t(?:(.+) MHz (?:\[(\d+)])?|--)\t(?:(.+) MHz (?:\[(\d+)])?|--)\t(.+)$/;
 
 export function parseCommLine(line: string): CommAgency | null {
   const m = line.match(reCommLine);
   if (!m) {
     return null;
   }
-  const com: CommAgency = {
-    agency: m[1],
-    callsign: m[2],
+  return {
+    agency: m[1] || '',
+    callsign: m[2] || '',
     tacan: m[3] || '',
     uhfChnl: m[4] || '',
     uhfPreset: m[5] || '',
     vhfChnl: m[6] || '',
     vhfPreset: m[7] || '',
-    notes: m[8],
+    notes: m[8] || '',
   };
-  return com;
 }
 
 export function parseCommLadder(lines?: string[]): CommAgency[] {
@@ -157,20 +155,19 @@ export function parseSteerpointLine(line: string): Steerpoint | null {
   if (!m) {
     return null;
   }
-  const no = parseInt(m[1], 10);
-  const com: Steerpoint = {
+  const no = parseInt(m[1] || '0', 10);
+  return {
     no: isNaN(no) ? 0 : no,
-    description: m[2],
-    time: m[3],
-    distance: m[4],
-    heading: m[5],
-    cas: m[6],
-    altitude: m[7],
-    action: m[8],
-    formation: m[9],
-    comments: m[10],
+    description: m[2] || '',
+    time: m[3] || '',
+    distance: m[4] || '',
+    heading: m[5] || '',
+    cas: m[6] || '',
+    altitude: m[7] || '',
+    action: m[8] || '',
+    formation: m[9] || '',
+    comments: m[10] || '',
   };
-  return com;
 }
 
 export function parseSteerpoints(lines?: string[]): Steerpoint[] {
@@ -206,8 +203,8 @@ export function parsePilotRoster(lines?: string[]): Flight[] {
     for (let i = 2; i <= 5; i++) {
       if (m[i]) {
         plts.push({
-          callsign: m[1] + (i - 1).toString(),
-          name: m[i],
+          callsign: (m[1] || '') + (i - 1).toString(),
+          name: m[i] || '',
         });
       } else {
         plts.push({
@@ -217,7 +214,7 @@ export function parsePilotRoster(lines?: string[]): Flight[] {
       }
     }
     flts.push({
-      callsign: m[1],
+      callsign: m[1] || '',
       pilots: plts,
     });
   }
@@ -233,22 +230,21 @@ export function parsePackage(line1: string, line2?: string): PackageElement | nu
     return null;
   }
   const m2 = line2 ? line2.match(rePackage2) : null;
-  const no = parseInt(m1[2], 10);
-  const size = parseInt(m1[5], 10);
-  const flt: PackageElement = {
-    callsign: m1[1],
+  const no = parseInt(m1[2] || '0', 10);
+  const size = parseInt(m1[5] || '0', 10);
+  return {
+    callsign: m1[1] || '',
     no: isNaN(no) ? 0 : no,
-    role: m1[4],
+    role: m1[4] || '',
     size: isNaN(size) ? 0 : size,
-    aircraft: m1[6],
-    task: m1[7],
+    aircraft: m1[6] || '',
+    task: m1[7] || '',
     takeOff: m2 ? m2[1] || '' : '',
     push: m2 ? m2[2] || '' : '',
     target: m2 ? m2[3] || '' : '',
     iff: m2 ? m2[4] || '' : '',
     primary: m1[3] === ' (x ) ',
   };
-  return flt;
 }
 
 export function parsePackageElements(lines?: string[]): PackageElement[] {
@@ -257,10 +253,11 @@ export function parsePackageElements(lines?: string[]): PackageElement[] {
   }
   const pes: PackageElement[] = [];
   for (let i = 3; i < lines.length; i += 2) {
-    if (lines[i].trim().length === 0) {
+    const line1 = lines[i];
+    if (!line1 || line1.trim().length === 0) {
       continue;
     }
-    const pe = parsePackage(lines[i], lines[i + 1]);
+    const pe = parsePackage(line1, lines[i + 1]);
     if (pe !== null) {
       pes.push(pe);
     }
@@ -276,7 +273,8 @@ export function getRegexResultSize(m: (string | undefined)[] | null): number {
     return 0;
   }
   for (let i = 1; i < m.length; i++) {
-    if (!m[i] || m[i]!.length === 0) {
+    const item = m[i];
+    if (!item || item.length === 0) {
       return i - 2;
     }
   }
@@ -292,12 +290,11 @@ export function parseOrdnanceLine(line: string): Record<number, Ordnance> | null
   let idx = 0;
   const ordnances: Record<number, Ordnance> = {};
   while (m.length > ofs && m[ofs]) {
-    const amount = parseInt(m[ofs + 1], 10);
-    const ordnance: Ordnance = {
+    const amount = parseInt(m[ofs + 1] || '0', 10);
+    ordnances[idx] = {
       amount: isNaN(amount) ? 0 : amount,
-      type: m[ofs + 2],
+      type: m[ofs + 2] || '',
     };
-    ordnances[idx] = ordnance;
     ofs += 3;
     idx++;
   }
@@ -324,8 +321,9 @@ export function parseFlightOrdnance(
     if (ord) {
       for (const [kStr, v] of Object.entries(ord)) {
         const k = Number(kStr);
-        if (elemOrd[k]) {
-          elemOrd[k].ordnance.push(v);
+        const elem = elemOrd[k];
+        if (elem) {
+          elem.ordnance.push(v);
         }
       }
     }
@@ -344,10 +342,10 @@ export function parseOrdnance(lines?: string[]): FlightOrdnance[] {
     const m = line.match(reOrdPackage);
     if (m !== null) {
       const size = getRegexResultSize(m);
-      const callsign = m[1];
+      const callsign = m[1] || '';
       const fltOrdData = parseFlightOrdnance(callsign, size, lines.slice(lno));
       const fltOrd: FlightOrdnance = {
-        callsign: m[1],
+        callsign: m[1] || '',
         element: fltOrdData,
       };
       pkgOrd.push(fltOrd);
@@ -374,24 +372,38 @@ export function parseWeather(lines?: string[]): Weather | null {
   if (rec.length < 6 || rec.some((r) => r === null)) {
     return null;
   }
+  const r0 = rec[0];
+  const r1 = rec[1];
+  const r2 = rec[2];
+  const r3 = rec[3];
+  const r4 = rec[4];
+  const r5 = rec[5];
+  if (!r0 || !r1 || !r2 || !r3 || !r4 || !r5) {
+    return null;
+  }
   const conds: WeatherCondition[] = [];
   for (let i = 2; i < 5; i++) {
     const cond: WeatherCondition = {
-      situation: rec[0]![i] || '',
-      wind: rec[1]![i] || '',
-      visibility: rec[2]![i] || '',
-      temperature: rec[3]![i] || '',
-      cloudBase: rec[4]![i] || '',
-      conLayer: rec[5]![i] || '',
+      situation: r0[i] || '',
+      wind: r1[i] || '',
+      visibility: r2[i] || '',
+      temperature: r3[i] || '',
+      cloudBase: r4[i] || '',
+      conLayer: r5[i] || '',
     };
     conds.push(cond);
   }
-  const weather: Weather = {
-    takeOff: conds[0],
-    targetArea: conds[1],
-    landing: conds[2],
+  const takeOff = conds[0];
+  const targetArea = conds[1];
+  const landing = conds[2];
+  if (!takeOff || !targetArea || !landing) {
+    return null;
+  }
+  return {
+    takeOff,
+    targetArea,
+    landing,
   };
-  return weather;
 }
 
 const reSupport = /^\s*(.+)\s\((.+)\):\s*\t(.+)\t(.+)$/;
@@ -401,13 +413,12 @@ export function parseSupportLine(line: string): Support | null {
   if (!m) {
     return null;
   }
-  const sup: Support = {
-    callsign: m[1],
-    task: m[2],
-    aircraft: m[3],
-    stationArea: m[4],
+  return {
+    callsign: m[1] || '',
+    task: m[2] || '',
+    aircraft: m[3] || '',
+    stationArea: m[4] || '',
   };
-  return sup;
 }
 
 export function parseSupport(lines?: string[]): Support[] {
@@ -488,7 +499,7 @@ export function parseAll(sections: Record<string, string[]>): Briefing {
     console.log(`parser-error while parsing section 'Support': ${err} `);
   }
 
-  const briefing: Briefing = {
+  return {
     missionOverview: mission,
     pilotRoster,
     packageElements,
@@ -498,15 +509,13 @@ export function parseAll(sections: Record<string, string[]>): Briefing {
     weather,
     support,
   };
-
-  return briefing;
 }
 
 const reAltConv = /^(\d+)\.(\d+)M$/;
 
 export function convAltitude(alt: string): string {
   const m = alt.match(reAltConv);
-  if (!m) {
+  if (!m || !m[1] || !m[2]) {
     return alt;
   }
   return m[1] + m[2] + '00';
@@ -529,7 +538,7 @@ export function createMetadataFormFilename(
   rawBriefing: string,
   rawIni: string
 ): Meta {
-  const meta: Meta = {
+  return {
     subject,
     callsign,
     createdAt: new Date(),
@@ -537,7 +546,6 @@ export function createMetadataFormFilename(
     rawBriefing,
     rawIni,
   };
-  return meta;
 }
 
 export const createMetadataFromFilename = createMetadataFormFilename;
@@ -559,7 +567,7 @@ export function parseBriefingString(s: string): Briefing {
       continue;
     }
     if (current !== '') {
-      secs[current].push(line);
+      secs[current]?.push(line);
     }
   }
 
@@ -580,12 +588,3 @@ export function parsesBriefingBytes(data: Uint8Array | ArrayBuffer | string): Br
   const text = new TextDecoder('utf-8').decode(data);
   return parseBriefingString(text);
 }
-
-export const parseBriefingBytes = parsesBriefingBytes;
-export const parseBriefing = parseBriefingString;
-
-// PascalCase aliases for Go-compatibility
-export const ParsesBriefingBytes = parsesBriefingBytes;
-export const ParseBriefingString = parseBriefingString;
-export const ParseBriefingReader = parseBriefingReader;
-export const CreateMetadataFormFilename = createMetadataFormFilename;
