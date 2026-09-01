@@ -54,6 +54,7 @@ export interface Target extends Point {
   crd: Coord,
   x: number,
   y: number,
+  z: number, // altitude merged from briefing if avail
   data: number,
   action: number,
   desc: string,

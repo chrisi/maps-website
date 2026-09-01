@@ -4,7 +4,6 @@ import type {
   ElemOrdnance,
   Flight,
   FlightOrdnance,
-  Meta,
   MissionOverview,
   Ordnance,
   PackageElement,
@@ -529,27 +528,6 @@ export function normalizeBriefing(br: Briefing): void {
   }
 }
 
-export const normalizBriefing = normalizeBriefing;
-
-export function createMetadataFormFilename(
-  filename: string,
-  subject: string,
-  callsign: string,
-  rawBriefing: string,
-  rawIni: string
-): Meta {
-  return {
-    subject,
-    callsign,
-    createdAt: new Date(),
-    filename,
-    rawBriefing,
-    rawIni,
-  };
-}
-
-export const createMetadataFromFilename = createMetadataFormFilename;
-
 export function parseBriefingString(s: string): Briefing {
   const lines = s.split(/\r?\n/);
 
@@ -575,16 +553,4 @@ export function parseBriefingString(s: string): Briefing {
   brief.generatedAt = generatedAt;
   normalizeBriefing(brief);
   return brief;
-}
-
-export function parseBriefingReader(readerOrContent: string): Briefing {
-  return parseBriefingString(readerOrContent);
-}
-
-export function parsesBriefingBytes(data: Uint8Array | ArrayBuffer | string): Briefing {
-  if (typeof data === 'string') {
-    return parseBriefingString(data);
-  }
-  const text = new TextDecoder('utf-8').decode(data);
-  return parseBriefingString(text);
 }

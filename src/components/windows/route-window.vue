@@ -18,7 +18,7 @@ import type {Mission} from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import {drawProfileAlongPath} from "@/scripts/flightpath.ts";
+import {drawProfileAlongPath, type ProfileWaypoint} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import FlightProfile from "@/components/windows/flight-profile.vue";
@@ -176,7 +176,7 @@ onMounted(() => {
   })
 })
 
-const getProfileWaypoints = () => {
+const getProfileWaypoints = (): ProfileWaypoint[] => {
   if (!mission.value) return []
 
   const cutIndex = mission.value.route.findIndex(wpt => wpt.tgt.action === 7)
@@ -184,7 +184,8 @@ const getProfileWaypoints = () => {
 
   return cutRoute.map(wpt => ({
     x: wpt.tgt.x / global.map!.pixels * 1024,
-    y: wpt.tgt.y / global.map!.pixels * 1024
+    y: wpt.tgt.y / global.map!.pixels * 1024,
+    z: wpt.tgt.y
   }))
 }
 

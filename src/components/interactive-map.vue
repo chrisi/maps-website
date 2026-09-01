@@ -43,6 +43,7 @@ import axios from "axios";
 import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
 import Position from "@/components/position.vue";
 import {OverlayMode} from "@/model/mode.ts";
+import {parseBriefingString} from "@/scripts/BriefingParser.ts";
 
 const route = useRoute()
 
@@ -78,6 +79,11 @@ dropFileHandler.onIniLoaded((filename, content) => {
   imcsClient.msgSendMission(filename, content.split("\n"))
   zoomToMission()
   activeTool.value = 'route'
+})
+
+dropFileHandler.onBriefLoaded((filename, content) => {
+  missionMgr.loadBriefing(filename, content)
+  //TODO: send briefing to imcs or equivalent.
 })
 
 dropFileHandler.onWbLoaded((filename, content) => {

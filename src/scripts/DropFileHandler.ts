@@ -8,6 +8,12 @@ export class DropFileHandler {
     this.iniHandler.push(cb);
   }
 
+  private briefHandler: ((filename: string, content: string) => void)[] = [];
+
+  public onBriefLoaded(cb: ((filename: string, content: string) => void)) {
+    this.briefHandler.push(cb);
+  }
+
   private wbHandler: ((filename: string, content: string) => void)[] = [];
 
   public onWbLoaded(cb: ((filename: string, content: string) => void)) {
@@ -54,6 +60,8 @@ export class DropFileHandler {
         if (!res) return;
         switch (typeof res) {
           case 'string':
+            if (this.filename.endsWith("briefing.txt"))
+              this.briefHandler.forEach(cb => cb(this.filename, res));
             if (this.filename.endsWith(".ini"))
               this.iniHandler.forEach(cb => cb(this.filename, res));
             if (this.filename.endsWith(".wb"))
@@ -82,6 +90,7 @@ export class DropFileHandler {
             console.log("process file: " + file.name);
             this.filename = file.name.repeat(1);
             if (this.filename.endsWith(".ini")) reader.readAsText(file);
+            if (this.filename.endsWith("briefing.txt")) reader.readAsText(file);
             if (this.filename.endsWith(".wb")) reader.readAsText(file);
             if (this.filename.endsWith(".fmap")) reader.readAsArrayBuffer(file);
             if (this.filename.endsWith(".png")) reader.readAsDataURL(file);

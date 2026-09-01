@@ -1,5 +1,11 @@
 import {distance} from "@/scripts/math.ts";
-import type {Point} from "@/model/base.ts";
+
+export interface ProfileWaypoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
 
 /**
  * Generates a profile visualization along a given path based on height mask data.
@@ -8,7 +14,7 @@ import type {Point} from "@/model/base.ts";
  * @param {string} heightMaskPath - The path to the height mask image file used as the source for height data.
  * @param {Point[]} waypoints - An array of coordinates representing the path for which the profile will be created. At least two waypoints are required.
  */
-export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, heightMaskPath: string, waypoints: Point[]): Promise<void> {
+export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, heightMaskPath: string, waypoints: ProfileWaypoint[]): Promise<void> {
   if (waypoints.length < 2) {
     throw new Error("At least two waypoints are required to create a profile.");
   }

@@ -32,8 +32,8 @@ describe("bmsXYToLatLong (korea, tmerc)", () => {
 
       const out = feetToLatLong(theater.projection, {x, y});
 
-      let dmsLat = ddToDms(out.lat);
-      let dmsLong = ddToDms(out.long);
+      const dmsLat = ddToDms(out.lat);
+      const dmsLong = ddToDms(out.long);
 
       console.log(
         `${name}: ${dmsLong.deg}° ${dmsLong.min.toFixed(3)}' E, ` +

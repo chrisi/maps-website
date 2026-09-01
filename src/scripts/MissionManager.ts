@@ -10,14 +10,18 @@ import {
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import type {Point} from "@/model/base.ts";
+import type {Briefing} from "@/model/briefing.ts";
 import {feetToLatLong, getFlightHours, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/data/radio.ts";
+import {parseBriefingString} from "@/scripts/BriefingParser.ts";
 
 export class MissionManager {
 
   private boundsPadding = 0.1;
+  private steerpointIdx = 0;
 
   private dataCartridge?: DataCardridge;
+  private briefing?: Briefing;
   private mission?: Mission;
   private global = useGlobalStore();
   private settings = useSettingsStore();
@@ -30,7 +34,13 @@ export class MissionManager {
     this.dataCartridgeEventHandler.push(cb);
   }
 
+  public loadBriefing(title: string, content: string) {
+    this.briefing = parseBriefingString(content)
+  }
+
   public loadDataCartridge(title: string, ini: string[]) {
+    console.log("load card")
+    this.steerpointIdx = 0;
     this.dataCartridge = {
       targets: [],
       ppts: [],
@@ -221,10 +231,19 @@ export class MissionManager {
     const ry = parseFloat(data[0]!)
     if (rx == 0 && ry == 0) return;
     const crd = feetToLatLong(this.global.map!.projection, {x: rx, y: ry});
+
+    let alt = 33000;
+
+    if (this.briefing) {
+      const sp = this.briefing?.steerpoints![this.steerpointIdx]!;
+      alt = Number(sp.altitude);
+    }
+
     const target: Target = {
       crd: crd,
       x: rx / res,
       y: this.global.map!.pixels - ry / res,
+      z: alt,
       data: parseFloat(data[2]!),
       action: parseInt(data[3]!),
       desc: data[4] ?? "Not set",
