@@ -236,7 +236,11 @@ export class MissionManager {
 
     if (this.briefing) {
       const sp = this.briefing?.steerpoints![this.steerpointIdx]!;
-      alt = Number(sp.altitude);
+      this.steerpointIdx++;
+      if (sp.altitude == "--")
+        alt = 0 // TODO: ground, not necessarily zero, get from profile
+      else
+        alt = Number(sp.altitude)
     }
 
     const target: Target = {

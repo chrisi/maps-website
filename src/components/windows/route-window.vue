@@ -185,7 +185,7 @@ const getProfileWaypoints = (): ProfileWaypoint[] => {
   return cutRoute.map(wpt => ({
     x: wpt.tgt.x / global.map!.pixels * 1024,
     y: wpt.tgt.y / global.map!.pixels * 1024,
-    z: wpt.tgt.y
+    z: wpt.tgt.z
   }))
 }
 

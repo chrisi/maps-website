@@ -142,6 +142,24 @@ export async function drawProfileAlongPath(profileCanvas: HTMLCanvasElement, hei
     profileCtx.stroke();
   }
   profileCtx.setLineDash([]);
+
+  // Draw flight path line connecting waypoints
+  profileCtx.strokeStyle = 'white';
+  profileCtx.lineWidth = 2;
+  profileCtx.beginPath();
+  for (let i = 0; i < waypoints.length; i++) {
+    const x = waypointXPositions[i]!;
+    const z = waypoints[i]!.z;
+    const k = 15000;
+    const normalized = (Math.log(z + k) - Math.log(k)) / (Math.log(maxHeight + k) - Math.log(k));
+    const y = profileHeight - normalized * plotHeight;
+    if (i === 0) {
+      profileCtx.moveTo(x, y);
+    } else {
+      profileCtx.lineTo(x, y);
+    }
+  }
+  profileCtx.stroke();
 }
 
 type AltitudeBackgroundOptions = {
