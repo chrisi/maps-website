@@ -1,6 +1,6 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Station} from "@/model/station.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import {watch} from "vue";
@@ -13,13 +13,13 @@ export interface Objective {
   owner: number;
   ocdIdx: number;
   type: number;
-  pos: Point;
+  pos: Point2D;
 }
 
 interface PreparedStation {
   station: Station;
   color: string;
-  pt: Point;
+  pt: Point2D;
   orientation: number;
   doubleRwy: boolean;
 }
@@ -119,7 +119,7 @@ export class StationOverlay extends BaseOverlay {
     })
   }
 
-  private drawRange(cnv: Canvas, pt: Point, scale: number = 1, color: string = 'white') {
+  private drawRange(cnv: Canvas, pt: Point2D, scale: number = 1, color: string = 'white') {
     const ctx = cnv.context;
 
     const ringRad = 8 * scale;

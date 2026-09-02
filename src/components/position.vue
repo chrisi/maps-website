@@ -2,7 +2,7 @@
 import {ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useGlobalStore} from "@/stores/global.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {strLatLong} from "@/scripts/conv.ts";
 import {feetToLatLong} from "@/scripts/math.ts";
 
@@ -10,13 +10,13 @@ const {map} = storeToRefs(useGlobalStore())
 const coords = ref("N00°00.000', E00°00.000'")
 
 const props = defineProps<{
-  pos: Point
+  pos: Point2D
 }>()
 
 watch(() => props.pos, (newPos) => {
   const feet = {x: newPos.x * map.value!.resolution, y: (map.value!.pixels - newPos.y) * map.value!.resolution}
-  const strCrd = strLatLong(feetToLatLong(map.value!.projection, feet));
-  coords.value = `${strCrd.lat}, ${strCrd.long}`
+  const strPos = strLatLong(feetToLatLong(map.value!.projection, feet));
+  coords.value = `${strPos.lat}, ${strPos.long}`
 })
 
 </script>

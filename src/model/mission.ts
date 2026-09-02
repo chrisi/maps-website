@@ -1,4 +1,4 @@
-import type {Coord, Point} from "@/model/base.ts";
+import type {Position, Point2D, Point3D} from "@/model/base.ts";
 
 export const Action = {
   Target: -1,
@@ -37,40 +37,27 @@ export interface Radio {
   freq: number
 }
 
-export interface LineStpt extends Point {
-  x: number,
-  y: number,
-}
-
-export interface Ppt extends Point {
-  x: number,
-  y: number,
-  z: number,
+export interface Ppt extends Point3D {
   radius: number,
   desc: string
 }
 
-export interface Target extends Point {
-  crd: Coord,
-  x: number,
-  y: number,
-  z: number, // altitude merged from briefing if avail
+export interface Target extends Point3D {
+  pos: Position,
   data: number,
   action: number,
   desc: string,
   duration: number,
 }
 
-export interface DataCardridge {
+export interface DataCartridge {
   ppts: Ppt[]
-  lines: LineStpt[]
+  lines: Point2D[]
   targets: Target[]
   radio: Radio[]
 }
 
-export interface Centroid extends Point {
-  x: number,
-  y: number,
+export interface Centroid extends Point2D {
   n: number,
 }
 

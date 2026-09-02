@@ -2,7 +2,7 @@ import {useGlobalStore} from "@/stores/global.ts";
 import {distance} from "@/scripts/math.ts";
 import type {Overlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {ImcsClient} from "@/scripts/ImcsClient.ts";
 
@@ -21,7 +21,7 @@ export class OverlayManager {
 
   private redrawListeners: (() => void)[] = []
 
-  private clickPos: Point | undefined = undefined
+  private clickPos: Point2D | undefined = undefined
 
   private allHotspots: Hotspot[] = []
 
@@ -52,7 +52,7 @@ export class OverlayManager {
     return this.cnv
   }
 
-  public draw = (context: CanvasRenderingContext2D, offset: Point, scale: number): void => {
+  public draw = (context: CanvasRenderingContext2D, offset: Point2D, scale: number): void => {
     for (const overlay of this.overlays) {
       try {
         if (overlay.isEnabled()) {
@@ -81,7 +81,7 @@ export class OverlayManager {
     }
   }
 
-  private findHotspots(pointerPos: Point, hotspotIterator: (cb: (hotspot: Hotspot) => void) => void, single: boolean = false): Hotspot[] {
+  private findHotspots(pointerPos: Point2D, hotspotIterator: (cb: (hotspot: Hotspot) => void) => void, single: boolean = false): Hotspot[] {
     if (!this.cnv) return []
     const pt = {
       x: pointerPos.x / this.cnv.scale + this.cnv.offset.x,
@@ -102,7 +102,7 @@ export class OverlayManager {
     return res.sort((a, b) => a.dist - b.dist).map(c => c.target)
   }
 
-  private isNearbyHotspot(hs: Hotspot, pt: Point, scale: number): number | undefined {
+  private isNearbyHotspot(hs: Hotspot, pt: Point2D, scale: number): number | undefined {
     const dist = distance(pt, hs.pos)
     const sz = !hs.size ? 15 / scale : (hs.size < 0 ? -hs.size / scale : hs.size) // TODO 15: make global hot spot size configurable
     if (dist < sz) return dist
@@ -171,12 +171,12 @@ export class OverlayManager {
     }
   }
 
-  private calculateAllHotspots(pt: Point): void {
+  private calculateAllHotspots(pt: Point2D): void {
     this.allHotspots = this.findHotspots(pt, cb => this.forEachHotspot(cb), false)
     this.global.hotspots = this.allHotspots
   }
 
-  private calculateOwnHotspots(overlay: Overlay, pt: Point): Hotspot[] {
+  private calculateOwnHotspots(overlay: Overlay, pt: Point2D): Hotspot[] {
     const ownCandidates = overlay.providesHotspots?.() || []
     const ownHs = this.findHotspots(pt, cb => ownCandidates.forEach(cb), false)
     overlay.setHotspots(ownHs)

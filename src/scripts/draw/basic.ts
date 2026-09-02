@@ -1,7 +1,7 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {deg2rad} from "@/scripts/math.ts";
 
-export function buildBezierPathFromPoints(points: Point[], cornerIndices: number[]): Path2D | undefined {
+export function buildBezierPathFromPoints(points: Point2D[], cornerIndices: number[]): Path2D | undefined {
   if (points.length < 2) return
   const path = new Path2D()
   const pStart = points[0]!
@@ -30,7 +30,7 @@ export function buildBezierPathFromPoints(points: Point[], cornerIndices: number
   return path
 }
 
-export function drawTextBoxed(ctx: CanvasRenderingContext2D, text: string, pos: Point, rotaRad: number = 0,
+export function drawTextBoxed(ctx: CanvasRenderingContext2D, text: string, pos: Point2D, rotaRad: number = 0,
                               boxColor: string = 'white', textColor: string = 'black', alpha: number = 1, lineWidth: number = 1) {
   const metrics = ctx.measureText(text);
   const textWidth = metrics.width;
@@ -72,7 +72,7 @@ export function drawTextBoxed(ctx: CanvasRenderingContext2D, text: string, pos: 
   ctx.restore();
 }
 
-export function drawTextOutlined(ctx: CanvasRenderingContext2D, text: string, pos: Point, rotaRad: number = 0,
+export function drawTextOutlined(ctx: CanvasRenderingContext2D, text: string, pos: Point2D, rotaRad: number = 0,
                                  color: string = 'white', outColor: string = 'black', outWith: number = 2) {
   ctx.save()
   ctx.textAlign = 'center'
@@ -87,7 +87,7 @@ export function drawTextOutlined(ctx: CanvasRenderingContext2D, text: string, po
   ctx.restore()
 }
 
-export function drawText(ctx: CanvasRenderingContext2D, text: string, pos: Point, rotaRad: number = 0, color: string = 'white') {
+export function drawText(ctx: CanvasRenderingContext2D, text: string, pos: Point2D, rotaRad: number = 0, color: string = 'white') {
   ctx.save()
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
@@ -156,14 +156,14 @@ export function dashStyle(width: number, style: string = 'dashed'): number[] {
   return style === 'dashed' ? [6 * width, 3 * width] : style === 'dotted' ? [width, 2.5 * width] : []
 }
 
-export function drawLine(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
+export function drawLine(ctx: CanvasRenderingContext2D, p1: Point2D, p2: Point2D) {
   ctx.beginPath()
   ctx.moveTo(p1.x, p1.y)
   ctx.lineTo(p2.x, p2.y)
   ctx.stroke()
 }
 
-export function drawLineAlt(ctx: CanvasRenderingContext2D, p1: Point, p2: Point, c1: string = 'black', c2: string = 'white', step: number = 4) {
+export function drawLineAlt(ctx: CanvasRenderingContext2D, p1: Point2D, p2: Point2D, c1: string = 'black', c2: string = 'white', step: number = 4) {
   ctx.beginPath()
   ctx.moveTo(p1.x, p1.y)
   ctx.lineTo(p2.x, p2.y)
@@ -176,7 +176,7 @@ export function drawLineAlt(ctx: CanvasRenderingContext2D, p1: Point, p2: Point,
   ctx.stroke()
 }
 
-export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point, width: number, height: number, rotaDeg: number = 0,
+export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point2D, width: number, height: number, rotaDeg: number = 0,
                          opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
   const rotation = deg2rad(rotaDeg)
   const halfW = width / 2
@@ -190,14 +190,14 @@ export function drawRect(ctx: CanvasRenderingContext2D, ctr: Point, width: numbe
   ctx.restore()
 }
 
-export function drawCircle(ctx: CanvasRenderingContext2D, pt: Point, rad: number,
+export function drawCircle(ctx: CanvasRenderingContext2D, pt: Point2D, rad: number,
                            opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
   ctx.beginPath()
   ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI)
   applyStyleAndDraw(ctx, opts)
 }
 
-export function drawEllipse(ctx: CanvasRenderingContext2D, ctr: Point, majorRad: number, minorRad: number, rotaDeg: number) {
+export function drawEllipse(ctx: CanvasRenderingContext2D, ctr: Point2D, majorRad: number, minorRad: number, rotaDeg: number) {
   const rotation = deg2rad(rotaDeg)
 
   ctx.save()
@@ -215,7 +215,7 @@ export function drawEllipse(ctx: CanvasRenderingContext2D, ctr: Point, majorRad:
   ctx.stroke()
 }
 
-export function drawPolygon(ctx: CanvasRenderingContext2D, ctr: Point, n: number, rad: number, start: number = 0,
+export function drawPolygon(ctx: CanvasRenderingContext2D, ctr: Point2D, n: number, rad: number, start: number = 0,
                             opts?: { fillStyle?: string; strokeStyle?: string; lineWidth?: number }) {
   ctx.save();
   const step = (Math.PI * 2) / n
@@ -243,7 +243,7 @@ function applyStyleAndDraw(ctx: CanvasRenderingContext2D, opts?: { fillStyle?: s
   ctx.stroke()
 }
 
-export function drawHighlight(ctx: CanvasRenderingContext2D, pt: Point, rad: number = 15) {
+export function drawHighlight(ctx: CanvasRenderingContext2D, pt: Point2D, rad: number = 15) {
   ctx.beginPath();
   ctx.arc(pt.x, pt.y, rad, 0, 2 * Math.PI, false);
   ctx.strokeStyle = '#ff0000';

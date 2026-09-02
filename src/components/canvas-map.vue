@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {onMounted, ref, watch} from "vue";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 const props = withDefaults(defineProps<{
   src: string
@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:zoom', zoom: number): void
-  (e: 'update:pos', pos: Point): void
+  (e: 'update:pos', pos: Point2D): void
   (e: 'init', ctx: CanvasRenderingContext2D): void
   (e: 'draw', ctx: CanvasRenderingContext2D, offset: { x: number, y: number }, scale: number): void
   (e: 'pointerdown', event: PointerEvent): void
@@ -273,11 +273,11 @@ function smoothZoomAt(x: number, y: number, zoomFactor: number) {
   }
 }
 
-function locateArea(p1: Point, p2: Point) {
+function locateArea(p1: Point2D, p2: Point2D) {
   const rectWidth = Math.abs(p2.x - p1.x);
   const rectHeight = Math.abs(p2.y - p1.y);
 
-  const centerPoint: Point = {
+  const centerPoint: Point2D = {
     x: (p1.x + p2.x) / 2,
     y: (p1.y + p2.y) / 2
   };
@@ -289,7 +289,7 @@ function locateArea(p1: Point, p2: Point) {
   locatePosition(centerPoint, scaleFactor);
 }
 
-function locatePosition(pos: Point, newScale?: number) {
+function locatePosition(pos: Point2D, newScale?: number) {
   if (newScale !== undefined) {
     targetScale = newScale;
   }

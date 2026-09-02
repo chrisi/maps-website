@@ -2,7 +2,7 @@ import {watch} from "vue";
 import {InputMode, OverlayMode} from "@/model/mode.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {SplinePainter} from "@/scripts/draw/SplinePainter.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {
   WbShapeType,
@@ -57,8 +57,8 @@ export class WhiteboardOverlay extends BaseOverlay {
   private rotation = 0
   private startRotation = 0
   private splinePainter: SplinePainter = new SplinePainter()
-  private startPoint: Point | undefined = undefined
-  private cursorPoint: Point | undefined = undefined
+  private startPoint: Point2D | undefined = undefined
+  private cursorPoint: Point2D | undefined = undefined
   private dragShape: WbShape | undefined = undefined
   private dragOffset = {x: 0, y: 0}
 
@@ -430,7 +430,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  private hitTestShape(cnv: Canvas, s: WbShape, pt: Point, tol: number): boolean {
+  private hitTestShape(cnv: Canvas, s: WbShape, pt: Point2D, tol: number): boolean {
     switch (s.type) {
       case WbShapeType.Line: {
         const l = s as WbLine
@@ -559,7 +559,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     return mode
   }
 
-  private hitTestFreehand(cnv: Canvas, fh: WbFreehand, pt: Point, tol: number): boolean {
+  private hitTestFreehand(cnv: Canvas, fh: WbFreehand, pt: Point2D, tol: number): boolean {
     const ctx = cnv.context
     ctx.save()
     // ensure identity transform to make isPointInStroke work correctly for world space coordinates (removed dpr transform)
@@ -571,7 +571,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     return hit
   }
 
-  private hitTestText(cnv: Canvas, text: WbText, pt: Point): boolean {
+  private hitTestText(cnv: Canvas, text: WbText, pt: Point2D): boolean {
     const ctx = cnv.context
     ctx.save()
     ctx.font = `${text.fontSize}px sans-serif`
@@ -596,7 +596,7 @@ export class WhiteboardOverlay extends BaseOverlay {
     return isPointInRect({x: worldCenterX, y: worldCenterY}, width, height, text.rotation, pt)
   }
 
-  private getRotatedRectDimensions(ctr: Point, cur: Point): { w: number, h: number } {
+  private getRotatedRectDimensions(ctr: Point2D, cur: Point2D): { w: number, h: number } {
     const rot = deg2rad(this.rotation)
     const dx = cur.x - ctr.x
     const dy = cur.y - ctr.y

@@ -3,11 +3,12 @@ import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {MissionManager} from "@/scripts/MissionManager.ts";
 import {watch} from "vue";
-import {Action, type LineStpt, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
+import {Action, type Ppt, type Target, type Waypoint} from "@/model/mission.ts";
 import {drawHighlight, drawOutlined, drawTextOutlined} from "@/scripts/draw/basic.ts";
 import {midpoint, vector} from "@/scripts/math.ts";
 import {drawTextBoxed} from "@/scripts/draw/basic.ts";
 import {pointOffsetRad} from "@/scripts/utils.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export class RouteOverlay extends BaseOverlay {
 
@@ -50,10 +51,10 @@ export class RouteOverlay extends BaseOverlay {
 
   public onDraw(cnv: Canvas): void {
     if (!this.missionMgr.isMissionLoaded()) return
-    const crd = this.missionMgr.getDatacartridge()
-    this.drawLineSteerPoints(cnv, crd.lines)
-    this.drawPrePlannedThreats(cnv, crd.ppts)
-    this.drawRoute(cnv, crd.targets)
+    const crt = this.missionMgr.getDataCartridge()
+    this.drawLineSteerPoints(cnv, crt.lines)
+    this.drawPrePlannedThreats(cnv, crt.ppts)
+    this.drawRoute(cnv, crt.targets)
 
     if (this.global.currentWaypoint) {
       const pos = this.toCnv(this.global.currentWaypoint.tgt, cnv)
@@ -83,7 +84,7 @@ export class RouteOverlay extends BaseOverlay {
     });
   }
 
-  private drawLineSteerPoints(cnv: Canvas, list: LineStpt[]) {
+  private drawLineSteerPoints(cnv: Canvas, list: Point2D[]) {
     const ctx = cnv.context;
     ctx.setLineDash([15, 5]);
     ctx.strokeStyle = 'black';

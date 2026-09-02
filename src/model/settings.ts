@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export interface Visibility {
   be: boolean;
@@ -16,7 +16,7 @@ export interface BullseyeSettings {
   lineColor: string;
   lineWidth: number;
   radialNM: number;
-  pos: Point;
+  pos: Point2D;
 }
 
 export interface CollabSettings {

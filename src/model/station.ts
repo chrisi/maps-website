@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export interface Station {
   campId: number,
@@ -6,7 +6,7 @@ export interface Station {
   name: string,
   country: string,
   type: string
-  pos: Point,
+  pos: Point2D,
   details?: Details,
 }
 

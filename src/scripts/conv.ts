@@ -1,9 +1,9 @@
-import type {Coord, CoordStr} from "@/model/base.ts";
+import type {Position, PositionStr} from "@/model/base.ts";
 
-export function strLatLong(crd: Coord): CoordStr {
-  const degLat = crd.lat;
+export function strLatLong(pos: Position): PositionStr {
+  const degLat = pos.lat;
   const lat = (degLat < 0 ? "S" : "N") + degreesString(degLat);
-  const degLong = crd.long;
+  const degLong = pos.long;
   const long = (degLong < 0 ? "W" : "E") + degreesString(degLong);
   return {lat, long}
 }

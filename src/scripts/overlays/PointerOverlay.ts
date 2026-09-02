@@ -1,13 +1,13 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export class PointerOverlay extends BaseOverlay {
 
-  private pos: Point | undefined
+  private pos: Point2D | undefined
 
   public init() {
-    this.imcsClient?.onPointerEvent((pos?: Point) => {
+    this.imcsClient?.onPointerEvent((pos?: Point2D) => {
       this.pos = pos
       this.redraw()
     })

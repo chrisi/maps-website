@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {alphaColor, dashStyle} from "@/scripts/draw/basic.ts";
 import {detectCorners, simplifyPoints} from "@/scripts/draw/spline.ts";
@@ -8,7 +8,7 @@ import type {WhiteboardSettings} from "@/model/settings.ts";
 
 export class SplinePainter {
 
-  private line: Point[] = []
+  private line: Point2D[] = []
   private cornerIndices: number[] = []
 
   private isDrawing = false
@@ -18,7 +18,7 @@ export class SplinePainter {
     return this.isDrawing
   }
 
-  public startDrawing(pt: Point) {
+  public startDrawing(pt: Point2D) {
     this.isDrawing = true
     this.line = [pt]
   }
@@ -41,7 +41,7 @@ export class SplinePainter {
     return fh.points.length > 1 ? fh : undefined
   }
 
-  public addPoint(point: Point) {
+  public addPoint(point: Point2D) {
     if (!this.isDrawing) return
     this.line.push(point)
   }
@@ -68,7 +68,7 @@ export class SplinePainter {
       this.drawSupportPoints(cnv)
   }
 
-  public drawSupportPoints(cnv: Canvas, pts: Point[] = this.line) {
+  public drawSupportPoints(cnv: Canvas, pts: Point2D[] = this.line) {
     const ctx = cnv.context
     ctx.lineWidth = 0.5 / cnv.scale
     ctx.strokeStyle = 'black'

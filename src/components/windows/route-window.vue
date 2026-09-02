@@ -232,9 +232,9 @@ const tos = computed(() => {
   }
 )
 
-const coord = computed(() => {
-    const crd = strLatLong(global.currentWaypoint!.tgt.crd)
-    return `${crd.lat} ${crd.long}`
+const position = computed(() => {
+    const pos = strLatLong(global.currentWaypoint!.tgt.pos)
+    return `${pos.lat} ${pos.long}`
   }
 )
 
@@ -244,7 +244,7 @@ const type = computed(() => {
 )
 
 const radioFreq = (idx: number): string => {
-  const freqStr = props.missionManager?.getDatacartridge()?.radio[idx]?.freq
+  const freqStr = props.missionManager?.getDataCartridge()?.radio[idx]?.freq
   if (freqStr)
     return (freqStr / 1000).toFixed(3)
   else
@@ -270,7 +270,7 @@ const radioFreq = (idx: number): string => {
         </div>
         <tool-spacer separator/>
         <tool-spacer/>
-        <div class="coord">{{ coord }}</div>
+        <div class="coord">{{ position }}</div>
         <tool-spacer/>
         <tool-textfield label="TOS" v-model="tos" :regexp="timeRegex"/>
         <tool-numberfield label="TAS" v-model="global.currentWaypoint!.spd" :min="150" :max="600" value="350" :step="1" unit="kts"/>
@@ -299,7 +299,7 @@ const radioFreq = (idx: number): string => {
           <div style="flex: 3" class="radioHeader">UHF</div>
           <div style="flex: 3" class="radioHeader">VHF</div>
         </div>
-        <div style="display: flex; flex-direction: row; margin: 2px 0;" v-for="(name, index) in radioNames">
+        <div style="display: flex; flex-direction: row; margin: 2px 0;" v-for="(name, index) in radioNames" v-bind:key="index">
           <div style="flex: 1; text-align: right; font-weight: bold" class="radioColumn">{{ index + 1 }}</div>
           <div style="flex: 2" class="radioColumn">{{ name }}</div>
           <div style="flex: 3" class="radioColumn">{{ radioFreq(index) }}</div>

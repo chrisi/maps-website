@@ -55,8 +55,8 @@ watch(
       data.value = undefined
       emit('update:modelValue', undefined)
     } else {
-      const strCrd = strLatLong(feetToLatLong(global.map!.projection, newVal.pos));
-      coords.value = `${strCrd.lat}, ${strCrd.long}`
+      const strPos = strLatLong(feetToLatLong(global.map!.projection, newVal.pos));
+      coords.value = `${strPos.lat}, ${strPos.long}`
       data.value = newVal.details
       if (newVal.details?.charts && newVal.details.charts.length > 0)
         tabs.value = ['AIP', 'Charts']

@@ -1,13 +1,13 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {OverlayMode} from "@/model/mode.ts";
 import {watch} from "vue";
 
 export class BullseyeOverlay extends BaseOverlay {
 
-  private location: Point = {x: 0, y: 0}
+  private location: Point2D = {x: 0, y: 0}
   private dragging = false;
 
   private lineColor = '#003300'
@@ -23,7 +23,7 @@ export class BullseyeOverlay extends BaseOverlay {
     watch(() => this.settings.viz.be, () => {
       this.redraw()
     })
-    this.imcsClient?.onBullseyePosEvent((pos: Point) => {
+    this.imcsClient?.onBullseyePosEvent((pos: Point2D) => {
       this.location = pos
       this.settings.settings.bullseye.pos = this.location
       this.redraw()
@@ -63,7 +63,7 @@ export class BullseyeOverlay extends BaseOverlay {
     this.settings.settings.bullseye.pos = this.location
   }
 
-  private drawBullseye(cnv: Canvas, pos: Point) {
+  private drawBullseye(cnv: Canvas, pos: Point2D) {
     const ctx = cnv.context
     const pt = this.toCnv(pos, cnv)
 

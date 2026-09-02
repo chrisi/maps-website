@@ -1,11 +1,11 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import {drawHighlight} from "@/scripts/draw/basic.ts";
 
 export class LocateOverlay extends BaseOverlay {
 
-  private location: Point | undefined
+  private location: Point2D | undefined
 
   private highlightSize = 17; //TODO: settings
 

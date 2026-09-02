@@ -1,5 +1,5 @@
 import {useGlobalStore} from "@/stores/global.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {MilSymbol, WbShape} from "@/model/overlays.ts";
 import type {CollabSettings} from "@/model/settings.ts";
 
@@ -29,7 +29,7 @@ export interface ImcsMsgAuthResult extends ImcsMsg {
 }
 
 export interface ImcsMsgPos extends ImcsMsg {
-  pos?: Point
+  pos?: Point2D
 }
 
 export interface ImcsMsgSymbol extends ImcsMsg {
@@ -71,15 +71,15 @@ export class ImcsClient {
     this.symbolEventHandler.push(cb);
   }
 
-  private pointerEventHandler: ((pt?: Point) => void)[] = [];
+  private pointerEventHandler: ((pt?: Point2D) => void)[] = [];
 
-  public onPointerEvent(cb: ((pt?: Point) => void)) {
+  public onPointerEvent(cb: ((pt?: Point2D) => void)) {
     this.pointerEventHandler.push(cb);
   }
 
-  private bullseyePosEventHandler: ((pt: Point) => void)[] = [];
+  private bullseyePosEventHandler: ((pt: Point2D) => void)[] = [];
 
-  public onBullseyePosEvent(cb: ((pt: Point) => void)) {
+  public onBullseyePosEvent(cb: ((pt: Point2D) => void)) {
     this.bullseyePosEventHandler.push(cb);
   }
 
@@ -120,12 +120,12 @@ export class ImcsClient {
     this.socket.send(raw);
   }
 
-  public msgSendPointer(pos?: Point) {
+  public msgSendPointer(pos?: Point2D) {
     const msg: ImcsMsgPos = {id: ImcsMsgId.Pointer, client: this.client, pos: pos}
     this.send(msg)
   }
 
-  public msgSendBullseyePos(pos: Point) {
+  public msgSendBullseyePos(pos: Point2D) {
     const msg: ImcsMsgPos = {id: ImcsMsgId.Bullseye, client: this.client, pos: pos}
     this.send(msg)
   }

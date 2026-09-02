@@ -1,7 +1,7 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export interface Canvas {
     context: CanvasRenderingContext2D,
-    offset: Point,
+    offset: Point2D,
     scale: number
 }

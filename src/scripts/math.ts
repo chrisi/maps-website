@@ -3,7 +3,7 @@
 //
 // This file should not depend on anything else excpet core JS datatypes and functions
 //
-import type {Coord, Point, Vector} from "@/model/base.ts";
+import type {Position, Point2D, Vector} from "@/model/base.ts";
 import proj4 from "proj4";
 
 export const FeetToMeters = 0.30488
@@ -16,7 +16,7 @@ const wgs84 = "EPSG:4326"
  * IMPORTANT:
  * - proj4 expects coordinates in meters as [x, y] and returns [lon, lat]
  */
-export function feetToLatLong(proj: string, pos: Point): Coord {
+export function feetToLatLong(proj: string, pos: Point2D): Position {
   const xm = pos.x * FeetToMeters
   const ym = pos.y * FeetToMeters
   const [lon, lat] = proj4(proj, wgs84, [xm, ym]) as [number, number];
@@ -24,19 +24,19 @@ export function feetToLatLong(proj: string, pos: Point): Coord {
 }
 
 // Given two points return a vector with length and direction
-export function vector(point1: Point, point2: Point): Vector {
+export function vector(point1: Point2D, point2: Point2D): Vector {
   const mag = Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
   const dir = Math.atan2(point2.x - point1.x, point2.y - point1.y);
   return {mag, dir};
 }
 
 // Compute the distance between two points
-export function distance(point1: Point, point2: Point): number {
+export function distance(point1: Point2D, point2: Point2D): number {
   return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
 }
 
 // Given a Vector
-export function vec2XY(vector: Vector): Point {
+export function vec2XY(vector: Vector): Point2D {
   const x = vector.mag * Math.cos(vector.dir);
   const y = vector.mag * Math.sin(vector.dir);
   return {x: x, y: y};
@@ -56,7 +56,7 @@ export function deg2rad(deg: number): number {
 }
 
 // Determine midpoint bewteen two points
-export function midpoint(point1: Point, point2: Point): Point {
+export function midpoint(point1: Point2D, point2: Point2D): Point2D {
   return {x: (point1.x + point2.x) / 2, y: (point1.y + point2.y) / 2};
 }
 
@@ -167,7 +167,7 @@ export function tas2mach(tas: number, oat: number): number {
   return (spd / a);
 }
 
-export function isPointOnLine(p1: Point, p2: Point, p: Point, threshold: number): boolean {
+export function isPointOnLine(p1: Point2D, p2: Point2D, p: Point2D, threshold: number): boolean {
   const t2 = threshold * threshold
 
   const abx = p2.x - p1.x
@@ -197,7 +197,7 @@ export function isPointOnLine(p1: Point, p2: Point, p: Point, threshold: number)
   return dx * dx + dy * dy <= t2
 }
 
-export function isPointOnCircle(ctr: Point, rad: number, p: Point, threshold: number): boolean {
+export function isPointOnCircle(ctr: Point2D, rad: number, p: Point2D, threshold: number): boolean {
   const r = Math.abs(rad)
   const dx = p.x - ctr.x
   const dy = p.y - ctr.y
@@ -218,7 +218,7 @@ export function isPointOnCircle(ctr: Point, rad: number, p: Point, threshold: nu
  *   F(x,y) = x^2/a^2 + y^2/b^2 - 1
  *   distance ≈ |F| / |∇F|
  */
-export function isPointOnEllipse(ctr: Point, majorRad: number, minorRad: number, rot: number, p: Point, threshold: number): boolean {
+export function isPointOnEllipse(ctr: Point2D, majorRad: number, minorRad: number, rot: number, p: Point2D, threshold: number): boolean {
   const rotation = deg2rad(rot)
   const a = Math.abs(majorRad)
   const b = Math.abs(minorRad)
@@ -259,7 +259,7 @@ export function isPointOnEllipse(ctr: Point, majorRad: number, minorRad: number,
   return approxDist <= t
 }
 
-export function isPointInRect(ctr: Point, width: number, height: number, rot: number, p: Point): boolean {
+export function isPointInRect(ctr: Point2D, width: number, height: number, rot: number, p: Point2D): boolean {
   const dx = p.x - ctr.x
   const dy = p.y - ctr.y
   const rad = deg2rad(-rot)
@@ -270,7 +270,7 @@ export function isPointInRect(ctr: Point, width: number, height: number, rot: nu
   return Math.abs(localX) <= width / 2 && Math.abs(localY) <= height / 2
 }
 
-export function isPointOnRect(ctr: Point, width: number, height: number, rot: number, p: Point, threshold: number): boolean {
+export function isPointOnRect(ctr: Point2D, width: number, height: number, rot: number, p: Point2D, threshold: number): boolean {
   const pts = rectCornersFromCenter(ctr, width, height, rot)
   return isPointOnLine(pts[0], pts[1], p, threshold) ||
     isPointOnLine(pts[1], pts[2], p, threshold) ||
@@ -278,15 +278,15 @@ export function isPointOnRect(ctr: Point, width: number, height: number, rot: nu
     isPointOnLine(pts[3], pts[0], p, threshold);
 }
 
-function rectCornersFromCenter(ctr: Point, width: number, height: number, rot: number): [Point, Point, Point, Point] {
+function rectCornersFromCenter(ctr: Point2D, width: number, height: number, rot: number): [Point2D, Point2D, Point2D, Point2D] {
   const hw = width / 2
   const hh = height / 2
-  const local: [Point, Point, Point, Point] = [{x: -hw, y: -hh}, {x: hw, y: -hh}, {x: hw, y: hh}, {x: -hw, y: hh}]
+  const local: [Point2D, Point2D, Point2D, Point2D] = [{x: -hw, y: -hh}, {x: hw, y: -hh}, {x: hw, y: hh}, {x: -hw, y: hh}]
   const rad = deg2rad(rot)
   const c = Math.cos(rad)
   const s = Math.sin(rad)
   return local.map(({x, y}) => ({
     x: ctr.x + x * c - y * s,
     y: ctr.y + x * s + y * c,
-  })) as [Point, Point, Point, Point];
+  })) as [Point2D, Point2D, Point2D, Point2D];
 }

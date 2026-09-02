@@ -1,8 +1,8 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {drawCircle, drawPolygon, drawRect} from "@/scripts/draw/basic.ts";
 import {deg2rad} from "@/scripts/math.ts";
 
-export function drawNavVor(ctx: CanvasRenderingContext2D, pt: Point, scale: number, color: string = 'white') {
+export function drawNavVor(ctx: CanvasRenderingContext2D, pt: Point2D, scale: number, color: string = 'white') {
   const lineWidth = 0.8 * scale
   const hexRad = 7 * scale
   const circleRad = hexRad * 0.2
@@ -10,7 +10,7 @@ export function drawNavVor(ctx: CanvasRenderingContext2D, pt: Point, scale: numb
   drawCircle(ctx, pt, circleRad, {fillStyle: 'black', strokeStyle: 'black', lineWidth: lineWidth})
 }
 
-export function drawNavDme(ctx: CanvasRenderingContext2D, pt: Point, scale: number, color: string = 'white') {
+export function drawNavDme(ctx: CanvasRenderingContext2D, pt: Point2D, scale: number, color: string = 'white') {
   const lineWidth = 0.8 * scale
   const hexRad = 7 * scale
   const circleRad = hexRad * 0.2
@@ -18,7 +18,7 @@ export function drawNavDme(ctx: CanvasRenderingContext2D, pt: Point, scale: numb
   drawCircle(ctx, pt, circleRad, {fillStyle: 'black', strokeStyle: 'black', lineWidth: lineWidth})
 }
 
-export function drawNavVorDme(ctx: CanvasRenderingContext2D, pt: Point, scale: number, color: string = 'white') {
+export function drawNavVorDme(ctx: CanvasRenderingContext2D, pt: Point2D, scale: number, color: string = 'white') {
   const lineWidth = 0.8 * scale
   const hexRad = 7 * scale
   const circleRad = hexRad * 0.2
@@ -27,7 +27,7 @@ export function drawNavVorDme(ctx: CanvasRenderingContext2D, pt: Point, scale: n
   drawCircle(ctx, pt, circleRad, {fillStyle: 'black', strokeStyle: 'black', lineWidth: lineWidth})
 }
 
-export function drawNavTacan(ctx: CanvasRenderingContext2D, pt: Point, scale: number, color: string = 'white', vortac: boolean = false) {
+export function drawNavTacan(ctx: CanvasRenderingContext2D, pt: Point2D, scale: number, color: string = 'white', vortac: boolean = false) {
   const lineWidth = 0.8 * scale
   const hexRad = 7 * scale
   const circleRad = hexRad * 0.2
@@ -79,7 +79,7 @@ export function drawNavTacan(ctx: CanvasRenderingContext2D, pt: Point, scale: nu
   drawCircle(ctx, pt, circleRad, {fillStyle: 'black', strokeStyle: 'black', lineWidth: lineWidth})
 }
 
-export function drawAirbase(ctx: CanvasRenderingContext2D, pt: Point, orientation: number, scale: number = 1.0, color: string = 'white', dualRw: boolean = false, strip: boolean = false) {
+export function drawAirbase(ctx: CanvasRenderingContext2D, pt: Point2D, orientation: number, scale: number = 1.0, color: string = 'white', dualRw: boolean = false, strip: boolean = false) {
 
   const oriRad = deg2rad(orientation + 90)
 

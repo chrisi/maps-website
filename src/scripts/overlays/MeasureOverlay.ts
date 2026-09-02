@@ -2,14 +2,14 @@ import {midpoint, rad2deg, vector} from "@/scripts/math.ts";
 import {drawArrowHead, drawOutlined, drawTextBoxed} from "@/scripts/draw/basic.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {OverlayMode} from "@/model/mode.ts";
 import {pointOffsetRad} from "@/scripts/utils.ts";
 
 export class MeasureOverlay extends BaseOverlay {
 
-  private from: Point | undefined
-  private to: Point | undefined
+  private from: Point2D | undefined
+  private to: Point2D | undefined
 
   private active = false
 
@@ -48,7 +48,7 @@ export class MeasureOverlay extends BaseOverlay {
     this.redraw()
   }
 
-  private drawRuler(cnv: Canvas, from: Point, to: Point) {
+  private drawRuler(cnv: Canvas, from: Point2D, to: Point2D) {
     const pFrom = this.toCnv(from, cnv)
     const pTo = this.toCnv(to, cnv)
     const vec = vector(from, to);
@@ -69,7 +69,7 @@ export class MeasureOverlay extends BaseOverlay {
     this.drawMeasurement(cnv, mid, vec.mag, vec.dir);
   }
 
-  private drawTicks(cnv: Canvas, pFrom: Point, pTo: Point) {
+  private drawTicks(cnv: Canvas, pFrom: Point2D, pTo: Point2D) {
     const ctx = cnv.context;
     const vec = vector(pFrom, pTo);
     if (vec.mag === 0) return;
@@ -88,7 +88,7 @@ export class MeasureOverlay extends BaseOverlay {
     ctx.stroke();
   }
 
-  private drawMeasurement(cnv: Canvas, pt: Point, distance: number, radians: number) {
+  private drawMeasurement(cnv: Canvas, pt: Point2D, distance: number, radians: number) {
     const ctx = cnv.context
     const pos = this.toCnv(pt, cnv)
     const degrees = rad2deg(radians);

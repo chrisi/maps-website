@@ -1,8 +1,8 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export interface MilSymbol {
   guid: string
-  pos: Point
+  pos: Point2D
   sym: string
   deleted?: boolean
 }
@@ -26,18 +26,18 @@ export interface WbShape {
 }
 
 export interface WbPosition  {
-  pos: Point
+  pos: Point2D
 }
 
 export interface WbFreehand extends WbShape {
-  points: Point[]
+  points: Point2D[]
   cornerIndices: number[]
   path?: Path2D // cache property; will be omitted for websocket transmission
 }
 
 export interface WbLine extends WbShape {
-  p1: Point
-  p2: Point
+  p1: Point2D
+  p2: Point2D
 }
 
 export interface WbText extends WbShape, WbPosition {

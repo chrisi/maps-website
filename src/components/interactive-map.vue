@@ -31,7 +31,7 @@ import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import CanvasMap from "@/components/canvas-map.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import HotspotList from "@/components/hotspot-list.vue";
@@ -55,7 +55,7 @@ const canvasMapRef = ref()
 //used only for debugging
 const ovlCtx = shallowRef<CanvasRenderingContext2D | null>(null)
 
-const pos = ref<Point>({x: 0, y: 0})
+const pos = ref<Point2D>({x: 0, y: 0})
 const zoom = ref(1)
 const suspend = ref(false)
 

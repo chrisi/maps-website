@@ -1,23 +1,7 @@
 import type {Airbase} from "@/model/airbase.ts";
 import type {StationFreq} from "@/model/station_freq.ts";
-import type {IniFile} from "@/model/ini_file.ts";
-
-export interface Meta {
-  subject: string;
-  callsign: string;
-  createdAt: Date;
-  filename: string;
-  rawBriefing: string;
-  rawIni: string;
-}
 
 export type Phase = 'dep' | 'arr' | 'alt';
-
-export const Departure: Phase = 'dep';
-export const Arrival: Phase = 'arr';
-export const Alternate: Phase = 'alt';
-
-export const Phases: Phase[] = [Departure, Arrival, Alternate];
 
 export interface AirbaseInfo {
   airbase?: Airbase | null;
@@ -124,7 +108,6 @@ export interface Support {
 }
 
 export interface Briefing {
-  _id?: string;
   generatedAt?: Date | null;
   missionOverview?: MissionOverview | null;
   pilotRoster?: Flight[];
@@ -138,6 +121,4 @@ export interface Briefing {
   rulesOfEngagement?: string;
   emergencyProcedures?: string;
   airbaseInfos?: Partial<Record<Phase, AirbaseInfo>>;
-  iniFile?: IniFile | null;
-  meta?: Meta | null;
 }

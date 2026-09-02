@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
 export const baseUrl = import.meta.env.BASE_URL
 
@@ -30,7 +30,7 @@ export function getModMask(e: PointerEvent): Mod {
     | (e.metaKey ? Mod.Meta : Mod.None)
 }
 
-export function pointOffsetRad(pt: Point, rot: number, dist: number) {
+export function pointOffsetRad(pt: Point2D, rot: number, dist: number) {
   return {x: pt.x + dist * Math.sin(rot), y: pt.y - dist * Math.cos(rot)}
 }
 

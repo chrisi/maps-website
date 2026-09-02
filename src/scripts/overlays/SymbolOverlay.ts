@@ -1,4 +1,4 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {MilSymbol} from "@/model/overlays.ts";
@@ -101,7 +101,7 @@ export class SymbolOverlay extends BaseOverlay {
     })
   }
 
-  private drawSymbol(cnv: Canvas, pos: Point, scale: number, symbol: string) {
+  private drawSymbol(cnv: Canvas, pos: Point2D, scale: number, symbol: string) {
     let img = this.iconCache.get(symbol);
     if (!img) {
       img = new Image();

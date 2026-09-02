@@ -1,7 +1,7 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {OverlayManager} from "@/scripts/overlays/OverlayManager.ts";
 import {type OverlayMode} from "@/model/mode.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Hotspot} from "@/scripts/overlays/Hotspot.ts";
 import type {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {useGlobalStore} from "@/stores/global.ts";
@@ -91,12 +91,12 @@ export abstract class BaseOverlay implements Overlay {
     this.manager!.redraw()
   }
 
-  protected fromCnv(pt: Point, cnv?: Canvas): Point {
+  protected fromCnv(pt: Point2D, cnv?: Canvas): Point2D {
     if (!cnv) cnv = this.manager!.getCanvas()
     return {x: pt.x / cnv.scale + cnv.offset.x, y: pt.y / cnv.scale + cnv.offset.y}
   }
 
-  protected toCnv(pt: Point, cnv?: Canvas): Point {
+  protected toCnv(pt: Point2D, cnv?: Canvas): Point2D {
     if (!cnv) cnv = this.manager!.getCanvas()
     return {x: (pt.x - cnv.offset.x) * cnv.scale, y: (pt.y - cnv.offset.y) * cnv.scale}
   }

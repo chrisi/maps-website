@@ -1,7 +1,6 @@
 import {
   Action,
-  type DataCardridge,
-  type LineStpt,
+  type DataCartridge,
   type Mission,
   type Ppt,
   type Target,
@@ -9,7 +8,7 @@ import {
 } from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import type {Briefing} from "@/model/briefing.ts";
 import {feetToLatLong, getFlightHours, rad2deg, vector} from "@/scripts/math.ts";
 import {getCallsignByFreq} from "@/data/radio.ts";
@@ -20,7 +19,7 @@ export class MissionManager {
   private boundsPadding = 0.1;
   private steerpointIdx = 0;
 
-  private dataCartridge?: DataCardridge;
+  private dataCartridge?: DataCartridge;
   private briefing?: Briefing;
   private mission?: Mission;
   private global = useGlobalStore();
@@ -87,14 +86,14 @@ export class MissionManager {
   }
 
   // Calculate and return the Centroid of the Mission
-  public getCentroid(): Point {
+  public getCentroid(): Point2D {
     return {
       x: this.mission!.centroid.x / this.mission!.centroid.n,
       y: this.mission!.centroid.y / this.mission!.centroid.n
     }
   }
 
-  public getBounds(): { min: Point, max: Point } {
+  public getBounds(): { min: Point2D, max: Point2D } {
     if (!this.mission || this.mission.route.length === 0) {
       return {
         min: {x: 0, y: 0},
@@ -145,7 +144,7 @@ export class MissionManager {
     return this.mission!;
   }
 
-  public getDatacartridge(): DataCardridge {
+  public getDataCartridge(): DataCartridge {
     return this.dataCartridge!;
   }
 
@@ -215,7 +214,7 @@ export class MissionManager {
     const rx = parseFloat(data[1]!)
     const ry = parseFloat(data[0]!)
     if (rx == 0 && ry == 0) return;
-    const lsp: LineStpt = {
+    const lsp: Point2D = {
       x: rx / res,
       y: this.global.map!.pixels - ry / res
     }
@@ -230,12 +229,12 @@ export class MissionManager {
     const rx = parseFloat(data[1]!)
     const ry = parseFloat(data[0]!)
     if (rx == 0 && ry == 0) return;
-    const crd = feetToLatLong(this.global.map!.projection, {x: rx, y: ry});
+    const pos = feetToLatLong(this.global.map!.projection, {x: rx, y: ry});
 
     let alt = 33000;
 
     if (this.briefing) {
-      const sp = this.briefing?.steerpoints![this.steerpointIdx]!;
+      const sp = this.briefing.steerpoints![this.steerpointIdx]!;
       this.steerpointIdx++;
       if (sp.altitude == "--")
         alt = 0 // TODO: ground, not necessarily zero, get from profile
@@ -244,7 +243,7 @@ export class MissionManager {
     }
 
     const target: Target = {
-      crd: crd,
+      pos: pos,
       x: rx / res,
       y: this.global.map!.pixels - ry / res,
       z: alt,
@@ -309,7 +308,7 @@ export class MissionManager {
   }
 
   //TODO: moved here from overlay draw, better integrate once on import instead of every redraw
-  private validPoint(pt: Point) {
+  private validPoint(pt: Point2D) {
     return (pt.x > 0 || pt.y < this.global.map!.pixels)
   }
 }

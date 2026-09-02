@@ -1,6 +1,6 @@
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 
-export function detectCorners(points: Point[]): number[] {
+export function detectCorners(points: Point2D[]): number[] {
   if (points.length < 3) return []
   const thresholdAngle = Math.PI / 4 // 45 degrees - change in direction sharper than this is a corner
   const cornerIndices = []
@@ -25,13 +25,13 @@ export function detectCorners(points: Point[]): number[] {
   return cornerIndices
 }
 
-export function simplifyPoints(points: Point[], scale: number): Point[] {
+export function simplifyPoints(points: Point2D[], scale: number): Point2D[] {
   if (points.length <= 2) return points
   const tolerance = 2 / scale // Tolerance adjusted for current zoom level
   return douglasPeucker(points, tolerance)
 }
 
-function douglasPeucker(points: Point[], tolerance: number): Point[] {
+function douglasPeucker(points: Point2D[], tolerance: number): Point2D[] {
   if (points.length <= 2) return points
 
   let maxDistance = 0
@@ -55,7 +55,7 @@ function douglasPeucker(points: Point[], tolerance: number): Point[] {
   }
 }
 
-function perpendicularDistance(pt: Point, lineStart: Point, lineEnd: Point): number {
+function perpendicularDistance(pt: Point2D, lineStart: Point2D, lineEnd: Point2D): number {
   const dx = lineEnd.x - lineStart.x
   const dy = lineEnd.y - lineStart.y
 

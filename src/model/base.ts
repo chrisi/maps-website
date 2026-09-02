@@ -1,6 +1,10 @@
-export interface Point {
+export interface Point2D {
   x: number;
   y: number;
+}
+
+export interface Point3D extends Point2D {
+  z: number;
 }
 
 export interface Vector {
@@ -8,12 +12,12 @@ export interface Vector {
   dir: number;
 }
 
-export interface Coord {
+export interface Position {
   lat: number;
   long: number;
 }
 
-export interface CoordStr {
+export interface PositionStr {
   lat: string;
   long: string;
 }

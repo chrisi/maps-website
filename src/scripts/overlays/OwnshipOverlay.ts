@@ -1,14 +1,14 @@
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
-import type {Point} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts";
 import {vector} from "@/scripts/math.ts";
 import {watch} from "vue";
 
 export class OwnshipOverlay extends BaseOverlay {
 
-  private pos: Point | undefined
+  private pos: Point2D | undefined
   private heading: number = 0
-  private prevWorldPos: Point | undefined
+  private prevWorldPos: Point2D | undefined
   private res = this.global.map!.resolution
   private ownship: Path2D
 
@@ -30,7 +30,7 @@ export class OwnshipOverlay extends BaseOverlay {
     return this.settings.viz.op
   }
 
-  public setPosition(pos: Point) {
+  public setPosition(pos: Point2D) {
     if (this.prevWorldPos) {
       const v = vector(this.prevWorldPos, pos)
       this.heading = v.dir * 180 / Math.PI
