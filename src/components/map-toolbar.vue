@@ -108,6 +108,11 @@ const resetIcons = () => {
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  const target = (e.target || document.activeElement) as HTMLElement | null
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)) {
+    return
+  }
+
   if (e.ctrlKey) {
     switch (e.code) {
       case 'KeyF':
