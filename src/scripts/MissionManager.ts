@@ -38,7 +38,6 @@ export class MissionManager {
   }
 
   public loadDataCartridge(title: string, ini: string[]) {
-    console.log("load card")
     this.steerpointIdx = 0;
     this.dataCartridge = {
       targets: [],

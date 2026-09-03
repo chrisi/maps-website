@@ -1,17 +1,13 @@
 import {ref} from "vue";
 import type {AgentSettings} from "@/model/settings.ts";
-import type {Point2D} from "@/model/base.ts";
+import type {Point3D} from "@/model/base.ts";
 
 const socket = ref<WebSocket | null>(null)
 
 export interface AgentMessage {
   type: string,
   version?: string,
-  payload?: Ownship | undefined
-}
-
-export interface Ownship extends Point2D {
-  z: number
+  payload?: Point3D | undefined
 }
 
 export class AgentClient {
@@ -23,9 +19,9 @@ export class AgentClient {
     this.updateEventHandler.push(cb);
   }
 
-  private posEventHandler: ((pos: Ownship) => void)[] = [];
+  private posEventHandler: ((pos: Point3D) => void)[] = [];
 
-  public onPosEvent(cb: ((pos: Ownship) => void)) {
+  public onPosEvent(cb: ((pos: Point3D) => void)) {
     this.posEventHandler.push(cb);
   }
 
@@ -55,7 +51,7 @@ export class AgentClient {
       try {
         const message = JSON.parse(event.data);
         if (message.type === 'pos' && message.payload) {
-          const ownship: Ownship = message.payload;
+          const ownship: Point3D = message.payload;
           this.posEventHandler.forEach(cb => cb(ownship));
         }
 

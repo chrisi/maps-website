@@ -31,7 +31,7 @@ import {MissionManager} from "@/scripts/MissionManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
-import type {Point2D} from "@/model/base.ts";
+import type {Point2D, Point3D} from "@/model/base.ts";
 import CanvasMap from "@/components/canvas-map.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import HotspotList from "@/components/hotspot-list.vue";
@@ -40,10 +40,10 @@ import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import {baseUrl, withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
-import {AgentClient, type Ownship} from "@/scripts/AgentClient.ts";
+import {AgentClient} from "@/scripts/AgentClient.ts";
 import Position from "@/components/position.vue";
 import {OverlayMode} from "@/model/mode.ts";
-import {parseBriefingString} from "@/scripts/BriefingParser.ts";
+import type {FlightData} from "@/model/flightdata.ts";
 
 const route = useRoute()
 
@@ -115,7 +115,7 @@ agentClient.onCloseEvent(() => {
   global.connectedAgent = false
 })
 
-agentClient.onPosEvent((ownship: Ownship) => {
+agentClient.onPosEvent((ownship: Point3D) => {
   ownShipOverlay.setPosition(ownship)
 })
 
@@ -220,9 +220,10 @@ watch(activeTool, (newValue) => {
 
 const fetchFromLocalBms = async () => {
   try {
-    const response = await axios.get(`http://${settings.settings.agent.host}:${settings.settings.agent.port}/ini`)
-    const ini = response.data.split('\n')
-    missionMgr.loadDataCartridge('Local BMS', ini)
+    const response = await axios.get<FlightData>(`http://${settings.settings.agent.host}:${settings.settings.agent.port}/flight`)
+    console.log("loading flight data for " + response.data.callsign)
+    missionMgr.loadBriefing('Local BMS', response.data.briefing)
+    missionMgr.loadDataCartridge('Local BMS', response.data.ini.split('\n'))
     zoomToMission()
   } catch (error) {
     console.error("Failed to fetch from local BMS", error)
