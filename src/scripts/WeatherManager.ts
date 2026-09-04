@@ -1,4 +1,5 @@
 import type {Fmap} from "@/model/fmap.ts";
+import type {Point2D} from "@/model/base.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 
 const data_offset = {
@@ -315,9 +316,16 @@ export class WeatherManager {
     this.readFog(buffer);
   }
 
-  public getMETAR(x: number, y: number) {
+  public getFmap() {
+    return this.fmap;
+  }
+
+  public getMETAR(grid: Point2D) {
     // fmap Guard
     if (this.fmap.version == 0) return "";
+
+    const x = grid.x;
+    const y = grid.y;
 
     // Initialize the METAR string
     let metar_str = "";

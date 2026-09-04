@@ -26,12 +26,18 @@ import RouteWindow from "@/components/windows/route-window.vue";
 import AircraftWindow from "@/components/windows/aircraft-window.vue";
 import WhiteboardWindow from "@/components/windows/whiteboard-window.vue";
 
+import {OverlayMode} from "@/model/mode.ts";
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
+import {AgentClient} from "@/scripts/AgentClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
+import {WeatherManager} from "@/scripts/WeatherManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";
 import type {Point2D, Point3D} from "@/model/base.ts";
+import type {FlightData} from "@/model/flightdata.ts";
+import Position from "@/components/position.vue";
+import Metar from "@/components/metar.vue";
 import CanvasMap from "@/components/canvas-map.vue";
 import MapToolbar from "@/components/map-toolbar.vue";
 import HotspotList from "@/components/hotspot-list.vue";
@@ -40,11 +46,7 @@ import OutCoord from "@/components/gui/OutCoord.vue";
 import SkyvectorLogo from "@/components/skyvector-logo.vue";
 import {baseUrl, withCanvasCallCounters} from "@/scripts/utils.ts";
 import axios from "axios";
-import {AgentClient} from "@/scripts/AgentClient.ts";
-import Position from "@/components/position.vue";
-import {OverlayMode} from "@/model/mode.ts";
-import type {FlightData} from "@/model/flightdata.ts";
-import {WeatherManager} from "@/scripts/WeatherManager.ts";
+
 
 const route = useRoute()
 
@@ -99,8 +101,6 @@ dropFileHandler.onWbLoaded((filename, content) => {
 dropFileHandler.onWeatherMapLoaded((filename, data) => {
   weatherMgr.processWeather(data, filename)
   console.log("Weather map loaded: " + filename)
-  const report = weatherMgr.getMETAR(1, 1)
-  console.log(report)
 })
 
 imcsClient.onClearEvent(() => {
@@ -295,6 +295,7 @@ const getMapUrl = (map: Theater) => {
 
 <template>
   <position v-if="settings.viz.xy" :pos="pos"/>
+  <metar :pos="pos" :wxManager="weatherMgr"/>
   <map-toolbar v-model="activeTool"/>
   <aip-window v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
