@@ -49,10 +49,15 @@ export interface WhiteboardSettings {
   supportPoints: boolean;
 }
 
+export interface WeatherSettings {
+  metric: boolean;
+}
+
 export interface Settings {
   debug: boolean;
   bullseye: BullseyeSettings;
   collab: CollabSettings;
   agent: AgentSettings;
+  weather: WeatherSettings;
   whiteboard: WhiteboardSettings;
 }

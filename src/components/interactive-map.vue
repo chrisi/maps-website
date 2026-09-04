@@ -44,6 +44,7 @@ import {AgentClient} from "@/scripts/AgentClient.ts";
 import Position from "@/components/position.vue";
 import {OverlayMode} from "@/model/mode.ts";
 import type {FlightData} from "@/model/flightdata.ts";
+import {WeatherManager} from "@/scripts/WeatherManager.ts";
 
 const route = useRoute()
 
@@ -70,6 +71,7 @@ const overlayManager = new OverlayManager(imcsClient)
 
 const dropFileHandler = new DropFileHandler()
 const missionMgr = new MissionManager()
+const weatherMgr = new WeatherManager()
 
 let inhibitLocate = false
 let ownShipOverlay: OwnshipOverlay
@@ -92,6 +94,13 @@ dropFileHandler.onWbLoaded((filename, content) => {
   imcsClient.msgSendDraw(global.whiteboard.shapes)
   imcsClient.msgSendSymbol(global.whiteboard.symbols)
   overlayManager.redraw()
+})
+
+dropFileHandler.onWeatherMapLoaded((filename, data) => {
+  weatherMgr.processWeather(data, filename)
+  console.log("Weather map loaded: " + filename)
+  const report = weatherMgr.getMETAR(1, 1)
+  console.log(report)
 })
 
 imcsClient.onClearEvent(() => {

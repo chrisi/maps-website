@@ -5,7 +5,7 @@ function createMockCanvas(width = 400, height = 300) {
   const strokeCalls: string[] = [];
   const moveToCalls: {x: number, y: number}[] = [];
   const lineToCalls: {x: number, y: number}[] = [];
-  let currentStrokeStyle = "";
+  const currentStrokeStyle = "";
 
   const ctx = {
     fillStyle: "",

@@ -35,6 +35,9 @@ export const useSettingsStore = defineStore('settings', () => {
         host: 'localhost',
         port: 8080
       },
+      weather: {
+        metric: true
+      },
       whiteboard: {
         line: {
           style: 'solid',
