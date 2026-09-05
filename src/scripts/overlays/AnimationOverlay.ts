@@ -6,11 +6,12 @@ import {OWNSHIP_PATH_DATA} from "@/scripts/overlays/OwnshipOverlay.ts";
 export class AnimationOverlay extends BaseOverlay {
 
   private pos: Point2D = {x: 2048, y: 2048};
-  private orbitRadius: number = 150;
+  private orbitRadius: number = 200;
   private orbitAngle: number = 0;
   private orbitSpeed: number = 0.8; // radians per second
   private ownship: Path2D;
   private colUS = "#00F800";
+  private colRUS = "#F80000";
 
   private animationFrameId: number | null = null;
   private lastTimestamp: number = 0;
@@ -94,18 +95,35 @@ export class AnimationOverlay extends BaseOverlay {
     ctx.strokeStyle = '#ffffff';
     ctx.stroke();
 
+    const usAngel = this.orbitAngle;
+    const redAngel = this.orbitAngle + 0.5;
+
     // 3. Compute orbit position
-    const orbitX = center.x + Math.cos(this.orbitAngle) * scaledRadius;
-    const orbitY = center.y + Math.sin(this.orbitAngle) * scaledRadius;
+    const orbitX1 = center.x + Math.cos(usAngel) * scaledRadius;
+    const orbitY1 = center.y + Math.sin(usAngel) * scaledRadius;
+    const orbitX2 = center.x + Math.cos(redAngel) * scaledRadius;
+    const orbitY2 = center.y + Math.sin(redAngel) * scaledRadius;
 
     // 4. Draw orbiting ownship
     ctx.save();
-    ctx.translate(orbitX, orbitY);
+    ctx.translate(orbitX1, orbitY1);
     ctx.scale(0.5, 0.5);
-    ctx.rotate(this.orbitAngle + Math.PI);
+    ctx.rotate(usAngel + Math.PI);
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'black';
     ctx.fillStyle = this.colUS;
+    ctx.fill(this.ownship);
+    ctx.stroke(this.ownship);
+    ctx.restore();
+
+    // 4. Draw orbiting ownship
+    ctx.save();
+    ctx.translate(orbitX2, orbitY2);
+    ctx.scale(0.5, 0.5);
+    ctx.rotate(redAngel + Math.PI);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = this.colRUS;
     ctx.fill(this.ownship);
     ctx.stroke(this.ownship);
     ctx.restore();
