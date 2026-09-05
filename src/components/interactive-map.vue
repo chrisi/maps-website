@@ -19,6 +19,7 @@ import {PointerOverlay} from "@/scripts/overlays/PointerOverlay.ts";
 import {WhiteboardOverlay} from "@/scripts/overlays/WhiteboardOverlay.ts";
 import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
+import {AnimationOverlay} from "@/scripts/overlays/AnimationOverlay.ts";
 //Toolwindows
 import AipWindow from "@/components/windows/aip-window.vue";
 import SettingsWindow from "@/components/windows/settings-window.vue";
@@ -152,6 +153,7 @@ onMounted(() => {
   overlayManager.registerOverlay(new WhiteboardOverlay())
   overlayManager.registerOverlay(new PointerOverlay())
   ownShipOverlay = overlayManager.registerOverlay(new OwnshipOverlay())
+  overlayManager.registerOverlay(new AnimationOverlay())
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
 })
