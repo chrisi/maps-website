@@ -1,28 +1,23 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point2D} from "@/model/base.ts";
+import {OWNSHIP_PATH_DATA} from "@/scripts/overlays/OwnshipOverlay.ts";
 
 export class AnimationOverlay extends BaseOverlay {
 
   private pos: Point2D = {x: 2048, y: 2048};
-  private orbitRadius: number = 80;
+  private orbitRadius: number = 150;
   private orbitAngle: number = 0;
-  private rectAngle: number = 0;
   private orbitSpeed: number = 0.8; // radians per second
-  private rotationSpeed: number = 2.0; // radians per second
-
-  private rectWidth: number = 32;
-  private rectHeight: number = 20;
+  private ownship: Path2D;
+  private colUS = "#00F800";
 
   private animationFrameId: number | null = null;
   private lastTimestamp: number = 0;
 
-  constructor(pos?: Point2D, orbitRadius: number = 80) {
+  constructor() {
     super();
-    if (pos) {
-      this.pos = pos;
-    }
-    this.orbitRadius = orbitRadius;
+    this.ownship = new Path2D(OWNSHIP_PATH_DATA);
   }
 
   public init(): void {
@@ -40,7 +35,6 @@ export class AnimationOverlay extends BaseOverlay {
 
   public stepAnimation(dt: number): void {
     this.orbitAngle = (this.orbitAngle + this.orbitSpeed * dt) % (2 * Math.PI);
-    this.rectAngle = (this.rectAngle + this.rotationSpeed * dt) % (2 * Math.PI);
   }
 
   public startAnimation(): void {
@@ -104,46 +98,18 @@ export class AnimationOverlay extends BaseOverlay {
     const orbitX = center.x + Math.cos(this.orbitAngle) * scaledRadius;
     const orbitY = center.y + Math.sin(this.orbitAngle) * scaledRadius;
 
-    // 4. Draw rotating rectangle
+    // 4. Draw orbiting ownship
     ctx.save();
     ctx.translate(orbitX, orbitY);
-    ctx.rotate(this.rectAngle);
-
-    const halfW = this.rectWidth / 2;
-    const halfH = this.rectHeight / 2;
-    const r = 4; // corner radius
-
-    const grad = ctx.createLinearGradient(-halfW, -halfH, halfW, halfH);
-    grad.addColorStop(0, '#00d2ff');
-    grad.addColorStop(1, '#0072ff');
-
-    // Rounded rectangle path
-    ctx.beginPath();
-    ctx.moveTo(-halfW + r, -halfH);
-    ctx.lineTo(halfW - r, -halfH);
-    ctx.arcTo(halfW, -halfH, halfW, -halfH + r, r);
-    ctx.lineTo(halfW, halfH - r);
-    ctx.arcTo(halfW, halfH, halfW - r, halfH, r);
-    ctx.lineTo(-halfW + r, halfH);
-    ctx.arcTo(-halfW, halfH, -halfW, halfH - r, r);
-    ctx.lineTo(-halfW, -halfH + r);
-    ctx.arcTo(-halfW, -halfH, -halfW + r, -halfH, r);
-    ctx.closePath();
-
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-
-    // Center indicator dot
-    ctx.beginPath();
-    ctx.arc(0, 0, 2, 0, 2 * Math.PI);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-
+    ctx.scale(0.5, 0.5);
+    ctx.rotate(this.orbitAngle + Math.PI);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = this.colUS;
+    ctx.fill(this.ownship);
+    ctx.stroke(this.ownship);
     ctx.restore();
+
     ctx.restore();
   }
 }

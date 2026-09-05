@@ -4,6 +4,8 @@ import type {Point2D} from "@/model/base.ts";
 import {vector} from "@/scripts/math.ts";
 import {watch} from "vue";
 
+export const OWNSHIP_PATH_DATA = "M 0 -32 L 3 -21 L 4 -14 L 7 -2 L 21 9 L 21 3 L 22 3 L 22 15 L 21 15 L 21 14 L 5 14 L 5 19 L 12 25 L 12 29 L 5 29 L 5 28 L 3 28 L 2 29 L -2 29 L -3 28 L -5 28 L -5 29 L -12 29 L -12 25 L -5 19 L -5 14 L -21 14 L -21 15 L -22 15 L -22 3 L -21 3 L -21 9 L -7 -2 L -4 -14 L -3 -21 Z"
+
 export class OwnshipOverlay extends BaseOverlay {
 
   private pos: Point2D | undefined
@@ -17,7 +19,7 @@ export class OwnshipOverlay extends BaseOverlay {
 
   constructor() {
     super();
-    this.ownship = new Path2D("M 0 -32 L 3 -21 L 4 -14 L 7 -2 L 21 9 L 21 3 L 22 3 L 22 15 L 21 15 L 21 14 L 5 14 L 5 19 L 12 25 L 12 29 L 5 29 L 5 28 L 3 28 L 2 29 L -2 29 L -3 28 L -5 28 L -5 29 L -12 29 L -12 25 L -5 19 L -5 14 L -21 14 L -21 15 L -22 15 L -22 3 L -21 3 L -21 9 L -7 -2 L -4 -14 L -3 -21 Z")
+    this.ownship = new Path2D(OWNSHIP_PATH_DATA)
   }
 
   public init() {
