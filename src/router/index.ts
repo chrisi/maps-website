@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 const routes = [
   {
@@ -10,6 +10,11 @@ const routes = [
     path: '/map/:name',
     name: 'Map',
     component: () => import('../components/interactive-map.vue'),
+  },
+  {
+    path: '/dev/anim',
+    name: 'DEV',
+    component: () => import('../components/dev/anim-test.vue'),
   }
 ]
 
