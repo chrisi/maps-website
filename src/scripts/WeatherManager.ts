@@ -151,15 +151,15 @@ export class WeatherManager {
     const direction_offset = 45264;
     const altitudes = 10;
 
-    let winds = new Float32Array(buffer);
+    const winds = new Float32Array(buffer);
 
     // Iterate over the map cells
     for (let y = 0; y < this.fmap.dimension.y; y++) {
 
-      let data = Array(this.fmap.dimension.x).fill(0);
+      const data = Array(this.fmap.dimension.x).fill(0);
       for (let x = 0; x < this.fmap.dimension.x; x++) {
 
-        let velocities = Array(altitudes).fill(0);
+        const velocities = Array(altitudes).fill(0);
         // Process the 10 altitudes for each weather Cell in BMS
         for (let alt = 0; alt < altitudes; alt++) {
           const i = y * this.fmap.dimension.x * altitudes + x * altitudes + alt;
@@ -176,7 +176,7 @@ export class WeatherManager {
 // Read Cloud Base in Feet (Float)
   private readCloudBase(buffer: any) {
     const offset = 80074;
-    let cloud_data = new Float32Array(buffer);
+    const cloud_data = new Float32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -193,7 +193,7 @@ export class WeatherManager {
   // Weather Type Poor and Inclement should be minimum BKN.
   private readCloudCover(buffer: any) {
     const offset = 83555;
-    let cloud_cover = new Int32Array(buffer);
+    const cloud_cover = new Int32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -208,7 +208,7 @@ export class WeatherManager {
   // Read Cloud Size (0 Largest ... 5 Smallest)
   private readCloudSize(buffer: any) {
     const offset = 87036; // Cloud Size (checked)
-    let cloud_size = new Float32Array(buffer);
+    const cloud_size = new Float32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -224,7 +224,7 @@ export class WeatherManager {
   // Towering Cumulus (1: Yes, 0: No)
   private readCloudType(buffer: any) {
     const offset = 90517; // Cloud Type
-    let cloud_type = new Int32Array(buffer);
+    const cloud_type = new Int32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -244,7 +244,7 @@ export class WeatherManager {
       this.fmap.shower = Array(this.fmap.cells).fill(0);
       return;
     }
-    let shower = new Int32Array(buffer);
+    const shower = new Int32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -261,7 +261,7 @@ export class WeatherManager {
     const offset = data_offset.visibility[this.fmap.version] ?? 0; // Visibility LUT
     if (offset == 0) return;
 
-    let visibility = new Float32Array(buffer);
+    const visibility = new Float32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
       const data = Array(this.fmap.dimension.x).fill(0);
@@ -281,12 +281,12 @@ export class WeatherManager {
       return;
     }
 
-    let fog = new Float32Array(buffer);
+    const fog = new Float32Array(buffer);
 
     for (let y = 0; y < this.fmap.dimension.y; y++) {
-      let data = Array(this.fmap.dimension.x).fill(0);
+      const data = Array(this.fmap.dimension.x).fill(0);
       for (let x = 0; x < this.fmap.dimension.x; x++) {
-        let i = y * this.fmap.dimension.x + x;
+        const i = y * this.fmap.dimension.x + x;
         data[x] = fog[offset + i];
       }
       this.fmap.fog.push(data);
@@ -419,7 +419,7 @@ export class WeatherManager {
     // Build Temperature String
     let temp_str = "";
     let dew_str = "/";
-    let temp = this.fmap.temperature[y]![x]!;
+    const temp = this.fmap.temperature[y]![x]!;
     const base = (hasFog && fog > 0 && fog < ceiling) ? fog : ceiling;
     let dew = (wx_type == 4) ? this.fmap.temperature[y]![x]! : (temp - base / 1000 * 1.2);
 
