@@ -38,6 +38,9 @@ export const useSettingsStore = defineStore('settings', () => {
       weather: {
         metric: true
       },
+      map: {
+        filter: '1'
+      },
       whiteboard: {
         line: {
           style: 'solid',

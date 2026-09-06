@@ -40,7 +40,6 @@ const imperialUnits = ref(true)
 
 const windAltitudes = ref("4")
 const weather = ref("2")
-const mapFilter = ref("3")
 
 interface GFSConfig {
   date: string;
@@ -107,7 +106,7 @@ const cycles: ValueCaptionPair[] = [
         <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" v-model="windAltitudes"
                        @change="changeChartConfig"/>
         <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" v-model="weather" @change="changeChartConfig"/>
-        <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="mapFilter" @change="changeChartConfig"/>
+        <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="settings.settings.map.filter" @change="changeChartConfig"/>
 
         <tool-section name="Visibility"/>
         <div class="checkbox-grid">

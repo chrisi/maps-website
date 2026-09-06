@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import type {Point2D} from "@/model/base.ts";
 
 const props = withDefaults(defineProps<{
@@ -8,9 +8,11 @@ const props = withDefaults(defineProps<{
   suspend: boolean
   cursor?: string
   hideMap?: boolean
+  filter?: string
 }>(), {
   cursor: 'default',
-  hideMap: false
+  hideMap: false,
+  filter: '1'
 })
 
 const emit = defineEmits<{
@@ -99,6 +101,32 @@ watch(() => props.suspend, (isSuspended) => {
 
 watch(() => props.hideMap, () => {
   redraw();
+})
+
+const filterStyle = computed(() => {
+  if (!props.filter) return 'grayscale(100%)'
+  switch (props.filter) {
+    case '0':
+    case 'default':
+    case 'none':
+      return 'none'
+    case '1':
+    case 'grayscale':
+    case 'mono':
+      return 'grayscale(100%)'
+    case '2':
+    case 'sepia':
+      return 'sepia(80%)'
+    case '3':
+    case 'dimmed':
+    case 'dark':
+      return 'brightness(70%)'
+    case '4':
+    case 'night':
+      return 'brightness(1) grayscale(1) invert(1)'
+    default:
+      return props.filter
+  }
 })
 
 const maxScale = 4;
@@ -628,7 +656,7 @@ function onContextMenu(e: MouseEvent) {
 
 <template>
   <div class="viewport" :style="{ cursor: props.cursor }">
-    <canvas id="map" ref="mapRef" :class="{ 'loaded': mapLoaded }"></canvas>
+    <canvas id="map" ref="mapRef" :class="{ 'loaded': mapLoaded }" :style="{ filter: filterStyle }"></canvas>
     <canvas id="overlay" ref="overlayRef" :class="{ 'loaded': mapLoaded }"></canvas>
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>

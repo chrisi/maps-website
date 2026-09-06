@@ -53,6 +53,10 @@ export interface WeatherSettings {
   metric: boolean;
 }
 
+export interface MapSettings {
+  filter: string;
+}
+
 export interface Settings {
   debug: boolean;
   bullseye: BullseyeSettings;
@@ -60,4 +64,5 @@ export interface Settings {
   agent: AgentSettings;
   weather: WeatherSettings;
   whiteboard: WhiteboardSettings;
+  map: MapSettings;
 }
