@@ -120,7 +120,7 @@ const filterStyle = computed(() => {
     case '3':
     case 'dimmed':
     case 'dark':
-      return 'brightness(70%)'
+      return 'brightness(50%)'
     case '4':
     case 'night':
       return 'brightness(1) grayscale(1) invert(1)'

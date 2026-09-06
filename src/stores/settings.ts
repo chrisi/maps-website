@@ -36,7 +36,8 @@ export const useSettingsStore = defineStore('settings', () => {
         port: 8080
       },
       weather: {
-        metric: true
+        metric: true,
+        altitude: '4'
       },
       map: {
         filter: '1'

@@ -38,7 +38,6 @@ function changeChartConfig(sender: string, value: string) {
 
 const imperialUnits = ref(true)
 
-const windAltitudes = ref("4")
 const weather = ref("2")
 
 interface GFSConfig {
@@ -103,7 +102,7 @@ const cycles: ValueCaptionPair[] = [
         <tool-checkbox id="unit" name="imperial" label="Imperial Units" v-model="imperialUnits"/>
 
         <tool-section name="Chart"/>
-        <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" v-model="windAltitudes"
+        <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" v-model="settings.settings.weather.altitude"
                        @change="changeChartConfig"/>
         <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" v-model="weather" @change="changeChartConfig"/>
         <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="settings.settings.map.filter" @change="changeChartConfig"/>

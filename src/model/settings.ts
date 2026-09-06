@@ -51,6 +51,7 @@ export interface WhiteboardSettings {
 
 export interface WeatherSettings {
   metric: boolean;
+  altitude: string;
 }
 
 export interface MapSettings {

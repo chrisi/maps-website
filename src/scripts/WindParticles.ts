@@ -77,7 +77,6 @@ export class WindParticles {
   private weatherData?: Fmap;
   private config: WindParticlesConfig;
   private particles: Particle[];
-  public isRunning: boolean;
   private windField: Float32Array | null; // Precomputed Float32Array [u0,v0, u1,v1, ...]
   private windFieldDimX: number;
   private windFieldDimY: number;
@@ -109,7 +108,6 @@ export class WindParticles {
     };
 
     this.particles = [];
-    this.isRunning = false;
     this.windField = null;
     this.windFieldDimX = 0;
     this.windFieldDimY = 0;
@@ -302,8 +300,6 @@ export class WindParticles {
 
   // Advance one animation step
   public step() {
-    if (!this.isRunning) return;
-
     // Hoist all per-frame constants outside the particle loop
     const vp = this.viewport;
     const margin = 50;
@@ -459,17 +455,6 @@ export class WindParticles {
       g: parseInt(result[2]!, 16),
       b: parseInt(result[3]!, 16)
     } : {r: 255, g: 255, b: 255};
-  }
-
-  // Start animation
-  public start() {
-    if (this.isRunning) return;
-    this.isRunning = true;
-  }
-
-  // Stop animation
-  public stop() {
-    this.isRunning = false;
   }
 
   // Clear canvas

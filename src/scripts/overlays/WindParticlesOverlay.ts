@@ -37,12 +37,16 @@ export class WindParticlesOverlay extends BaseOverlay {
       this.redraw();
     });
 
-    this.windParticles.start();
+    watch(() => this.settings.settings.weather.altitude, (newAlt) => {
+      const alt = parseInt(newAlt, 10);
+      this.setAltitude(Number.isNaN(alt) ? 0 : alt);
+    }, {immediate: true});
+
     this.updateAnimationLoop();
   }
 
   public override isEnabled(): boolean {
-    return this.settings.viz.wx && super.isEnabled();
+    return this.settings.viz.wx;
   }
 
   public override setEnabled(enabled: boolean): void {
@@ -52,52 +56,41 @@ export class WindParticlesOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.isEnabled() || !this.windParticles) return;
-    this.windParticles!.draw(cnv.context);
+//    this.windParticles!.draw(cnv.context);
     this.drawWorldInScreenSpace(() => {
       this.windParticles!.draw(cnv.context);///*cnv.scale*/
     }, cnv);
   }
 
   private animationLoop = (timestamp?: number): void => {
-    // Only continue if wind particles are active
-    if (this.isEnabled() && this.windParticles && this.windParticles.isRunning) {
-      if (!timestamp) timestamp = performance.now();
+    if (!timestamp) timestamp = performance.now();
 
-      // Throttle rendering to reduce CPU usage on large maps
-      if (!this.lastAnimationFrameTime || (timestamp - this.lastAnimationFrameTime) >= this.animationFrameInterval) {
-        this.lastAnimationFrameTime = timestamp;
+    // Throttle rendering to reduce CPU usage on large maps
+    if (!this.lastAnimationFrameTime || (timestamp - this.lastAnimationFrameTime) >= this.animationFrameInterval) {
+      this.lastAnimationFrameTime = timestamp;
 
-        try {
-          const cnv = this.getCanvas();
-          const visX = cnv.offset.x;
-          const visY = cnv.offset.y;
-          const visW = window.innerWidth / cnv.scale;
-          const visH = window.innerHeight / cnv.scale;
-          this.windParticles.setViewport(visX, visY, visW, visH);
-          this.windParticles.setZoom(cnv.scale, false);
-        } catch {
-          console.warn("canvas not yet ready")
-        }
-
-        this.windParticles.step();
-        this.redraw();
+      try {
+        const cnv = this.getCanvas();
+        const visX = cnv.offset.x;
+        const visY = cnv.offset.y;
+        const visW = window.innerWidth / cnv.scale;
+        const visH = window.innerHeight / cnv.scale;
+        this.windParticles!.setViewport(visX, visY, visW, visH);
+        this.windParticles!.setZoom(cnv.scale, false);
+      } catch {
+        console.warn("canvas not yet ready")
       }
 
-      // Continue the animation loop
-      this.animationLoopId = requestAnimationFrame(this.animationLoop);
-    } else {
-      // Stop animation loop if wind particles are not active
-      if (this.animationLoopId) {
-        cancelAnimationFrame(this.animationLoopId);
-        this.animationLoopId = null;
-      }
-      this.lastAnimationFrameTime = 0;
+      this.windParticles!.step();
+      this.redraw();
     }
+
+    // Continue the animation loop
+    this.animationLoopId = requestAnimationFrame(this.animationLoop);
   };
 
   public updateAnimationLoop(): void {
-    if (this.isEnabled() && this.windParticles && this.windParticles.isRunning) {
+    if (this.isEnabled()) {
       // Start animation loop if not already running
       if (!this.animationLoopId) {
         this.animationLoopId = requestAnimationFrame(this.animationLoop);
