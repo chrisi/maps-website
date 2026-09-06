@@ -56,9 +56,8 @@ export class WindParticlesOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-//    this.windParticles!.draw(cnv.context);
     this.drawWorldInScreenSpace(() => {
-      this.windParticles!.draw(cnv.context);///*cnv.scale*/
+      this.windParticles!.draw(cnv.context, cnv.scale);
     }, cnv);
   }
 

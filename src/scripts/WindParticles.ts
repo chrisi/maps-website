@@ -155,7 +155,6 @@ export class WindParticles {
   }
 
   public setZoom(zoomLevel: number, forceRebuild: boolean) {
-    console.log(zoomLevel)
     const safeZoom = Math.max(zoomLevel || 1, 0.01);
     const targetCount = this.getParticleCountForZoom(safeZoom);
     const zoomChanged = Math.abs((this.config.zoom || 1) - safeZoom) > 0.001;
@@ -170,7 +169,6 @@ export class WindParticles {
     }
 
     if (zoomChanged || countChanged) {
-      console.log(safeZoom, targetCount)
       this.syncParticleCount();
     }
   }
@@ -384,9 +382,8 @@ export class WindParticles {
   }
 
   // Draw all particles
-  public draw(ctx: CanvasRenderingContext2D) {
+  public draw(ctx: CanvasRenderingContext2D, scale: number) {
     const vp = this.viewport;
-
     ctx.save();
 
     // Clip to viewport so fade and drawing don't touch offscreen regions
@@ -414,6 +411,10 @@ export class WindParticles {
     // Draw particles as short rounded trail segments
     const particles = this.particles;
     const len = particles.length;
+
+    const normWidth = this.config.particleWidth / scale;
+    const normLen = this.config.particleLength / scale;
+
     for (let i = 0; i < len; i++) {
       const particle = particles[i]!;
       // Calculate opacity based on age
@@ -425,14 +426,14 @@ export class WindParticles {
         const alpha = Math.min(this.config.particleOpacity, ageRatio * this.config.particleOpacity);
 
         ctx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
-        ctx.lineWidth = this.config.particleWidth;
+        ctx.lineWidth = normWidth;
 
         const dx = particle.x - particle.xt;
         const dy = particle.y - particle.yt;
         const controlX = particle.xt + dx * 0.5 + particle.vx * 0.35;
         const controlY = particle.yt + dy * 0.5 + particle.vy * 0.35;
-        const endX = particle.xt + dx * this.config.particleLength;
-        const endY = particle.yt + dy * this.config.particleLength;
+        const endX = particle.xt + dx * normLen;
+        const endY = particle.yt + dy * normLen;
 
         ctx.beginPath();
         ctx.moveTo(particle.xt, particle.yt);
