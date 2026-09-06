@@ -32,4 +32,4 @@ jobs:
         run: |
           git config --global user.email "mail@christiangebauer.de"
           git config --global user.name "Christian Gebauer"
-          npx gh-pages -d dist -u "Christian Gebauer <mail@christiangebauer.de>" -r https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          npx gh-pages -d dist --dotfiles --nojekyll -u "Christian Gebauer <mail@christiangebauer.de>" -r https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
