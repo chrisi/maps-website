@@ -2,6 +2,7 @@ import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
 import type {Point2D} from "@/model/base.ts";
 import {OWNSHIP_PATH_DATA} from "@/scripts/overlays/OwnshipOverlay.ts";
+import {watch} from "vue";
 
 export class AnimationOverlay extends BaseOverlay {
 
@@ -32,6 +33,13 @@ export class AnimationOverlay extends BaseOverlay {
       }
     }
     this.startAnimation();
+    watch(() => this.settings.settings.debug, () => {
+      this.redraw()
+    })
+  }
+
+  public isEnabled(): boolean {
+    return this.settings.settings.debug
   }
 
   public stepAnimation(dt: number): void {

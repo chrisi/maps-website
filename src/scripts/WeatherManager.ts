@@ -39,6 +39,12 @@ export class WeatherManager {
     }
   };
 
+  private weatherEventHandler: ((fmap: Fmap) => void)[] = [];
+
+  public onWeatherEvent(cb: ((fmap: Fmap) => void)) {
+    this.weatherEventHandler.push(cb);
+  }
+
   private clearWeather() {
     // Header Information
     this.fmap.version = 0;
@@ -314,10 +320,8 @@ export class WeatherManager {
     this.readShowerdata(buffer);
     this.readVisibility(buffer);
     this.readFog(buffer);
-  }
 
-  public getFmap() {
-    return this.fmap;
+    this.weatherEventHandler.forEach(cb => cb(this.fmap));
   }
 
   public getMETAR(grid: Point2D) {

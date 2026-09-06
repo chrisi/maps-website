@@ -5,6 +5,7 @@
 // Thanks to LAJOUVET for providing this implementation.
 
 import type {Fmap} from "@/model/fmap.ts";
+import type {Point2D} from "@/model/base.ts";
 
 interface WindParticlesConfig {
   /** Active particle count after zoom adjustment */
@@ -72,9 +73,8 @@ interface Particle {
 
 export class WindParticles {
 
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private weatherData: Fmap;
+  private cnvSize: Point2D;
+  private weatherData?: Fmap;
   private config: WindParticlesConfig;
   private particles: Particle[];
   public isRunning: boolean;
@@ -84,10 +84,8 @@ export class WindParticles {
   private colorCache: { [key: string]: string }; // Cache for color strings
   private viewport: { x: number, y: number, width: number, height: number } | null;  //in canvas pixels, null = full canvas
 
-  constructor(canvas: HTMLCanvasElement, weatherData: Fmap) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d', {alpha: true})!;
-    this.weatherData = weatherData;
+  constructor(cnvSize: Point2D) {
+    this.cnvSize = cnvSize
 
     // Particle configuration
     this.config = {
@@ -159,6 +157,7 @@ export class WindParticles {
   }
 
   public setZoom(zoomLevel: number, forceRebuild: boolean) {
+    console.log(zoomLevel)
     const safeZoom = Math.max(zoomLevel || 1, 0.01);
     const targetCount = this.getParticleCountForZoom(safeZoom);
     const zoomChanged = Math.abs((this.config.zoom || 1) - safeZoom) > 0.001;
@@ -173,6 +172,7 @@ export class WindParticles {
     }
 
     if (zoomChanged || countChanged) {
+      console.log(safeZoom, targetCount)
       this.syncParticleCount();
     }
   }
@@ -184,8 +184,8 @@ export class WindParticles {
     const vp = this.viewport;
     const spawnX = vp ? vp.x - margin : 0;
     const spawnY = vp ? vp.y - margin : 0;
-    const spawnW = vp ? vp.width + margin * 2 : this.canvas.width;
-    const spawnH = vp ? vp.height + margin * 2 : this.canvas.height;
+    const spawnW = vp ? vp.width + margin * 2 : this.cnvSize.x;
+    const spawnH = vp ? vp.height + margin * 2 : this.cnvSize.y;
 
     const x = spawnX + Math.random() * spawnW;
     const y = spawnY + Math.random() * spawnH;
@@ -242,8 +242,8 @@ export class WindParticles {
     if (!this.windField) return res;
     const dimX = this.windFieldDimX;
     const dimY = this.windFieldDimY;
-    const gx = Math.min(dimX - 1, Math.max(0, Math.floor(x / this.canvas.width * dimX)));
-    const gy = Math.min(dimY - 1, Math.max(0, Math.floor(y / this.canvas.height * dimY)));
+    const gx = Math.min(dimX - 1, Math.max(0, Math.floor(x / this.cnvSize.x * dimX)));
+    const gy = Math.min(dimY - 1, Math.max(0, Math.floor(y / this.cnvSize.y * dimY)));
     const idx = (gy * dimX + gx) * 2;
     res.u = this.windField[idx]!;
     res.v = this.windField[idx + 1]!;
@@ -259,8 +259,8 @@ export class WindParticles {
     const dimY = this.windFieldDimY;
     const buf = this.windField;
 
-    const fx = (x / this.canvas.width) * (dimX - 1);
-    const fy = (y / this.canvas.height) * (dimY - 1);
+    const fx = (x / this.cnvSize.x) * (dimX - 1);
+    const fy = (y / this.cnvSize.y) * (dimY - 1);
     const x0 = Math.floor(fx);
     const y0 = Math.floor(fy);
     const x1 = x0 + 1 < dimX ? x0 + 1 : x0;
@@ -301,7 +301,7 @@ export class WindParticles {
   }
 
   // Advance one animation step
-  public animate() {
+  public step() {
     if (!this.isRunning) return;
 
     // Hoist all per-frame constants outside the particle loop
@@ -309,13 +309,13 @@ export class WindParticles {
     const margin = 50;
     const minX = vp ? vp.x - margin : 0;
     const minY = vp ? vp.y - margin : 0;
-    const maxX = vp ? vp.x + vp.width + margin : this.canvas.width;
-    const maxY = vp ? vp.y + vp.height + margin : this.canvas.height;
+    const maxX = vp ? vp.x + vp.width + margin : this.cnvSize.x;
+    const maxY = vp ? vp.y + vp.height + margin : this.cnvSize.y;
     const lifetime = this.config.particleLifetime;
     const smoothing = this.config.velocitySmoothing;
     const iSmoothing = 1 - smoothing;
     const scaleFactor = this.weatherData
-      ? this.canvas.width / Math.max(this.windFieldDimX * 12, 1)
+      ? this.cnvSize.x / Math.max(this.windFieldDimX * 12, 1)
       : 0;
     const zoomCompensation = this.config.zoom > 1
       ? 1 / Math.pow(this.config.zoom, this.config.zoomMotionCompensation)
@@ -326,8 +326,8 @@ export class WindParticles {
     const buf = this.windField;
     const dimX = this.windFieldDimX;
     const dimY = this.windFieldDimY;
-    const cw = this.canvas.width;
-    const ch = this.canvas.height;
+    const cw = this.cnvSize.x;
+    const ch = this.cnvSize.y;
     const dimX1 = dimX - 1;
     const dimY1 = dimY - 1;
 
@@ -385,37 +385,35 @@ export class WindParticles {
       p.x += p.vx;
       p.y += p.vy;
     }
-
-    this.draw();
   }
 
   // Draw all particles
-  private draw() {
+  public draw(ctx: CanvasRenderingContext2D) {
     const vp = this.viewport;
 
-    this.ctx.save();
+    ctx.save();
 
     // Clip to viewport so fade and drawing don't touch offscreen regions
     if (vp) {
-      this.ctx.beginPath();
-      this.ctx.rect(vp.x, vp.y, vp.width, vp.height);
-      this.ctx.clip();
+      ctx.beginPath();
+      ctx.rect(vp.x, vp.y, vp.width, vp.height);
+      ctx.clip();
     }
 
     // Fade effect - erodes trails without darkening background
-    this.ctx.globalCompositeOperation = 'destination-out';
-    this.ctx.globalAlpha = 1 - this.config.fadeOpacity;
-    this.ctx.fillStyle = '#ffffff';
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.globalAlpha = 1 - this.config.fadeOpacity;
+    ctx.fillStyle = '#ffffff';
     if (vp) {
-      this.ctx.fillRect(vp.x, vp.y, vp.width, vp.height);
+      ctx.fillRect(vp.x, vp.y, vp.width, vp.height);
     } else {
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      ctx.fillRect(0, 0, this.cnvSize.x, this.cnvSize.y);
     }
-    this.ctx.globalAlpha = 1;
-    this.ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
 
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
 
     // Draw particles as short rounded trail segments
     const particles = this.particles;
@@ -430,8 +428,8 @@ export class WindParticles {
         // Set alpha based on age for smooth fade-in
         const alpha = Math.min(this.config.particleOpacity, ageRatio * this.config.particleOpacity);
 
-        this.ctx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
-        this.ctx.lineWidth = this.config.particleWidth;
+        ctx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
+        ctx.lineWidth = this.config.particleWidth;
 
         const dx = particle.x - particle.xt;
         const dy = particle.y - particle.yt;
@@ -440,14 +438,14 @@ export class WindParticles {
         const endX = particle.xt + dx * this.config.particleLength;
         const endY = particle.yt + dy * this.config.particleLength;
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(particle.xt, particle.yt);
-        this.ctx.quadraticCurveTo(controlX, controlY, endX, endY);
-        this.ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(particle.xt, particle.yt);
+        ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+        ctx.stroke();
       }
     }
 
-    this.ctx.restore();
+    ctx.restore();
   }
 
   // Advance one animation step — the real implementation is the new animate() above
@@ -475,12 +473,12 @@ export class WindParticles {
   }
 
   // Clear canvas
-  public clear() {
+  public clear(ctx: CanvasRenderingContext2D) {
     // Fully clear the canvas with proper transparency
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.clearRect(0, 0, this.cnvSize.x, this.cnvSize.y);
     // Fill with transparent black initially for better fade effect
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, this.cnvSize.x, this.cnvSize.y);
   }
 
   // Update configuration
@@ -516,13 +514,6 @@ export class WindParticles {
     this.weatherData = weatherData;
     this._buildWindField();
     this.initParticles();
-  }
-
-  // Resize canvas
-  public resize(width: number, height: number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.setZoom(this.config.zoom, true);
   }
 
   // Update the visible viewport so particles are only rendered/spawned in the visible area
