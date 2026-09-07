@@ -6,7 +6,7 @@ import TheaterLink from "@/components/theater-link.vue";
 <template>
   <div class="blue-bar" style="text-align: center;">
     <a href="https://www.falcon-bms.com">
-      <img src="https://www.falcon-bms.com/wp-content/uploads/2021/07/web_logo_large_alt.png" width="324" height="83" alt="">
+      <img src="https://cdn.falcon-bms.com/maps/web_assets/web_logo_large.png" width="324" height="83" alt="Falcon BMS Logo">
     </a>
   </div>
   <div class="content">
