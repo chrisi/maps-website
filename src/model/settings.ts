@@ -1,15 +1,16 @@
 import type {Point2D} from "@/model/base.ts";
 
 export interface Visibility {
-  be: boolean;
-  ms: boolean;
-  wx: boolean;
-  wb: boolean;
-  xy: boolean;
-  st: boolean;
-  mp: boolean;
-  op: boolean;
-  ow: boolean;
+  be: boolean; // Bullseye
+  ms: boolean; // Mission/Route
+  wx: boolean; // Weather
+  wb: boolean; // Whiteboard/Symbols
+  xy: boolean; // Position
+  st: boolean; // Stations
+  mp: boolean; // Map
+  op: boolean; // Ownship
+  ow: boolean; // Owner
+  mt: boolean; // METAR
 }
 
 export interface BullseyeSettings {

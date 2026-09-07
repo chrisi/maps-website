@@ -102,6 +102,9 @@ dropFileHandler.onWbLoaded((filename, content) => {
 
 dropFileHandler.onWeatherMapLoaded((filename, data) => {
   weatherMgr.processWeather(data, filename)
+  settings.viz.wx = true
+  settings.viz.mt = true
+  settings.settings.map.filter = '1'
   console.log("Weather map loaded: " + filename)
 })
 
@@ -299,7 +302,7 @@ const getMapUrl = (map: Theater) => {
 
 <template>
   <position v-if="settings.viz.xy" :pos="pos"/>
-  <metar :pos="pos" :wxManager="weatherMgr"/>
+  <metar v-if="settings.viz.mt" :pos="pos" :wxManager="weatherMgr"/>
   <map-toolbar v-model="activeTool"/>
   <aip-window v-model="selectedStation" :visible="activeWindow=='locate'" @close="activeWindow=''"/>
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>

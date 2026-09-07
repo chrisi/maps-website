@@ -32,10 +32,6 @@ function btnClick(sender: string) {
   emit('btnClick', sender)
 }
 
-function changeChartConfig(sender: string, value: string) {
-  console.log(`changeChartConfig: ${sender} -> ${value}`)
-}
-
 const imperialUnits = ref(true)
 
 const weather = ref("2")
@@ -102,22 +98,22 @@ const cycles: ValueCaptionPair[] = [
         <tool-checkbox id="unit" name="imperial" label="Imperial Units" v-model="imperialUnits"/>
 
         <tool-section name="Chart"/>
-        <tool-dropdown id="alt-select" name="altitudes" label="Wind Alt." :options="alts" v-model="settings.settings.weather.altitude"
-                       @change="changeChartConfig"/>
-        <tool-dropdown id="wx-select" name="weather" label="Weather" :options="wx" v-model="weather" @change="changeChartConfig"/>
-        <tool-dropdown id="flt-select" name="filter" label="Map Filter" :options="filters" v-model="settings.settings.map.filter" @change="changeChartConfig"/>
+        <tool-dropdown name="altitudes" label="Wind Alt." :options="alts" v-model="settings.settings.weather.altitude"/>
+        <tool-dropdown name="weather" label="Weather" :options="wx" v-model="weather"/>
+        <tool-dropdown name="filter" label="Map Filter" :options="filters" v-model="settings.settings.map.filter"/>
 
         <tool-section name="Visibility"/>
         <div class="checkbox-grid">
-          <tool-checkbox id="coordinates_show" label="Coordinates" v-model="settings.viz.xy"/>
-          <tool-checkbox id="bullseye_show" label="Bullseye" v-model="settings.viz.be"/>
-          <tool-checkbox id="mission_show" label="Mission" v-model="settings.viz.ms"/>
-          <tool-checkbox id="weather_show" label="Weather" v-model="settings.viz.wx"/>
-          <tool-checkbox id="whiteboard_show" label="Whiteboard" v-model="settings.viz.wb"/>
-          <tool-checkbox id="stations_show" label="Stations" v-model="settings.viz.st"/>
-          <tool-checkbox id="owner_show" label="Owner" v-model="settings.viz.ow"/>
-          <tool-checkbox id="map_show" label="Map" v-model="settings.viz.mp"/>
-          <tool-checkbox id="pos_show" label="Aircraft" v-model="settings.viz.op"/>
+          <tool-checkbox label="Coordinates" v-model="settings.viz.xy"/>
+          <tool-checkbox label="Bullseye" v-model="settings.viz.be"/>
+          <tool-checkbox label="Mission" v-model="settings.viz.ms"/>
+          <tool-checkbox label="Weather" v-model="settings.viz.wx"/>
+          <tool-checkbox label="Whiteboard" v-model="settings.viz.wb"/>
+          <tool-checkbox label="Stations" v-model="settings.viz.st"/>
+          <tool-checkbox label="Owner" v-model="settings.viz.ow"/>
+          <tool-checkbox label="Map" v-model="settings.viz.mp"/>
+          <tool-checkbox label="Aircraft" v-model="settings.viz.op"/>
+          <tool-checkbox label="METAR" v-model="settings.viz.mt"/>
         </div>
       </template>
 

@@ -6,13 +6,14 @@ export const useSettingsStore = defineStore('settings', () => {
   const viz = reactive<Visibility>({
     be: true,
     ms: true,
-    wx: true,
+    wx: false,
     wb: true,
     xy: true,
     st: true,
     mp: true,
     op: true,
     ow: false,
+    mt: true,
   })
 
   const settings = reactive<Settings>(
@@ -37,10 +38,10 @@ export const useSettingsStore = defineStore('settings', () => {
       },
       weather: {
         metric: true,
-        altitude: '4'
+        altitude: '0'
       },
       map: {
-        filter: '1'
+        filter: '0'
       },
       whiteboard: {
         line: {
