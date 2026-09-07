@@ -104,7 +104,7 @@ dropFileHandler.onWeatherMapLoaded((filename, data) => {
   weatherMgr.processWeather(data, filename)
   settings.viz.wx = true
   settings.viz.mt = true
-  settings.settings.map.filter = '1'
+  settings.settings.map.filter = '3'
   console.log("Weather map loaded: " + filename)
 })
 
