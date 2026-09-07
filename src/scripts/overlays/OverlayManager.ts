@@ -1,4 +1,5 @@
 import {useGlobalStore} from "@/stores/global.ts";
+import {useSettingsStore} from "@/stores/settings.ts";
 import {distance} from "@/scripts/math.ts";
 import type {Overlay} from "@/scripts/overlays/BaseOverlay.ts";
 import type {Canvas} from "@/scripts/overlays/Canvas.ts";
@@ -14,6 +15,7 @@ interface HotspotCandidate {
 export class OverlayManager {
 
   private global = useGlobalStore()
+  private settings = useSettingsStore()
 
   private cnv: Canvas | undefined
 
@@ -53,6 +55,8 @@ export class OverlayManager {
   }
 
   public draw = (context: CanvasRenderingContext2D, offset: Point2D, scale: number): void => {
+    let ovlCnt = 0;
+    const ofs = 800;
     for (const overlay of this.overlays) {
       try {
         if (overlay.isEnabled()) {
@@ -61,10 +65,22 @@ export class OverlayManager {
             offset: offset,
             scale: scale
           }
-          // const start = performance.now() // Start timing
+          const start = performance.now() // Start timing
           overlay.onDraw(this.cnv)
-          // const end = performance.now() // End timing
-          // console.trace(`Redraw of ${overlay.constructor.name} took ${(end - start).toFixed(2)} ms`)
+          const end = performance.now() // End timing
+
+          if (this.settings.settings.debug) {
+            const elapsed = end - start;
+            const overlayName = overlay.constructor.name.padEnd(20, ' ');
+            context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            context.fillRect(0, ofs + 20 * ovlCnt, 260, 20);
+            context.fillStyle = '#00ff00';
+            context.font = 'bold 14px monospace';
+            context.textAlign = 'left';
+            context.textBaseline = 'middle';
+            context.fillText(`${overlayName}: ${elapsed.toFixed(2)} ms`, 8, ofs + 11 + 20 * ovlCnt);
+            ovlCnt++;
+          }
         }
       } catch (err) {
         console.error(this.errorMessage(overlay) + ` on redraw with scale ${scale}.`, err);
