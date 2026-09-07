@@ -254,6 +254,20 @@ const zoomToMission = () => {
 
 const handleKeyDown = (e: KeyboardEvent) => {
   switch (e.key) {
+    case 'R':
+      settings.viz.wx = false
+      settings.settings.map.filter = '0'
+      break;
+    case 'W':
+      if (settings.viz.wx) {
+        settings.viz.wx = false
+        settings.settings.map.filter = '0'
+
+      } else {
+        settings.viz.wx = true
+        settings.settings.map.filter = '3'
+      }
+      break;
     case '#':
       settings.settings.debug = !settings.settings.debug
       break
