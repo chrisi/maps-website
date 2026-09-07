@@ -7,7 +7,7 @@
 import type {Fmap} from "@/model/fmap.ts";
 import type {Point2D} from "@/model/base.ts";
 
-interface WindParticlesConfig {
+export interface WindParticlesConfig {
   /** Active particle count after zoom adjustment */
   particleCount: number;
 
@@ -37,6 +37,9 @@ interface WindParticlesConfig {
 
   /** Base opacity */
   particleOpacity: number;
+
+  /** Overall layer/canvas opacity (0 to 1) when drawing to target canvas */
+  opacity: number;
 
   /** Particle color, overridden by speed */
   particleColor: string;
@@ -83,10 +86,15 @@ export class WindParticles {
   private colorCache: { [key: string]: string }; // Cache for color strings
   private viewport: { x: number, y: number, width: number, height: number } | null;  //in canvas pixels, null = full canvas
 
-  private offscreenCanvas: HTMLCanvasElement | null = null;
-  private offscreenCtx: CanvasRenderingContext2D | null = null;
-  private offset: Point2D = {x: 0, y: 0};
-  private scale: number = 1;
+  private offscreenCanvases: [HTMLCanvasElement, HTMLCanvasElement] | null = null;
+  private offscreenContexts: [CanvasRenderingContext2D, CanvasRenderingContext2D] | null = null;
+  private activeBufferIndex: number = 0;
+  private hasBufferContent: boolean = false;
+
+  private currentOffset: Point2D = {x: 0, y: 0};
+  private currentScale: number = 1;
+  private bufferOffset: Point2D = {x: 0, y: 0};
+  private bufferScale: number = 1;
   private screenWidth: number = 0;
   private screenHeight: number = 0;
 
@@ -104,7 +112,8 @@ export class WindParticles {
       particleSpeed: 0.05,
       particleWidth: 1.5,
       particleLength: 1.15,
-      particleOpacity: 0.8,
+      particleOpacity: 1,
+      opacity: 0.7,
       particleColor: '#ffffff',
       fadeOpacity: 0.95,
       minWindSpeed: 0.1,
@@ -390,61 +399,93 @@ export class WindParticles {
 
   public setScreenSize(width: number, height: number): void {
     if (width <= 0 || height <= 0) return;
-    if (!this.offscreenCanvas) {
-      if (typeof document !== 'undefined') {
-        this.offscreenCanvas = document.createElement('canvas');
-        this.offscreenCanvas.width = width;
-        this.offscreenCanvas.height = height;
-        this.offscreenCtx = this.offscreenCanvas.getContext('2d', {alpha: true});
-        this.screenWidth = width;
-        this.screenHeight = height;
-      }
-    } else if (this.offscreenCanvas.width !== width || this.offscreenCanvas.height !== height) {
-      this.offscreenCanvas.width = width;
-      this.offscreenCanvas.height = height;
-      this.screenWidth = width;
-      this.screenHeight = height;
+    if (this.screenWidth === width && this.screenHeight === height && this.offscreenCanvases) {
+      return;
     }
+    if (typeof document === 'undefined') return;
+
+    if (!this.offscreenCanvases) {
+      const c1 = document.createElement('canvas');
+      const c2 = document.createElement('canvas');
+      c1.width = width;
+      c1.height = height;
+      c2.width = width;
+      c2.height = height;
+      const ctx1 = c1.getContext('2d', {alpha: true});
+      const ctx2 = c2.getContext('2d', {alpha: true});
+      if (ctx1 && ctx2) {
+        this.offscreenCanvases = [c1, c2];
+        this.offscreenContexts = [ctx1, ctx2];
+      }
+    } else {
+      this.offscreenCanvases[0].width = width;
+      this.offscreenCanvases[0].height = height;
+      this.offscreenCanvases[1].width = width;
+      this.offscreenCanvases[1].height = height;
+      this.hasBufferContent = false;
+    }
+    this.screenWidth = width;
+    this.screenHeight = height;
   }
 
   public setOffsetAndScale(offset: Point2D, scale: number): void {
-    if (Math.abs(this.scale - scale) > 0.001) {
-      if (this.offscreenCtx && this.offscreenCanvas) {
-        this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
-      }
-    }
-    this.offset = {x: offset.x, y: offset.y};
-    this.scale = scale;
+    this.currentOffset = {x: offset.x, y: offset.y};
+    this.currentScale = scale > 0 ? scale : 1;
   }
 
   // Render particles and fade pass to private offscreen canvas
   public render(): void {
-    if (!this.offscreenCtx || !this.offscreenCanvas || this.screenWidth <= 0 || this.screenHeight <= 0) {
+    if (!this.offscreenContexts || !this.offscreenCanvases || this.screenWidth <= 0 || this.screenHeight <= 0) {
       return;
     }
-    const ctx = this.offscreenCtx;
     const width = this.screenWidth;
     const height = this.screenHeight;
+    const currentScale = this.currentScale;
+    const currentOffset = this.currentOffset;
 
-    ctx.save();
+    const readIdx = this.activeBufferIndex;
+    const writeIdx = 1 - readIdx;
+    const srcCanvas = this.offscreenCanvases[readIdx];
+    const dstCtx = this.offscreenContexts[writeIdx];
+    if (!srcCanvas || !dstCtx) {
+      return;
+    }
 
-    // Fade effect - erodes trails without darkening background
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.globalAlpha = 1 - this.config.fadeOpacity;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
+    // Clear destination buffer
+    dstCtx.clearRect(0, 0, width, height);
 
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    if (this.hasBufferContent && this.bufferScale > 0) {
+      const k = currentScale / this.bufferScale;
+      const dx = (this.bufferOffset.x - currentOffset.x) * currentScale;
+      const dy = (this.bufferOffset.y - currentOffset.y) * currentScale;
+
+      dstCtx.save();
+      if (Math.abs(k - 1) > 0.0001 || Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01) {
+        dstCtx.translate(dx, dy);
+        dstCtx.scale(k, k);
+      }
+      dstCtx.drawImage(srcCanvas, 0, 0);
+      dstCtx.restore();
+
+      // Fade effect - erodes trails without darkening background
+      dstCtx.save();
+      dstCtx.globalCompositeOperation = 'destination-out';
+      dstCtx.globalAlpha = 1 - this.config.fadeOpacity;
+      dstCtx.fillStyle = '#ffffff';
+      dstCtx.fillRect(0, 0, width, height);
+      dstCtx.restore();
+    }
+
+    dstCtx.save();
+    dstCtx.lineCap = 'round';
+    dstCtx.lineJoin = 'round';
 
     // Draw particles as short rounded trail segments
     const particles = this.particles;
     const len = particles.length;
-    const scale = this.scale;
-    const offsetX = this.offset.x;
-    const offsetY = this.offset.y;
+    const scale = currentScale;
+    const offsetX = currentOffset.x;
+    const offsetY = currentOffset.y;
     const particleWidth = this.config.particleWidth;
     const particleLength = this.config.particleLength;
     const particleOpacity = this.config.particleOpacity;
@@ -467,8 +508,8 @@ export class WindParticles {
         }
 
         const alpha = Math.min(particleOpacity, ageRatio * particleOpacity);
-        ctx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
-        ctx.lineWidth = particleWidth;
+        dstCtx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
+        dstCtx.lineWidth = particleWidth;
 
         const dx = screenX - screenXt;
         const dy = screenY - screenYt;
@@ -477,27 +518,69 @@ export class WindParticles {
         const endX = screenXt + dx * particleLength;
         const endY = screenYt + dy * particleLength;
 
-        ctx.beginPath();
-        ctx.moveTo(screenXt, screenYt);
-        ctx.quadraticCurveTo(controlX, controlY, endX, endY);
-        ctx.stroke();
+        dstCtx.beginPath();
+        dstCtx.moveTo(screenXt, screenYt);
+        dstCtx.quadraticCurveTo(controlX, controlY, endX, endY);
+        dstCtx.stroke();
       }
     }
 
-    ctx.restore();
+    dstCtx.restore();
+
+    this.activeBufferIndex = writeIdx;
+    this.bufferOffset = {x: currentOffset.x, y: currentOffset.y};
+    this.bufferScale = currentScale;
+    this.hasBufferContent = true;
   }
 
-  // Blit offscreen canvas onto target canvas context
-  public drawTo(targetCtx: CanvasRenderingContext2D): void {
-    if (this.offscreenCanvas && this.screenWidth > 0 && this.screenHeight > 0) {
-      targetCtx.drawImage(this.offscreenCanvas, 0, 0);
+  // Blit offscreen canvas onto target canvas context with adjustable opacity and real-time transform
+  public drawTo(targetCtx: CanvasRenderingContext2D, opacity?: number, currentOffset?: Point2D, currentScale?: number): void {
+    if (!this.offscreenCanvases || !this.hasBufferContent || this.screenWidth <= 0 || this.screenHeight <= 0) {
+      return;
+    }
+    const activeCanvas = this.offscreenCanvases[this.activeBufferIndex];
+    if (!activeCanvas) {
+      return;
+    }
+    const alpha = opacity !== undefined ? Math.max(0, Math.min(1, opacity)) : this.config.opacity;
+
+    const targetS = (currentScale !== undefined && currentScale > 0) ? currentScale : this.bufferScale;
+    const targetOff = currentOffset ?? this.bufferOffset;
+
+    const k = this.bufferScale > 0 ? targetS / this.bufferScale : 1;
+    const dx = (this.bufferOffset.x - targetOff.x) * targetS;
+    const dy = (this.bufferOffset.y - targetOff.y) * targetS;
+    const needsTransform = Math.abs(k - 1) > 0.0001 || Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01;
+    const needsAlpha = alpha < 1;
+
+    if (needsTransform || needsAlpha) {
+      targetCtx.save();
+      if (needsAlpha) {
+        targetCtx.globalAlpha = alpha;
+      }
+      if (needsTransform) {
+        targetCtx.translate(dx, dy);
+        targetCtx.scale(k, k);
+      }
+      targetCtx.drawImage(activeCanvas, 0, 0);
+      targetCtx.restore();
+    } else {
+      targetCtx.drawImage(activeCanvas, 0, 0);
     }
   }
 
+  public setOpacity(opacity: number): void {
+    this.config.opacity = Math.max(0, Math.min(1, opacity));
+  }
+
+  public getOpacity(): number {
+    return this.config.opacity;
+  }
+
   // Draw method maintained for compatibility
-  public draw(targetCtx?: CanvasRenderingContext2D): void {
+  public draw(targetCtx?: CanvasRenderingContext2D, opacity?: number, currentOffset?: Point2D, currentScale?: number): void {
     if (targetCtx) {
-      this.drawTo(targetCtx);
+      this.drawTo(targetCtx, opacity, currentOffset, currentScale);
     }
   }
 
@@ -516,16 +599,18 @@ export class WindParticles {
 
   // Clear canvas
   public clear(ctx?: CanvasRenderingContext2D) {
-    if (this.offscreenCtx && this.offscreenCanvas) {
-      this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
+    if (this.offscreenContexts && this.offscreenCanvases && this.screenWidth > 0 && this.screenHeight > 0) {
+      this.offscreenContexts[0].clearRect(0, 0, this.screenWidth, this.screenHeight);
+      this.offscreenContexts[1].clearRect(0, 0, this.screenWidth, this.screenHeight);
     }
+    this.hasBufferContent = false;
     if (ctx) {
       ctx.clearRect(0, 0, this.cnvSize.x, this.cnvSize.y);
     }
   }
 
   // Update configuration
-  public setConfig(newConfig: WindParticlesConfig) {
+  public setConfig(newConfig: Partial<WindParticlesConfig>) {
     Object.assign(this.config, newConfig);
 
     // Clear color cache on config changes
@@ -570,7 +655,7 @@ export class WindParticles {
       Math.abs(prev.width - width) > 10 || Math.abs(prev.height - height) > 10) {
       this.viewport = {x, y, width, height};
       // Respawn out-of-viewport particles immediately so coverage is dense
-      const margin = 50;
+      const margin = Math.max(50, Math.min(width, height) * 0.1);
       for (let i = 0; i < this.particles.length; i++) {
         const p = this.particles[i]!;
         if (p.x < x - margin || p.x > x + width + margin ||

@@ -62,7 +62,7 @@ export class WindParticlesOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    this.windParticles?.drawTo(cnv.context);
+    this.windParticles?.drawTo(cnv.context, undefined, cnv.offset, cnv.scale);
   }
 
   private animationLoop = (timestamp?: number): void => {
