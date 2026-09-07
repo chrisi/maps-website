@@ -32,7 +32,10 @@ export class WindParticlesOverlay extends BaseOverlay {
     });
     this.setFps(30);
 
-    watch(() => this.settings.viz.wx, () => {
+    watch(() => this.settings.viz.wx, (wx) => {
+      if (!wx) {
+        this.windParticles?.clear();
+      }
       this.updateAnimationLoop();
       this.redraw();
     });
@@ -51,14 +54,15 @@ export class WindParticlesOverlay extends BaseOverlay {
 
   public override setEnabled(enabled: boolean): void {
     super.setEnabled(enabled);
+    if (!enabled) {
+      this.windParticles?.clear();
+    }
     this.updateAnimationLoop();
     this.redraw();
   }
 
   public onDraw(cnv: Canvas): void {
-    this.drawWorldInScreenSpace(() => {
-      this.windParticles!.draw(cnv.context, cnv.scale);
-    }, cnv);
+    this.windParticles?.drawTo(cnv.context);
   }
 
   private animationLoop = (timestamp?: number): void => {
@@ -74,6 +78,8 @@ export class WindParticlesOverlay extends BaseOverlay {
         const visY = cnv.offset.y;
         const visW = window.innerWidth / cnv.scale;
         const visH = window.innerHeight / cnv.scale;
+        this.windParticles!.setScreenSize(window.innerWidth, window.innerHeight);
+        this.windParticles!.setOffsetAndScale(cnv.offset, cnv.scale);
         this.windParticles!.setViewport(visX, visY, visW, visH);
         this.windParticles!.setZoom(cnv.scale, false);
       } catch {
@@ -81,6 +87,7 @@ export class WindParticlesOverlay extends BaseOverlay {
       }
 
       this.windParticles!.step();
+      this.windParticles!.render();
       this.redraw();
     }
 
@@ -101,6 +108,7 @@ export class WindParticlesOverlay extends BaseOverlay {
         this.animationLoopId = null;
       }
       this.lastAnimationFrameTime = 0;
+      this.windParticles?.clear();
     }
   }
 

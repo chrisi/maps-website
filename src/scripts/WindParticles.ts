@@ -83,6 +83,13 @@ export class WindParticles {
   private colorCache: { [key: string]: string }; // Cache for color strings
   private viewport: { x: number, y: number, width: number, height: number } | null;  //in canvas pixels, null = full canvas
 
+  private offscreenCanvas: HTMLCanvasElement | null = null;
+  private offscreenCtx: CanvasRenderingContext2D | null = null;
+  private offset: Point2D = {x: 0, y: 0};
+  private scale: number = 1;
+  private screenWidth: number = 0;
+  private screenHeight: number = 0;
+
   constructor(cnvSize: Point2D) {
     this.cnvSize = cnvSize
 
@@ -91,7 +98,7 @@ export class WindParticles {
       particleCount: 5000,
       baseParticleCount: 5000,
       minParticleCount: 500,
-      maxParticleCount: 9000,
+      maxParticleCount: 1000,
       particleCountZoomPower: 2.2,
       particleLifetime: 90,
       particleSpeed: 0.05,
@@ -381,27 +388,51 @@ export class WindParticles {
     }
   }
 
-  // Draw all particles
-  public draw(ctx: CanvasRenderingContext2D, scale: number) {
-    const vp = this.viewport;
-    ctx.save();
-
-    // Clip to viewport so fade and drawing don't touch offscreen regions
-    if (vp) {
-      ctx.beginPath();
-      ctx.rect(vp.x, vp.y, vp.width, vp.height);
-      ctx.clip();
+  public setScreenSize(width: number, height: number): void {
+    if (width <= 0 || height <= 0) return;
+    if (!this.offscreenCanvas) {
+      if (typeof document !== 'undefined') {
+        this.offscreenCanvas = document.createElement('canvas');
+        this.offscreenCanvas.width = width;
+        this.offscreenCanvas.height = height;
+        this.offscreenCtx = this.offscreenCanvas.getContext('2d', {alpha: true});
+        this.screenWidth = width;
+        this.screenHeight = height;
+      }
+    } else if (this.offscreenCanvas.width !== width || this.offscreenCanvas.height !== height) {
+      this.offscreenCanvas.width = width;
+      this.offscreenCanvas.height = height;
+      this.screenWidth = width;
+      this.screenHeight = height;
     }
+  }
+
+  public setOffsetAndScale(offset: Point2D, scale: number): void {
+    if (Math.abs(this.scale - scale) > 0.001) {
+      if (this.offscreenCtx && this.offscreenCanvas) {
+        this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
+      }
+    }
+    this.offset = {x: offset.x, y: offset.y};
+    this.scale = scale;
+  }
+
+  // Render particles and fade pass to private offscreen canvas
+  public render(): void {
+    if (!this.offscreenCtx || !this.offscreenCanvas || this.screenWidth <= 0 || this.screenHeight <= 0) {
+      return;
+    }
+    const ctx = this.offscreenCtx;
+    const width = this.screenWidth;
+    const height = this.screenHeight;
+
+    ctx.save();
 
     // Fade effect - erodes trails without darkening background
     ctx.globalCompositeOperation = 'destination-out';
     ctx.globalAlpha = 1 - this.config.fadeOpacity;
     ctx.fillStyle = '#ffffff';
-    if (vp) {
-      ctx.fillRect(vp.x, vp.y, vp.width, vp.height);
-    } else {
-      ctx.fillRect(0, 0, this.cnvSize.x, this.cnvSize.y);
-    }
+    ctx.fillRect(0, 0, width, height);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
 
@@ -411,9 +442,12 @@ export class WindParticles {
     // Draw particles as short rounded trail segments
     const particles = this.particles;
     const len = particles.length;
-
-    const normWidth = this.config.particleWidth / scale;
-    const normLen = this.config.particleLength / scale;
+    const scale = this.scale;
+    const offsetX = this.offset.x;
+    const offsetY = this.offset.y;
+    const particleWidth = this.config.particleWidth;
+    const particleLength = this.config.particleLength;
+    const particleOpacity = this.config.particleOpacity;
 
     for (let i = 0; i < len; i++) {
       const particle = particles[i]!;
@@ -421,28 +455,50 @@ export class WindParticles {
       const ageRatio = Math.min(particle.age / 10, 1);
 
       if (ageRatio > 0.1) {
-        // Set color based on wind speed
-        // Set alpha based on age for smooth fade-in
-        const alpha = Math.min(this.config.particleOpacity, ageRatio * this.config.particleOpacity);
+        // Convert world coords to screen space
+        const screenXt = (particle.xt - offsetX) * scale;
+        const screenYt = (particle.yt - offsetY) * scale;
+        const screenX = (particle.x - offsetX) * scale;
+        const screenY = (particle.y - offsetY) * scale;
 
+        // Skip particles that are completely offscreen
+        if (screenXt < -50 || screenXt > width + 50 || screenYt < -50 || screenYt > height + 50) {
+          continue;
+        }
+
+        const alpha = Math.min(particleOpacity, ageRatio * particleOpacity);
         ctx.strokeStyle = this.getColorFromWindSpeed(particle.windSpeed, alpha);
-        ctx.lineWidth = normWidth;
+        ctx.lineWidth = particleWidth;
 
-        const dx = particle.x - particle.xt;
-        const dy = particle.y - particle.yt;
-        const controlX = particle.xt + dx * 0.5 + particle.vx * 0.35;
-        const controlY = particle.yt + dy * 0.5 + particle.vy * 0.35;
-        const endX = particle.xt + dx * normLen;
-        const endY = particle.yt + dy * normLen;
+        const dx = screenX - screenXt;
+        const dy = screenY - screenYt;
+        const controlX = screenXt + dx * 0.5 + (particle.vx * scale) * 0.35;
+        const controlY = screenYt + dy * 0.5 + (particle.vy * scale) * 0.35;
+        const endX = screenXt + dx * particleLength;
+        const endY = screenYt + dy * particleLength;
 
         ctx.beginPath();
-        ctx.moveTo(particle.xt, particle.yt);
+        ctx.moveTo(screenXt, screenYt);
         ctx.quadraticCurveTo(controlX, controlY, endX, endY);
         ctx.stroke();
       }
     }
 
     ctx.restore();
+  }
+
+  // Blit offscreen canvas onto target canvas context
+  public drawTo(targetCtx: CanvasRenderingContext2D): void {
+    if (this.offscreenCanvas && this.screenWidth > 0 && this.screenHeight > 0) {
+      targetCtx.drawImage(this.offscreenCanvas, 0, 0);
+    }
+  }
+
+  // Draw method maintained for compatibility
+  public draw(targetCtx?: CanvasRenderingContext2D): void {
+    if (targetCtx) {
+      this.drawTo(targetCtx);
+    }
   }
 
   // Advance one animation step — the real implementation is the new animate() above
@@ -459,12 +515,13 @@ export class WindParticles {
   }
 
   // Clear canvas
-  public clear(ctx: CanvasRenderingContext2D) {
-    // Fully clear the canvas with proper transparency
-    ctx.clearRect(0, 0, this.cnvSize.x, this.cnvSize.y);
-    // Fill with transparent black initially for better fade effect
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-    ctx.fillRect(0, 0, this.cnvSize.x, this.cnvSize.y);
+  public clear(ctx?: CanvasRenderingContext2D) {
+    if (this.offscreenCtx && this.offscreenCanvas) {
+      this.offscreenCtx.clearRect(0, 0, this.offscreenCanvas.width, this.offscreenCanvas.height);
+    }
+    if (ctx) {
+      ctx.clearRect(0, 0, this.cnvSize.x, this.cnvSize.y);
+    }
   }
 
   // Update configuration
