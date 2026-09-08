@@ -21,6 +21,7 @@ import {OwnshipOverlay} from "@/scripts/overlays/OwnshipOverlay.ts";
 import {DebugOverlay} from "@/scripts/overlays/DebugOverlay.ts";
 import {AnimationOverlay} from "@/scripts/overlays/AnimationOverlay.ts";
 import {CloudsOverlay} from "@/scripts/overlays/CloudsOverlay.ts";
+import {IsobarsOverlay} from "@/scripts/overlays/IsobarsOverlay.ts";
 import {WindParticlesOverlay} from "@/scripts/overlays/WindParticlesOverlay.ts";
 //Toolwindows
 import AipWindow from "@/components/windows/aip-window.vue";
@@ -162,6 +163,7 @@ onMounted(() => {
   overlayManager.registerOverlay(new AnimationOverlay())
   overlayManager.registerOverlay(new WindParticlesOverlay(weatherMgr))
   overlayManager.registerOverlay(new CloudsOverlay(weatherMgr))
+  overlayManager.registerOverlay(new IsobarsOverlay(weatherMgr))
   overlayManager.addRedrawEventListener(() => canvasMapRef.value.redrawOverlay())
   window.addEventListener('keydown', handleKeyDown)
 })
