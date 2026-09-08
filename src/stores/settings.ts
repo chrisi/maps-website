@@ -47,6 +47,7 @@ export const useSettingsStore = defineStore('settings', () => {
       weather: {
         metric: true,
         altitude: '0',
+        colorCloudBase: true,
         wxLayers: wx,
       },
       map: {
