@@ -1,6 +1,6 @@
 import {reactive} from "vue";
 import {defineStore} from "pinia";
-import type {Settings, Visibility} from "@/model/settings.ts";
+import type {Settings, Visibility, WxLayers} from "@/model/settings.ts";
 
 export const useSettingsStore = defineStore('settings', () => {
   const viz = reactive<Visibility>({
@@ -14,6 +14,14 @@ export const useSettingsStore = defineStore('settings', () => {
     op: true,
     ow: false,
     mt: true,
+  })
+
+  const wx = reactive<WxLayers>({
+    temps: false,
+    winds: true,
+    clouds: true,
+    doppler: false,
+    isobaric: false
   })
 
   const settings = reactive<Settings>(
@@ -38,7 +46,8 @@ export const useSettingsStore = defineStore('settings', () => {
       },
       weather: {
         metric: true,
-        altitude: '0'
+        altitude: '0',
+        wxLayers: wx,
       },
       map: {
         filter: '0'

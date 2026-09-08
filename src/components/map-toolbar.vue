@@ -54,6 +54,10 @@ const tools = ref<Tool[]>([
     desc: "Draw the mission route on the map.", show: () => viz.value.ms
   },
   {
+    name: "weather", caption: "Weather", activeIcon: "icon_weather.png", icons: ["icon_weather.png", "icon_weather1.png"],
+    desc: "Show weather data on the map.", show: () => viz.value.wx
+  },
+  {
     name: "aircraft", caption: "Aircraft", activeIcon: "icon_aircraft.png", icons: ["icon_aircraft.png", "icon_aircraft1.png"],
     desc: "Show aircraft position on the map.", show: () => viz.value.op
   },
@@ -142,10 +146,14 @@ const handleKeyDown = (e: KeyboardEvent) => {
         emit('update:modelValue', 'route')
         break
       case '5':
+      case 'f':
+        emit('update:modelValue', 'weather')
+        break
+      case '6':
       case 'a':
         emit('update:modelValue', 'aircraft')
         break
-      case '6':
+      case '7':
       case 's':
         emit('update:modelValue', 'settings')
         break

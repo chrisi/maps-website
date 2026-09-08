@@ -28,6 +28,7 @@ import SettingsWindow from "@/components/windows/settings-window.vue";
 import RouteWindow from "@/components/windows/route-window.vue";
 import AircraftWindow from "@/components/windows/aircraft-window.vue";
 import WhiteboardWindow from "@/components/windows/whiteboard-window.vue";
+import WeatherWindow from "@/components/windows/weather-window.vue";
 
 import {OverlayMode} from "@/model/mode.ts";
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
@@ -222,6 +223,11 @@ watch(activeTool, (newValue) => {
       global.mode = OverlayMode.Move
       suspend.value = false
       break
+    case 'weather':
+      activeWindow.value = 'weather'
+      global.mode = OverlayMode.Move
+      suspend.value = false
+      break
     case 'aircraft':
       activeWindow.value = 'aircraft'
       global.mode = OverlayMode.Move
@@ -324,6 +330,7 @@ const getMapUrl = (map: Theater) => {
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"
                      :imcsClient="imcsClient"/>
+  <weather-window :visible="activeWindow=='weather'" @close="activeWindow=''"/>
   <aircraft-window :visible="activeWindow=='aircraft'" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">

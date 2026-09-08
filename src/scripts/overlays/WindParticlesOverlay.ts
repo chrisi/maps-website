@@ -32,8 +32,16 @@ export class WindParticlesOverlay extends BaseOverlay {
     });
     this.setFps(30);
 
-    watch(() => this.settings.viz.wx, (wx) => {
-      if (!wx) {
+    watch(() => this.settings.viz.wx, (vis) => {
+      if (!vis) {
+        this.windParticles?.clear();
+      }
+      this.updateAnimationLoop();
+      this.redraw();
+    });
+
+    watch(() => this.settings.settings.weather.wxLayers.winds, (vis) => {
+      if (!vis) {
         this.windParticles?.clear();
       }
       this.updateAnimationLoop();
@@ -49,7 +57,7 @@ export class WindParticlesOverlay extends BaseOverlay {
   }
 
   public override isEnabled(): boolean {
-    return this.settings.viz.wx;
+    return this.settings.viz.wx && this.settings.settings.weather.wxLayers.winds;
   }
 
   public override setEnabled(enabled: boolean): void {

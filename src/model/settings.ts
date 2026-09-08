@@ -50,9 +50,19 @@ export interface WhiteboardSettings {
   supportPoints: boolean;
 }
 
+export interface WxLayers {
+  temps: boolean;
+  winds: boolean;
+  clouds: boolean;
+  doppler: boolean;
+  isobaric: boolean;
+}
+
 export interface WeatherSettings {
   metric: boolean;
   altitude: string;
+  colorCloudBase: boolean;
+  wxLayers: WxLayers;
 }
 
 export interface MapSettings {

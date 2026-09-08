@@ -11,7 +11,6 @@ export class CloudsOverlay extends BaseOverlay {
   private readonly cloudAltColorMap = new Map<number, string>()
   private readonly weatherMgr: WeatherManager
 
-  private colorCodedCloudBase: boolean = true
   private baseOpacity: number = 0.7
   private blurFactor: number = 0.8
   private cloudSizeFactor: number = 1.8
@@ -57,14 +56,23 @@ export class CloudsOverlay extends BaseOverlay {
     watch(() => this.settings.viz.wx, () => {
       this.redraw();
     })
+
+    watch(() => this.settings.settings.weather.wxLayers.clouds, () => {
+      this.redraw();
+    })
+
+    watch(() => this.settings.settings.weather.colorCloudBase, () => {
+      this.regenerateCloudCache();
+      this.redraw();
+    })
   }
 
   public override isEnabled(): boolean {
-    return this.settings.viz.wx && true
+    return this.settings.viz.wx && this.settings.settings.weather.wxLayers.clouds;
   }
 
   private getCloudBaseAltitudeColor(altitudeFeet: number): string {
-    if (!this.colorCodedCloudBase)
+    if (!this.settings.settings.weather.colorCloudBase)
       return "rgb(255, 255, 255)"
     for (const [key, value] of this.cloudAltColorMap) {
       if (altitudeFeet <= key) {
