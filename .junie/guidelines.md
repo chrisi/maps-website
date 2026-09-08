@@ -6,6 +6,7 @@
 - Keep changes minimal and focused on the requested task.
 - Do not refactor unrelated code.
 - Preserve existing behavior unless explicitly asked to change it.
+- Don't use semicolons to end statements.
 
 ## Vue
 - Use `<script setup lang="ts">` for new Vue components.
