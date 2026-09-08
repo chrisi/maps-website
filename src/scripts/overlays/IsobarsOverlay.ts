@@ -9,7 +9,6 @@ export class IsobarsOverlay extends BaseOverlay {
   private readonly weatherMgr: WeatherManager
 
   private weatherData: Fmap | null = null
-  private offlineCanvas: HTMLCanvasElement | null = null
 
   private gridSizeX: number = 0
   private gridSizeY: number = 0
@@ -30,7 +29,7 @@ export class IsobarsOverlay extends BaseOverlay {
         this.tileSizeX = this.global.map.pixels / this.gridSizeX
         this.tileSizeY = this.global.map.pixels / this.gridSizeY
       }
-      this.regenerateIsobarsCache()
+      this.redraw()
     })
 
     watch(() => this.settings.viz.wx, () => {
@@ -42,7 +41,6 @@ export class IsobarsOverlay extends BaseOverlay {
     })
 
     watch(() => this.settings.settings.weather.metric, () => {
-      this.regenerateIsobarsCache()
       this.redraw()
     })
   }
@@ -51,30 +49,12 @@ export class IsobarsOverlay extends BaseOverlay {
     return this.settings.viz.wx && this.settings.settings.weather.wxLayers.isobaric
   }
 
-  private regenerateIsobarsCache(): void {
-    if (!this.weatherData?.pressure || this.weatherData.pressure.length === 0 || !this.global.map) {
-      this.offlineCanvas = null
-      return
-    }
+  public onDraw(cnv: Canvas): void {
+    if (!this.weatherData?.pressure || this.weatherData.pressure.length === 0 || !this.global.map) return
 
     const width = this.global.map.pixels
     const height = this.global.map.pixels
     if (width <= 0 || height <= 0) return
-
-    if (!this.offlineCanvas) {
-      if (typeof document !== "undefined") {
-        this.offlineCanvas = document.createElement("canvas")
-      }
-    }
-    if (!this.offlineCanvas) return
-
-    this.offlineCanvas.width = width
-    this.offlineCanvas.height = height
-
-    const ctx = this.offlineCanvas.getContext("2d")
-    if (!ctx) return
-
-    ctx.clearRect(0, 0, width, height)
 
     if (this.gridSizeX <= 0 || this.gridSizeY <= 0) {
       this.gridSizeX = this.weatherData.dimension.x
@@ -110,51 +90,41 @@ export class IsobarsOverlay extends BaseOverlay {
       pressures[i] = minPressure + i
     }
 
-    ctx.strokeStyle = "#383b79"
-    ctx.lineWidth = 4
-    ctx.font = "18px serif"
-
-    let lastLevel = ""
-
-    const isMetric = this.settings.settings.weather.metric
-
-    const drawContours = (
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-      l: number
-    ): void => {
-      ctx.beginPath()
-      ctx.moveTo(y1 * this.tileSizeX, x1 * this.tileSizeY)
-      ctx.lineTo(y2 * this.tileSizeX, x2 * this.tileSizeY)
-      ctx.stroke()
-
-      const levelStr = !isMetric ? (l * 0.0295301).toFixed(2) : l.toString()
-      if (lastLevel !== levelStr) {
-        ctx.fillStyle = "#000000"
-        ctx.fillText(levelStr, y1 * this.tileSizeX + 5 + 2, x1 * this.tileSizeY + 2)
-        ctx.fillStyle = "#ffffff"
-        ctx.fillText(levelStr, y1 * this.tileSizeX + 5, x1 * this.tileSizeY)
-        lastLevel = levelStr
-      }
-    }
-
-    const c = new Conrec(drawContours)
-    c.contour(this.weatherData.pressure, ilb, iub, jlb, jub, x, y, pressures.length, pressures)
-  }
-
-  public onDraw(cnv: Canvas): void {
-    if (!this.weatherData?.pressure || this.weatherData.pressure.length === 0) return
-
-    if (!this.offlineCanvas) {
-      this.regenerateIsobarsCache()
-    }
-
-    if (!this.offlineCanvas) return
-
     this.drawWorldInScreenSpace(() => {
-      cnv.context.drawImage(this.offlineCanvas!, 0, 0)
+      const ctx = cnv.context
+      ctx.strokeStyle = "#383b79"
+      ctx.lineWidth = 4
+      ctx.font = "18px serif"
+
+      let lastLevel = ""
+
+      const isMetric = this.settings.settings.weather.metric
+
+      const drawContours = (
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        l: number
+      ): void => {
+        ctx.beginPath()
+        ctx.moveTo(y1 * this.tileSizeX, x1 * this.tileSizeY)
+        ctx.lineTo(y2 * this.tileSizeX, x2 * this.tileSizeY)
+        ctx.arc(y2 * this.tileSizeX, x2 * this.tileSizeY, 5, 0, 2 * Math.PI)
+        ctx.stroke()
+
+        const levelStr = !isMetric ? (l * 0.0295301).toFixed(2) : l.toString()
+        if (lastLevel !== levelStr) {
+          ctx.fillStyle = "#000000"
+          ctx.fillText(levelStr, y1 * this.tileSizeX + 5 + 2, x1 * this.tileSizeY + 2)
+          ctx.fillStyle = "#ffffff"
+          ctx.fillText(levelStr, y1 * this.tileSizeX + 5, x1 * this.tileSizeY)
+          lastLevel = levelStr
+        }
+      }
+
+      const c = new Conrec(drawContours)
+      c.contour(this.weatherData!.pressure, ilb, iub, jlb, jub, x, y, pressures.length, pressures)
     })
   }
 }
