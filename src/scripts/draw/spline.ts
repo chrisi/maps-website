@@ -1,4 +1,4 @@
-import type {Point2D} from "@/model/base.ts";
+import type {Point2D} from "@/model/base.ts"
 
 export function detectCorners(points: Point2D[]): number[] {
   if (points.length < 3) return []
@@ -31,7 +31,7 @@ export function simplifyPoints(points: Point2D[], scale: number): Point2D[] {
   return douglasPeucker(points, tolerance)
 }
 
-function douglasPeucker(points: Point2D[], tolerance: number): Point2D[] {
+export function douglasPeucker(points: Point2D[], tolerance: number): Point2D[] {
   if (points.length <= 2) return points
 
   let maxDistance = 0
