@@ -4,7 +4,7 @@ import type {WeatherManager} from "@/scripts/WeatherManager.ts"
 import type {Fmap} from "@/model/fmap.ts"
 import type {Point2D} from "@/model/base.ts"
 import {Conrec} from "@/scripts/Conrec.ts"
-import {douglasPeucker} from "@/scripts/draw/spline.ts"
+import {addSplineToPath, douglasPeucker} from "@/scripts/draw/spline.ts"
 import {watch} from "vue"
 
 interface IsobarLabel {
@@ -136,10 +136,7 @@ export class IsobarsOverlay extends BaseOverlay {
       const simplified = douglasPeucker(worldPoints, 20)
       if (simplified.length < 2) continue
 
-      path.moveTo(simplified[0]!.x, simplified[0]!.y)
-      for (let i = 1; i < simplified.length; i++) {
-        path.lineTo(simplified[i]!.x, simplified[i]!.y)
-      }
+      addSplineToPath(path, simplified)
 
       if (lastLevel !== contour.level) {
         labels.push({
@@ -169,16 +166,16 @@ export class IsobarsOverlay extends BaseOverlay {
       ctx.lineWidth = 4
       ctx.stroke(this.isobarsPath!)
 
-      // ctx.font = "18px serif"
-      // const isMetric = this.settings.settings.weather.metric
-      //
-      // for (const label of this.labels) {
-      //   const levelStr = !isMetric ? (label.level * 0.0295301).toFixed(2) : label.level.toString()
-      //   ctx.fillStyle = "#000000"
-      //   ctx.fillText(levelStr, label.x + 2, label.y + 2)
-      //   ctx.fillStyle = "#ffffff"
-      //   ctx.fillText(levelStr, label.x, label.y)
-      // }
+      ctx.font = "18px serif"
+      const isMetric = this.settings.settings.weather.metric
+
+      for (const label of this.labels) {
+        const levelStr = !isMetric ? (label.level * 0.0295301).toFixed(2) : label.level.toString()
+        ctx.fillStyle = "#000000"
+        ctx.fillText(levelStr, label.x + 2, label.y + 2)
+        ctx.fillStyle = "#ffffff"
+        ctx.fillText(levelStr, label.x, label.y)
+      }
     })
   }
 }
