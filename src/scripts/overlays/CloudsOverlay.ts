@@ -12,7 +12,6 @@ export class CloudsOverlay extends BaseOverlay {
   private readonly weatherMgr: WeatherManager
 
   private baseOpacity: number = 0.7
-  private blurFactor: number = 0.8
   private cloudSizeFactor: number = 1.8
 
   private weatherData: Fmap | null = null
@@ -49,7 +48,7 @@ export class CloudsOverlay extends BaseOverlay {
       this.gridSizeY = this.weatherData.dimension.y
       this.tileSizeX = this.global.map!.pixels / this.gridSizeX
       this.tileSizeY = this.global.map!.pixels / this.gridSizeY
-      this.cloudRad = Math.min(this.tileSizeX, this.tileSizeY) / 2
+      this.cloudRad = Math.min(this.tileSizeX, this.tileSizeY) * 2
       this.regenerateCloudCache()
     })
 
@@ -108,7 +107,6 @@ export class CloudsOverlay extends BaseOverlay {
     ctx.clearRect(0, 0, width, height)
     ctx.save()
     ctx.globalAlpha = this.baseOpacity
-    ctx.filter = "blur(" + Math.max(this.tileSizeX, this.tileSizeY) * this.blurFactor + "px)"
 
     const data = this.weatherData.cloud
     for (let x = 0; x < this.gridSizeX; x++) {
@@ -119,15 +117,17 @@ export class CloudsOverlay extends BaseOverlay {
         if (!cover || cover < 2) continue
         const fac = cover / MAX_CLOUD_COVER * this.cloudSizeFactor
         const col = this.getCloudBaseAltitudeColor(base)
+        const cx = x * this.tileSizeX + this.tileSizeX / 2
+        const cy = y * this.tileSizeY + this.tileSizeY / 2
+        const rad = this.cloudRad * fac
+
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad)
+        gradient.addColorStop(0, col.replace("rgb", "rgba").replace(")", ", 0.2)"))
+        gradient.addColorStop(1, col.replace("rgb", "rgba").replace(")", ", 0)"))
+
         ctx.beginPath()
-        ctx.arc(
-          x * this.tileSizeX + this.tileSizeX / 2,
-          y * this.tileSizeY + this.tileSizeY / 2,
-          this.cloudRad * fac,
-          0,
-          2 * Math.PI
-        )
-        ctx.fillStyle = col
+        ctx.arc(cx, cy, rad, 0, 2 * Math.PI)
+        ctx.fillStyle = gradient
         ctx.fill()
       }
     }
