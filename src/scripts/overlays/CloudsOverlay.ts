@@ -12,7 +12,6 @@ export class CloudsOverlay extends BaseOverlay {
   private readonly weatherMgr: WeatherManager
 
   private baseOpacity: number = 0.7
-  private blurFactor: number = 0.8
   private cloudSizeFactor: number = 1.8
 
   private weatherData: Fmap | null = null
@@ -49,7 +48,7 @@ export class CloudsOverlay extends BaseOverlay {
       this.gridSizeY = this.weatherData.dimension.y
       this.tileSizeX = this.global.map!.pixels / this.gridSizeX
       this.tileSizeY = this.global.map!.pixels / this.gridSizeY
-      this.cloudRad = Math.min(this.tileSizeX, this.tileSizeY) / 2
+      this.cloudRad = Math.min(this.tileSizeX, this.tileSizeY) * 2
       this.regenerateCloudCache()
     })
 
@@ -108,7 +107,6 @@ export class CloudsOverlay extends BaseOverlay {
     ctx.clearRect(0, 0, width, height)
     ctx.save()
     ctx.globalAlpha = this.baseOpacity
-    ctx.filter = "blur(" + Math.max(this.tileSizeX, this.tileSizeY) * this.blurFactor + "px)"
 
     const data = this.weatherData.cloud
     for (let x = 0; x < this.gridSizeX; x++) {
@@ -119,15 +117,17 @@ export class CloudsOverlay extends BaseOverlay {
         if (!cover || cover < 2) continue
         const fac = cover / MAX_CLOUD_COVER * this.cloudSizeFactor
         const col = this.getCloudBaseAltitudeColor(base)
+        const cx = x * this.tileSizeX + this.tileSizeX / 2
+        const cy = y * this.tileSizeY + this.tileSizeY / 2
+        const rad = this.cloudRad * fac
+
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad)
+        gradient.addColorStop(0, col.replace("rgb", "rgba").replace(")", ", 0.2)"))
+        gradient.addColorStop(1, col.replace("rgb", "rgba").replace(")", ", 0)"))
+
         ctx.beginPath()
-        ctx.arc(
-          x * this.tileSizeX + this.tileSizeX / 2,
-          y * this.tileSizeY + this.tileSizeY / 2,
-          this.cloudRad * fac,
-          0,
-          2 * Math.PI
-        )
-        ctx.fillStyle = col
+        ctx.arc(cx, cy, rad, 0, 2 * Math.PI)
+        ctx.fillStyle = gradient
         ctx.fill()
       }
     }
@@ -146,5 +146,88 @@ export class CloudsOverlay extends BaseOverlay {
     this.drawWorldInScreenSpace(() => {
       cnv.context.drawImage(this.offlineCanvas!, 0, 0)
     })
+
+    if (this.settings.settings.weather.colorCloudBase) {
+      this.drawLegend(cnv)
+    }
+  }
+
+  private drawLegend(cnv: Canvas): void {
+    const ctx = cnv.context
+    ctx.save()
+
+    const padX = 10
+    const padY = 8
+    const rowHeight = 17
+    const boxWidth = 14
+    const boxHeight = 10
+    const boxGap = 8
+    const titleGap = 6
+    const radius = 6
+
+    const items: { label: string, color: string }[] = []
+    for (const [key, color] of this.cloudAltColorMap) {
+      const label = key >= 20000 ? "> 9,000 ft" : `≤ ${key.toLocaleString()} ft`
+      items.push({ label, color })
+    }
+
+    ctx.font = "bold 11px sans-serif"
+    const title = "Cloud Base"
+    let maxContentWidth = ctx.measureText(title).width
+
+    ctx.font = "11px sans-serif"
+    for (const item of items) {
+      const textWidth = ctx.measureText(item.label).width
+      maxContentWidth = Math.max(maxContentWidth, boxWidth + boxGap + textWidth)
+    }
+
+    const legendWidth = maxContentWidth + padX * 2
+    const legendHeight = padY * 2 + 14 + titleGap + items.length * rowHeight
+
+    const canvasHeight = ctx.canvas.clientHeight || (typeof window !== "undefined" ? window.innerHeight : 0) || ctx.canvas.height
+    const x = 16
+    const y = Math.max(16, canvasHeight - legendHeight - 16)
+
+    // Draw darkened background with rounded corners
+    ctx.fillStyle = "rgba(0, 0, 0, 0.65)"
+    if (ctx.roundRect) {
+      ctx.beginPath()
+      ctx.roundRect(x, y, legendWidth, legendHeight, radius)
+      ctx.fill()
+    } else {
+      ctx.fillRect(x, y, legendWidth, legendHeight)
+    }
+
+    // Draw title
+    ctx.fillStyle = "#ffffff"
+    ctx.font = "bold 11px sans-serif"
+    ctx.textAlign = "left"
+    ctx.textBaseline = "top"
+    ctx.fillText(title, x + padX, y + padY)
+
+    // Draw items
+    ctx.font = "11px sans-serif"
+    let currentY = y + padY + 14 + titleGap
+
+    for (const item of items) {
+      const boxY = currentY + (rowHeight - boxHeight) / 2
+      const boxX = x + padX
+
+      ctx.fillStyle = item.color
+      ctx.fillRect(boxX, boxY, boxWidth, boxHeight)
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"
+      ctx.lineWidth = 1
+      ctx.strokeRect(boxX, boxY, boxWidth, boxHeight)
+
+      ctx.fillStyle = "#ffffff"
+      ctx.textAlign = "left"
+      ctx.textBaseline = "middle"
+      ctx.fillText(item.label, boxX + boxWidth + boxGap, currentY + rowHeight / 2)
+
+      currentY += rowHeight
+    }
+
+    ctx.restore()
   }
 }
