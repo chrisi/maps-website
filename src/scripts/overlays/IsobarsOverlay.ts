@@ -152,7 +152,7 @@ export class IsobarsOverlay extends BaseOverlay {
   }
 
   public onDraw(cnv: Canvas): void {
-    if (!this.weatherData?.pressure || this.weatherData.pressure.length === 0 || !this.global.map) return
+    const ctx = cnv.context
 
     if (!this.isobarsPath) {
       this.generateIsobarsPath()
@@ -160,22 +160,34 @@ export class IsobarsOverlay extends BaseOverlay {
 
     if (!this.isobarsPath) return
 
-    this.drawWorldInScreenSpace(() => {
-      const ctx = cnv.context
-      ctx.strokeStyle = "#383b79"
-      ctx.lineWidth = 4
-      ctx.stroke(this.isobarsPath!)
+    const matrix = new DOMMatrix([
+      cnv.scale, 0, 0, cnv.scale,
+      -cnv.offset.x * cnv.scale,
+      -cnv.offset.y * cnv.scale
+    ])
 
-      ctx.font = "18px serif"
-      const isMetric = this.settings.settings.weather.metric
+    const screenPath = new Path2D()
+    screenPath.addPath(this.isobarsPath, matrix)
 
-      for (const label of this.labels) {
-        const levelStr = !isMetric ? (label.level * 0.0295301).toFixed(2) : label.level.toString()
-        ctx.fillStyle = "#000000"
-        ctx.fillText(levelStr, label.x + 2, label.y + 2)
-        ctx.fillStyle = "#ffffff"
-        ctx.fillText(levelStr, label.x, label.y)
-      }
-    })
+    ctx.save()
+    ctx.globalAlpha = 0.5
+    ctx.strokeStyle = "#000"
+    ctx.lineWidth = 3
+    ctx.stroke(screenPath)
+    ctx.strokeStyle = "#88f"
+    ctx.lineWidth = 1
+    ctx.stroke(screenPath)
+
+    ctx.font = "18px sans"
+    const isMetric = this.settings.settings.weather.metric
+
+    for (const label of this.labels) {
+      const pos = this.toCnv(label, cnv)
+      const levelStr = !isMetric ? (label.level * 0.0295301).toFixed(2) : label.level.toString()
+      //TODO: use nice text
+      ctx.fillStyle = "#ffffff"
+      ctx.fillText(levelStr, pos.x, pos.y)
+    }
+    cnv.context.restore()
   }
 }
