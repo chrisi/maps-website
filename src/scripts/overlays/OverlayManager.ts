@@ -12,6 +12,13 @@ interface HotspotCandidate {
   target: Hotspot
 }
 
+interface OverlayPerfStats {
+  count: number
+  totalMs: number
+  minMs: number
+  maxMs: number
+}
+
 export class OverlayManager {
 
   private global = useGlobalStore()
@@ -20,6 +27,8 @@ export class OverlayManager {
   private cnv: Canvas | undefined
 
   private overlays: Overlay[] = []
+
+  private perfStats = new Map<Overlay, OverlayPerfStats>()
 
   private redrawListeners: (() => void)[] = []
 
@@ -70,20 +79,58 @@ export class OverlayManager {
           const end = performance.now() // End timing
 
           if (this.settings.settings.debug) {
-            const elapsed = end - start;
-            const overlayName = overlay.constructor.name.padEnd(20, ' ');
-            context.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            context.fillRect(0, ofs + 20 * ovlCnt, 260, 20);
-            context.fillStyle = '#00ff00';
-            context.font = 'bold 14px monospace';
-            context.textAlign = 'left';
-            context.textBaseline = 'middle';
-            context.fillText(`${overlayName}: ${elapsed.toFixed(2)} ms`, 8, ofs + 11 + 20 * ovlCnt);
-            ovlCnt++;
+            const elapsedMs = end - start
+            console.log(elapsedMs)
+            let stats = this.perfStats.get(overlay)
+            if (!stats) {
+              stats = {
+                count: 1,
+                totalMs: elapsedMs,
+                minMs: elapsedMs,
+                maxMs: elapsedMs
+              }
+              this.perfStats.set(overlay, stats)
+            } else {
+              stats.count++
+              stats.totalMs += elapsedMs
+              stats.minMs = Math.min(stats.minMs, elapsedMs)
+              stats.maxMs = Math.max(stats.maxMs, elapsedMs)
+            }
+            const avgMs = stats.totalMs / stats.count
+            const overlayName = overlay.constructor.name.padEnd(20, ' ')
+            const avg = avgMs.toFixed(2).padStart(8)
+            const min = stats.minMs.toFixed(2).padStart(8)
+            const max = stats.maxMs.toFixed(2).padStart(8)
+
+            const text = `${overlayName}: avg: ${avg} ms, min: ${min} ms, max: ${max} ms`
+            context.font = 'bold 14px monospace'
+            const textWidth = context.measureText(text).width
+            context.fillStyle = 'rgba(0, 0, 0, 0.7)'
+            context.fillRect(0, ofs + 20 * ovlCnt, textWidth + 16, 20)
+            context.fillStyle = '#00ff00'
+            context.textAlign = 'left'
+            context.textBaseline = 'middle'
+            context.fillText(text, 8, ofs + 11 + 20 * ovlCnt)
+            ovlCnt++
           }
         }
       } catch (err) {
         console.error(this.errorMessage(overlay) + ` on redraw with scale ${scale}.`, err);
+      }
+    }
+
+    for (const overlay of this.overlays) {
+      try {
+        if (overlay.isEnabled()) {
+          this.cnv = {
+            context: context,
+            offset: offset,
+            scale: scale
+          }
+          overlay.onDrawLegend(this.cnv)
+        }
+      } catch (err) {
+        console.error(this.errorMessage(overlay) + ` on redraw legend with scale ${scale}.`, err);
       }
     }
   }

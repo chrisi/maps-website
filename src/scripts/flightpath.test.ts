@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {drawProfileAlongPath, type Point3D} from "./flightpath";
+import {drawProfileAlongPath} from "./flightpath";
+import type {Point3D} from "@/model/base.ts";
 
 function createMockCanvas(width = 400, height = 300) {
   const strokeCalls: string[] = [];

@@ -18,10 +18,11 @@ import type {Mission} from "@/model/mission.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {tosTime} from "@/scripts/math.ts";
 import {strLatLong} from "@/scripts/conv.ts";
-import {drawProfileAlongPath, type Point3D} from "@/scripts/flightpath.ts";
+import {drawProfileAlongPath} from "@/scripts/flightpath.ts";
 import {baseUrl} from "@/scripts/utils.ts";
 import ToolTitle from "@/components/forms/tool-title.vue";
 import FlightProfile from "@/components/windows/flight-profile.vue";
+import type {Point3D} from "@/model/base.ts";
 
 const props = defineProps({
   visible: {

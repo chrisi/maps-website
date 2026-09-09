@@ -146,13 +146,14 @@ export class CloudsOverlay extends BaseOverlay {
     this.drawWorldInScreenSpace(() => {
       cnv.context.drawImage(this.offlineCanvas!, 0, 0)
     })
-
-    if (this.settings.settings.weather.colorCloudBase) {
-      this.drawLegend(cnv)
-    }
   }
 
-  private drawLegend(cnv: Canvas): void {
+  public onDrawLegend(cnv: Canvas): void {
+    if (!this.weatherData?.cloud) return
+
+    if (!this.settings.settings.weather.colorCloudBase)
+      return
+
     const ctx = cnv.context
     ctx.save()
 

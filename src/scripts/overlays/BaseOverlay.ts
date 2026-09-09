@@ -24,6 +24,8 @@ export interface Overlay {
 
   onDraw(cnv: Canvas): void
 
+  onDrawLegend(cnv: Canvas): void
+
   onPointerDown?(e: PointerEvent, ownHotspots: Hotspot[]): void
 
   onPointerUp?(e: PointerEvent, ownHotspots: Hotspot[], isClick: boolean): void
@@ -86,6 +88,9 @@ export abstract class BaseOverlay implements Overlay {
   }
 
   public abstract onDraw(cnv: Canvas): void
+
+  public onDrawLegend(cnv: Canvas): void {
+  }
 
   protected redraw(): void {
     this.manager!.redraw()
