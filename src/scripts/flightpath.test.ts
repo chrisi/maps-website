@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {drawProfileAlongPath, type ProfileWaypoint} from "./flightpath";
+import {drawProfileAlongPath, type Point3D} from "./flightpath";
 
 function createMockCanvas(width = 400, height = 300) {
   const strokeCalls: string[] = [];
@@ -86,7 +86,7 @@ describe("flightpath", () => {
       }
     };
 
-    const waypoints: ProfileWaypoint[] = [
+    const waypoints: Point3D[] = [
       {x: 0, y: 0, z: 10000},
       {x: 50, y: 50, z: 20000},
       {x: 100, y: 100, z: 30000}
