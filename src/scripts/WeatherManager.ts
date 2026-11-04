@@ -1,6 +1,7 @@
 import type {Fmap} from "@/model/fmap.ts";
 import type {Point2D} from "@/model/base.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
+import {createGfsProcessor, type GfsProcessor} from "@/scripts/gfs.ts"
 
 const data_offset = {
   shower: [0, 0, 0, 0, 0, 0, 0, 0, 0, 93998],
@@ -40,6 +41,27 @@ export class WeatherManager {
   };
 
   private weatherEventHandler: ((fmap: Fmap) => void)[] = [];
+
+  private gfsProc: GfsProcessor;
+
+  constructor() {
+    this.gfsProc = createGfsProcessor({
+      fmap: this.fmap,
+      clearWeather: () => this.clearWeather(),
+      setTimeString: (day, hour, minute) => {
+        const dayString = day.toFixed(0)
+        const hourString = this.padZeros(hour.toFixed(0), 2)
+        const minuteString = this.padZeros(minute.toFixed(0), 2)
+        this.fmap.time = dayString + hourString + minuteString
+      },
+
+      updateAirportTitles: () => this.weatherEventHandler.forEach(cb => cb(this.fmap))
+    })
+  }
+
+  public processGrib2(buffer: any, filename: string) {
+    this.gfsProc.ProcessGrib2(buffer);
+  }
 
   public onWeatherEvent(cb: ((fmap: Fmap) => void)) {
     this.weatherEventHandler.push(cb);

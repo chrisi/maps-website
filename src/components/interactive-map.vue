@@ -111,6 +111,14 @@ dropFileHandler.onWeatherMapLoaded((filename, data) => {
   console.log("Weather map loaded: " + filename)
 })
 
+dropFileHandler.onGrib2Loaded((filename, data) => {
+  weatherMgr.processGrib2(data, filename)
+  settings.viz.wx = true
+  settings.viz.mt = true
+  settings.settings.map.filter = '3'
+  console.log("Weather map loaded from GFS: " + filename)
+})
+
 imcsClient.onClearEvent(() => {
   global.whiteboard = {shapes: [], symbols: []}
   overlayManager.redraw()
