@@ -274,6 +274,7 @@ function gfsEndianness(byte_array: Uint8Array): Uint8Array {
             gfsSwapBytes(byte_array,1,6);
             gfsSwapBytes(byte_array,2,5);
             gfsSwapBytes(byte_array,3,4);
+            break;
         default:
             break;
     }
@@ -296,7 +297,7 @@ function gfsArrayToInt(byte_array: Uint8Array): number {
         value = (value * 256) + byte_array[i]!;
     }
     return value;
-};
+}
 
 // Bit unpack for 9 to 16 bits
 // Array a, bits bs and index i
@@ -309,7 +310,7 @@ function gfsBitUnpack(a: Uint8Array, bs: number, i: number): number {
     var ey = (eb / 8) >> 0; // End Byte
     var res = 0;
 
-    for (var i=sy; i <= ey; i++) res = res * 256 + a[i]!;
+    for (let n=sy; n <= ey; n++) res = res * 256 + a[n]!;
     res = (res >> ms) & mb;
 
     return res;
