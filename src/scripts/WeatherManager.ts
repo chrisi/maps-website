@@ -2,6 +2,7 @@ import type {Fmap} from "@/model/fmap.ts";
 import type {Point2D} from "@/model/base.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
 import {createGfsProcessor, type GfsProcessor} from "@/scripts/gfs.ts"
+import {useGlobalStore} from "@/stores/global.ts";
 
 const data_offset = {
   shower: [0, 0, 0, 0, 0, 0, 0, 0, 0, 93998],
@@ -12,6 +13,7 @@ const data_offset = {
 export class WeatherManager {
 
   private settings = useSettingsStore();
+  private global = useGlobalStore();
 
   private fmap: Fmap = {
     time: "10000Z",
@@ -59,8 +61,43 @@ export class WeatherManager {
     })
   }
 
-  public processGrib2(buffer: any, filename: string) {
+  public processGrib2(buffer: any) {
     this.gfsProc.ProcessGrib2(buffer);
+  }
+
+  public async downloadGrib2(date: string, cycle: number, offset: number) {
+    const gfsUrl = this.gfsProc.gfsConstructURL(this.global.map!.datum, date, cycle, offset);
+    const filename = this.gfsProc.gfsGetFilename(cycle, offset);
+
+    const response = await fetch(gfsUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to download GRIB2 file: ${response.status} ${response.statusText}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+
+    this.downloadBuffer(buffer, filename);
+    this.gfsProc.ProcessGrib2(buffer);
+  }
+
+  private downloadBuffer(buffer: ArrayBuffer, filename: string) {
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+    const objectUrl = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.setAttribute("download", filename);
+    downloadLink.setAttribute("href", objectUrl);
+    downloadLink.click();
+
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  private downloadFile(src: any, dest: any) {
+    let link = new URL(src);
+    let downloadLink = document.createElement('a');
+    downloadLink.setAttribute('download', dest);
+    downloadLink.setAttribute('href', link.toString());
+    downloadLink.click();
   }
 
   public onWeatherEvent(cb: ((fmap: Fmap) => void)) {

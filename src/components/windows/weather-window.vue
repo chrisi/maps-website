@@ -9,6 +9,8 @@ import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
 import {reactive} from "vue";
 import {useSettingsStore} from "@/stores/settings.ts";
 import ToolTitle from "@/components/forms/tool-title.vue";
+import ToolRow from "@/components/forms/tool-row.vue";
+import ToolButton from "@/components/forms/tool-button.vue";
 
 const settings = useSettingsStore()
 
@@ -21,10 +23,9 @@ defineProps({
 
 const emit = defineEmits(['close', 'btnClick'])
 
-// function btnClick(sender: string) {
-//   emit('btnClick', sender)
-// }
-
+function btnClick(sender: string) {
+  emit('btnClick', sender)
+}
 
 interface GFSConfig {
   date: string;
@@ -105,6 +106,12 @@ const cycles: ValueCaptionPair[] = [
     </tool-dropdown>
     <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles" v-model="gfs.cycle"/>
     <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" v-model="gfs.forecast" width="60px"/>
+
+    <tool-row>
+      <div style="text-align: end; width: 100%;">
+        <tool-button id="downloadGrib2" icon="/icons/buttons/download.png" @click="btnClick"/>
+      </div>
+    </tool-row>
 
   </tool-window>
 </template>

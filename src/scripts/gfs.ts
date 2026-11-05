@@ -203,20 +203,21 @@ function gfsGetAvailableProd(): string[] {
     return prod;
 }
 
-// Construct name like: gfs.t18z.pgrb2.0p25.f001
-function gfsGetFilename(cycle: string | number, offset: string | number): string {
-    var forecast_str = offset.toString();
-    while (forecast_str.length < 3) forecast_str = "0" + forecast_str;
-    return "gfs.t" + cycle + "z.pgrb2.0p25.f" + forecast_str;
-}
+  // Construct name like: gfs.t18z.pgrb2.0p25.f001
+  function gfsGetFilename(cycle: string | number, offset: string | number): string {
+    const cycleStr = cycle.toString().padStart(2, "0");
+    const forecastStr = offset.toString().padStart(3, "0");
+    return "gfs.t" + cycleStr + "z.pgrb2.0p25.f" + forecastStr;
+  }
 
-// Construct name like: %2Fgfs.20230531%2F18%2Fatmos
-function gfsGetDirname(date: string, cycle: string | number): string {
-    return "%2Fgfs." + date + "%2F" + cycle + "%2Fatmos";
-}
+  // Construct name like: %2Fgfs.20230531%2F18%2Fatmos
+  function gfsGetDirname(date: string, cycle: string | number): string {
+    const cycleStr = cycle.toString().padStart(2, "0");
+    return "%2Fgfs." + date + "%2F" + cycleStr + "%2Fatmos";
+  }
 
-// Set the bounding box for the region
-function gfsGetTheaterBox(datum: GfsDatum): GfsTheaterBox {
+  // Set the bounding box for the region
+  function gfsGetTheaterBox(datum: GfsDatum): GfsTheaterBox {
     var b_lat = Math.round(parseFloat(String(datum.lat)));
     var t_lat = b_lat + 9.0;
     var l_long = Math.round(parseFloat(String(datum.long)));

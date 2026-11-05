@@ -28,7 +28,11 @@ export const maps: Theater[] = [
     folder: "04_KTO",
     mapFilename: "KTO_UI_Map_6k.jpeg", // native 6144
     stations: koreaStations,
-    local: true // load the map from own assets instead from bms cdn
+    local: true, // load the map from own assets instead from bms cdn
+    datum: {
+      "lat": 33.84375,
+      "long": 123
+    }
   },
   {
     name: "balkans",
@@ -41,7 +45,11 @@ export const maps: Theater[] = [
     folder: "02_Balkans",
     mapFilename: "Balkans_UI_Map_6K.jpeg", // native 6144
     stations: balkansStations,
-    local: true // load the map from own assets instead from bms cdn
+    local: true, // load the map from own assets instead from bms cdn
+    datum: {
+      "lat": 33.84375,
+      "long": 123
+    }
   },
   {
     name: "israel",
@@ -54,7 +62,11 @@ export const maps: Theater[] = [
     folder: "03_ITO",
     mapFilename: "ITO_UI_Map_6K.jpeg", // native 6144
     stations: israelStations,
-    local: true // load the map from own assets instead from bms cdn
+    local: true, // load the map from own assets instead from bms cdn
+    datum: {
+      "lat": 33.84375,
+      "long": 123
+    }
   },
   {
     name: "hellas",
@@ -67,7 +79,11 @@ export const maps: Theater[] = [
     folder: "05_HTO", // TODO: tbd
     mapFilename: "HTO_UI_Map_6K.jpeg", // native 6144
     stations: hellasStations,
-    local: true // load the map from own assets instead from bms cdn
+    local: true, // load the map from own assets instead from bms cdn
+    datum: {
+      "lat": 33.84375,
+      "long": 123
+    }
   }
 ]
 

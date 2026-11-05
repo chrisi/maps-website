@@ -1,4 +1,5 @@
 import type {Station} from "@/model/station.ts";
+import type {Position} from "@/model/base.ts";
 
 export interface Theater {
   name: string
@@ -11,4 +12,5 @@ export interface Theater {
   mapFilename: string
   stations: Station[]
   local: boolean
+  datum: Position
 }
