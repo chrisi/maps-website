@@ -4,8 +4,9 @@ import ToolWindow from "@/components/forms/tool-window.vue";
 import ToolSection from "@/components/forms/tool-section.vue";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 import ToolDropdown from "@/components/forms/tool-dropdown.vue";
-import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
+import type {WeatherManager} from "@/scripts/WeatherManager.ts";
+import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import {reactive} from "vue";
 import {useSettingsStore} from "@/stores/settings.ts";
 import ToolTitle from "@/components/forms/tool-title.vue";
@@ -14,18 +15,12 @@ import ToolButton from "@/components/forms/tool-button.vue";
 
 const settings = useSettingsStore()
 
-defineProps({
-  visible: {
-    type: Boolean,
-    required: true
-  }
-})
+const props = defineProps<{
+  visible: boolean
+  wxManager: WeatherManager
+}>()
 
 const emit = defineEmits(['close', 'btnClick'])
-
-function btnClick(sender: string) {
-  emit('btnClick', sender)
-}
 
 interface GFSConfig {
   date: string;
@@ -53,7 +48,7 @@ const alts: ValueCaptionPair[] = [
   {value: "8", caption: "40000"},
   {value: "9", caption: "50000"}
 ]
-//
+
 // const wx: ValueCaptionPair[] = [
 //   {value: "2", caption: "Temperature"},
 //   {value: "1", caption: "Winds"},
@@ -76,6 +71,11 @@ const cycles: ValueCaptionPair[] = [
   {value: "12", caption: "1200Z"},
   {value: "18", caption: "1800Z"}
 ]
+
+const downloadGrib2 = (sender: string) => {
+  console.log("Weather: " + sender)
+  props.wxManager.downloadGrib2("20261106", 0, 1)
+}
 
 </script>
 
@@ -109,7 +109,7 @@ const cycles: ValueCaptionPair[] = [
 
     <tool-row>
       <div style="text-align: end; width: 100%;">
-        <tool-button id="downloadGrib2" icon="/icons/buttons/download.png" @click="btnClick"/>
+        <tool-button id="downloadGrib2" icon="/icons/buttons/download.png" @click="downloadGrib2"/>
       </div>
     </tool-row>
 

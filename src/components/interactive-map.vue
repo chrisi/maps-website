@@ -119,11 +119,6 @@ dropFileHandler.onGrib2Loaded((filename, data) => {
   console.log("Weather map loaded from GFS: " + filename)
 })
 
-const weatherClick = (sender: string) => {
-  console.log("Weather: " + sender)
-  weatherMgr.downloadGrib2("20261106", 0, 1)
-}
-
 imcsClient.onClearEvent(() => {
   global.whiteboard = {shapes: [], symbols: []}
   overlayManager.redraw()
@@ -345,7 +340,7 @@ const getMapUrl = (map: Theater) => {
   <route-window :visible="activeWindow=='route'" :missionManager="missionMgr" @close="activeWindow=''" @btnClick="routeClick"/>
   <whiteboard-window :visible="activeWindow=='whiteboard'" @close="activeWindow=''" :overlayManager="overlayManager"
                      :imcsClient="imcsClient"/>
-  <weather-window :visible="activeWindow=='weather'" @close="activeWindow=''" @btnClick="weatherClick"/>
+  <weather-window :visible="activeWindow=='weather'" @close="activeWindow=''" :wxManager="weatherMgr"/>
   <aircraft-window :visible="activeWindow=='aircraft'" @close="activeWindow=''"/>
   <settings-window :visible="activeWindow=='settings'" @close="activeWindow=''" @btnClick="settingsClick"/>
   <div @drop="dropFileHandler.process" @dragover="dropFileHandler.allow">
