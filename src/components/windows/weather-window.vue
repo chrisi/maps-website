@@ -15,6 +15,8 @@ import ToolButton from "@/components/forms/tool-button.vue";
 
 const settings = useSettingsStore()
 
+const dateOptions = getCurrentAndLast7Days()
+
 const props = defineProps<{
   visible: boolean
   wxManager: WeatherManager
@@ -31,9 +33,9 @@ interface GFSConfig {
 const maxForecast = 384 // TODO: move to settings ?
 
 const gfs = reactive<GFSConfig>({
-  date: "20230531",
+  date: dateOptions[0]!.value,
   cycle: "06",
-  forecast: 42
+  forecast: 12
 })
 
 const alts: ValueCaptionPair[] = [
@@ -74,7 +76,36 @@ const cycles: ValueCaptionPair[] = [
 
 const downloadGrib2 = (sender: string) => {
   console.log("Weather: " + sender)
-  props.wxManager.downloadGrib2("20261106", 0, 1)
+  props.wxManager.downloadGrib2("20261106", Number(gfs.cycle), gfs.forecast)
+}
+
+type DateOption = {
+  value: string
+  label: string
+}
+
+function getCurrentAndLast7Days(): DateOption[] {
+  const dates: DateOption[] = []
+
+  for (let i = 0; i <= 7; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+
+    dates.push({
+      value: `${year}${month}${day}`,
+      label: date.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+    })
+  }
+
+  return dates
 }
 
 </script>
@@ -102,7 +133,9 @@ const downloadGrib2 = (sender: string) => {
 
     <tool-section name="Global Forecast System"/>
     <tool-dropdown id="gfs-date" name="date" label="Date" v-model="gfs.date">
-      <option value="20230531">May 31, 2023</option>
+      <option v-for="date in dateOptions" :key="date.value" :value="date.value">
+        {{ date.label }}
+      </option>
     </tool-dropdown>
     <tool-dropdown id="gfs-cycle" name="cycle" label="Cycle" :options="cycles" v-model="gfs.cycle"/>
     <tool-numberfield id="gfs-off" name="offset" label="Forecast" :min="1" :max="maxForecast" v-model="gfs.forecast" width="60px"/>
