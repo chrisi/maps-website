@@ -58,3 +58,32 @@ export interface Fmap {
 
   //clear(): void;
 }
+
+// Create an empty fmap with the default header information
+export function createEmptyFmap(): Fmap {
+  return {
+    time: "10000Z",
+    version: 0,
+    changed: false,
+    scaler: 1,
+    dimension: {x: 0, y: 0},
+    airmass: {direction: 0, speed: 0},
+    turbulence: {top: 31000, bottom: 28000},
+    contrail: [34000, 28000, 25000, 2000],
+    cells: 0,
+    type: [],
+    pressure: [],
+    temperature: [],
+    wind: [],
+    cloud: {base: [], cover: [], size: [], type: []},
+    shower: [],
+    visibility: [],
+    fog: [],
+    analytics: {
+      pressure_min: 1060,
+      pressure_max: 950,
+      temperature_min: 50,
+      temperature_max: -50
+    }
+  };
+}

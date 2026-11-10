@@ -1,364 +1,43 @@
-import type {Fmap} from "@/model/fmap.ts";
-import type {Point2D} from "@/model/base.ts";
-import {useGlobalStore} from "@/stores/global.ts";
-import {useSettingsStore} from "@/stores/settings.ts";
-import {createGfsProcessor, type GfsProcessor} from "@/scripts/weather/GfsProcessor.ts"
-import {padZeros} from "@/scripts/utils.ts";
-
-const data_offset = {
-  shower: [0, 0, 0, 0, 0, 0, 0, 0, 0, 93998],
-  visibility: [0, 0, 0, 0, 0, 93998, 93998, 93998, 97479],
-  fog: [0, 0, 0, 0, 0, 0, 0, 0, 0, 100960],
-};
+import {createEmptyFmap, type Fmap} from "@/model/fmap.ts"
+import type {Point2D} from "@/model/base.ts"
+import {useGlobalStore} from "@/stores/global.ts"
+import {useSettingsStore} from "@/stores/settings.ts"
+import {FmapImport} from "@/scripts/weather/FmapImport.ts"
+import {GfsClient} from "@/scripts/weather/GfsClient.ts"
+import {padZeros} from "@/scripts/utils.ts"
 
 export class WeatherManager {
 
   private settings = useSettingsStore();
   private global = useGlobalStore();
 
-  private fmap: Fmap = {
-    time: "10000Z",
-    version: 0,
-    changed: false,
-    scaler: 1,
-    dimension: {x: 0, y: 0},
-    airmass: {direction: 0, speed: 0},
-    turbulence: {top: 31000, bottom: 28000},
-    contrail: [34000, 28000, 25000, 2000],
-    cells: 0,
-    type: [],
-    pressure: [],
-    temperature: [],
-    wind: [],
-    cloud: {base: [], cover: [], size: [], type: [],},
-    shower: [],
-    visibility: [],
-    fog: [],
-    analytics: {
-      pressure_min: 1060,
-      pressure_max: 950,
-      temperature_min: 50,
-      temperature_max: -50
-    }
-  };
+  private fmap: Fmap = createEmptyFmap();
 
   private weatherEventHandler: ((fmap: Fmap) => void)[] = [];
 
-  private gfsProc: GfsProcessor;
-
-  constructor() {
-    this.gfsProc = createGfsProcessor({
-      fmap: this.fmap,
-      clearWeather: () => this.clearWeather(),
-      setTimeString: (day, hour, minute) => {
-        const dayString = day.toFixed(0)
-        const hourString = this.padZeros(hour.toFixed(0), 2)
-        const minuteString = this.padZeros(minute.toFixed(0), 2)
-        this.fmap.time = dayString + hourString + minuteString
-      },
-
-      updateAirportTitles: () => this.weatherEventHandler.forEach(cb => cb(this.fmap))
-    })
-  }
-
-  public processGrib2(buffer: ArrayBuffer) {
-    this.gfsProc.ProcessGrib2(buffer);
-  }
-
-  public async downloadGrib2(date: string, cycle: number, offset: number) {
-    const gfsUrl = this.gfsProc.gfsConstructURL(this.global.map!.datum, date, cycle, offset);
-    const filename = this.gfsProc.gfsGetFilename(cycle, offset);
-    this.downloadFile(gfsUrl, filename);
-  }
-
-  private downloadFile(src: string, filename: string) {
-    const link = new URL(src);
-    const downloadLink = document.createElement('a');
-    downloadLink.setAttribute('download', filename);
-    downloadLink.setAttribute('href', link.toString());
-    downloadLink.click();
-  }
+  private fmapImport = new FmapImport();
+  private gfsClient = new GfsClient();
 
   public onWeatherEvent(cb: ((fmap: Fmap) => void)) {
     this.weatherEventHandler.push(cb);
   }
 
-  private clearWeather() {
-    // Header Information
-    this.fmap.version = 0;
-    this.fmap.time = "10000Z";
-    this.fmap.dimension = {x: 0, y: 0};
-    this.fmap.airmass = {direction: 0, speed: 0};
-    this.fmap.turbulence = {top: 31000, bottom: 28000};
-    this.fmap.contrail = [34000, 28000, 25000, 2000];
-    this.fmap.cells = 0;
-
-    // Weather Data
-    this.fmap.type = [];
-    this.fmap.pressure = [];
-    this.fmap.temperature = [];
-    this.fmap.wind = [];
-    this.fmap.cloud.base = [];
-    this.fmap.cloud.cover = [];
-    this.fmap.cloud.size = [];
-    this.fmap.cloud.type = [];
-    this.fmap.shower = [];
-    this.fmap.visibility = [];
-    this.fmap.fog = [];
-    this.fmap.analytics = {
-      pressure_min: 1060,
-      pressure_max: 950,
-      temperature_min: 50,
-      temperature_max: -50
-    };
-  }
-
-  private readMapInfo(buffer: any) {
-    const view = new Uint32Array(buffer);
-    if (view.length < 11) {
-      return;
-    }
-
-    this.fmap.version = view[0] ?? 0;
-    this.fmap.dimension.x = view[1] ?? 0;
-    this.fmap.dimension.y = view[2] ?? 0;
-    this.fmap.airmass.direction = view[3] ?? 0;
-    this.fmap.airmass.speed = view[4] ?? 0;
-    this.fmap.turbulence.top = view[5] ?? 0;
-    this.fmap.turbulence.bottom = view[6] ?? 0;
-    this.fmap.contrail[0] = view[7] ?? 0;
-    this.fmap.contrail[1] = view[8] ?? 0;
-    this.fmap.contrail[2] = view[9] ?? 0;
-    this.fmap.contrail[3] = view[10] ?? 0;
-
-    // Compute total cells
-    this.fmap.cells = this.fmap.dimension.x * this.fmap.dimension.y;
-  }
-
-  // Read the BMS Weather Type (1: Sunny, 2: Fair, 3: Poor, 4: Inclement)
-  private readWeatherType(buffer: any) {
-    const offset = 11;
-    const type = new Int32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = type[offset + i];
-      }
-      this.fmap.type.push(data);
-    }
-  }
-
-  // Read the Atmospheric Pressure in mb / hPa
-  private readAtmosphericPressure(buffer: any) {
-    const offset = 3492;
-    const pressure = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = pressure[offset + i]
-        if (data[x] < this.fmap.analytics.pressure_min) this.fmap.analytics.pressure_min = data[x];
-        if (data[x] > this.fmap.analytics.pressure_max) this.fmap.analytics.pressure_max = data[x];
-      }
-      this.fmap.pressure.push(data);
-    }
-  }
-
-  // Read the Surface temperature in Celsius
-  private readSurfaceTemperature(buffer: any) {
-
-    const offset = 6973;
-    const temperature = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = temperature[offset + i];
-        if (data[x] < this.fmap.analytics.temperature_min) this.fmap.analytics.temperature_min = data[x];
-        if (data[x] > this.fmap.analytics.temperature_max) this.fmap.analytics.temperature_max = data[x];
-      }
-      this.fmap.temperature.push(data);
-    }
-  }
-
-  // Wind speed and direction for 10 altitudes:
-  // 0ft, 3000ft, 6000ft, 9000ft, 12,000ft,
-  // 18,000ft, 24,000ft, 30,000ft,
-  // 40,000ft, 50,000ft
-  private readWindVelocities(buffer: any) {
-
-    const magnitude_offset = 10454;
-    const direction_offset = 45264;
-    const altitudes = 10;
-
-    const winds = new Float32Array(buffer);
-
-    // Iterate over the map cells
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-
-        const velocities = Array(altitudes).fill(0);
-        // Process the 10 altitudes for each weather Cell in BMS
-        for (let alt = 0; alt < altitudes; alt++) {
-          const i = y * this.fmap.dimension.x * altitudes + x * altitudes + alt;
-          const speed = winds[magnitude_offset + i];
-          const direction = winds[direction_offset + i];
-          velocities[alt] = {direction: direction, speed: speed};
-        }
-        data[x] = velocities;
-      }
-      this.fmap.wind.push(data);
-    }
-  }
-
-// Read Cloud Base in Feet (Float)
-  private readCloudBase(buffer: any) {
-    const offset = 80074;
-    const cloud_data = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = cloud_data[offset + i];
-      }
-      this.fmap.cloud.base.push(data);
-    }
-  }
-
-  // Read Cloud Cover Data
-  // (1: FEW, 5: SCT, 9: BKN, 13: OVC)
-  // Weather Type Poor and Inclement should be minimum BKN.
-  private readCloudCover(buffer: any) {
-    const offset = 83555;
-    const cloud_cover = new Int32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = cloud_cover[offset + i];
-      }
-      this.fmap.cloud.cover.push(data);
-    }
-  }
-
-  // Read Cloud Size (0 Largest ... 5 Smallest)
-  private readCloudSize(buffer: any) {
-    const offset = 87036; // Cloud Size (checked)
-    const cloud_size = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = cloud_size[offset + i];
-      }
-      this.fmap.cloud.size.push(data);
-    }
-  }
-
-  // Read Cloud Type
-  // Towering Cumulus (1: Yes, 0: No)
-  private readCloudType(buffer: any) {
-    const offset = 90517; // Cloud Type
-    const cloud_type = new Int32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = cloud_type[offset + i];
-      }
-      this.fmap.cloud.type.push(data);
-    }
-  }
-
-  // Read Shower Data
-  // Showers (1: Yes, 0: No)
-  private readShowerdata(buffer: any) {
-    const offset = data_offset.shower[this.fmap.version] ?? 0; // (version 8 only)
-    if (offset == 0) {
-      this.fmap.shower = Array(this.fmap.cells).fill(0);
-      return;
-    }
-    const shower = new Int32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = shower[offset + i];
-      }
-      this.fmap.shower.push(data);
-    }
-  }
-
-  // Read Visibility 0 ... 60 km in Float
-  private readVisibility(buffer: any) {
-    const offset = data_offset.visibility[this.fmap.version] ?? 0; // Visibility LUT
-    if (offset == 0) return;
-
-    const visibility = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = visibility[offset + i];
-      }
-      this.fmap.visibility.push(data);
-    }
-  }
-
-  // Read Fog altitude level (in Feet Float)
-  private readFog(buffer: any) {
-    const offset = data_offset.fog[this.fmap.version] ?? 0; // Version 8 only;
-    if (offset == 0) {
-      this.fmap.fog = Array(this.fmap.cells).fill(0);
-      return;
-    }
-
-    const fog = new Float32Array(buffer);
-
-    for (let y = 0; y < this.fmap.dimension.y; y++) {
-      const data = Array(this.fmap.dimension.x).fill(0);
-      for (let x = 0; x < this.fmap.dimension.x; x++) {
-        const i = y * this.fmap.dimension.x + x;
-        data[x] = fog[offset + i];
-      }
-      this.fmap.fog.push(data);
-    }
-  }
-
   // Process the .fmap binary buffer
-  //TODO: check filename to time
-  public processWeather(buffer: any, filename: string) {
-    this.clearWeather();
+  public processWeather(buffer: ArrayBuffer, filename: string) {
+    this.setWeather(this.fmapImport.import(buffer, filename));
+  }
 
-    // Set the Weather Time
-    this.fmap.time = filename.split(".")[0]!;
+  // Process the GFS grib2 binary buffer
+  public processGrib2(buffer: ArrayBuffer) {
+    this.setWeather(this.gfsClient.convertGrib2(buffer));
+  }
 
-    // Read the Weather Data from .fmap
-    this.readMapInfo(buffer);
-    this.readWeatherType(buffer);
-    this.readAtmosphericPressure(buffer);
-    this.readSurfaceTemperature(buffer);
-    this.readWindVelocities(buffer);
-    this.readCloudBase(buffer);
-    this.readCloudCover(buffer);
-    this.readCloudSize(buffer);
-    this.readCloudType(buffer);
-    this.readShowerdata(buffer);
-    this.readVisibility(buffer);
-    this.readFog(buffer);
+  public downloadGrib2(date: string, cycle: number, offset: number) {
+    this.gfsClient.downloadGrib2(this.global.map!.datum, date, cycle, offset);
+  }
 
+  private setWeather(fmap: Fmap) {
+    this.fmap = fmap;
     this.weatherEventHandler.forEach(cb => cb(this.fmap));
   }
 
