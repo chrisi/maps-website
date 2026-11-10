@@ -85,3 +85,21 @@ export function padZeros(str: string, num: number) {
   while (str.length < num) str = "0" + str;
   return str;
 }
+
+// Convert Array to String
+export function arrayToStr(byte_array: Uint8Array): string {
+  let result = ""
+  for (let i = 0; i < byte_array.length; i++) {
+    result += String.fromCharCode(byte_array[i]!)
+  }
+  return result
+}
+
+// Convert Array to Integer
+export function arrayToInt(byte_array: Uint8Array): number {
+  let value = 0
+  for (let i = byte_array.length - 1; i >= 0; i--) {
+    value = (value * 256) + byte_array[i]!
+  }
+  return value
+}

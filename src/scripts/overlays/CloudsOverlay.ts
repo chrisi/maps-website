@@ -157,6 +157,8 @@ export class CloudsOverlay extends BaseOverlay {
     const ctx = cnv.context
     ctx.save()
 
+    const marginLeft = 14
+    const marginBottom = 48
     const padX = 10
     const padY = 8
     const rowHeight = 17
@@ -186,8 +188,8 @@ export class CloudsOverlay extends BaseOverlay {
     const legendHeight = padY * 2 + 14 + titleGap + items.length * rowHeight
 
     const canvasHeight = ctx.canvas.clientHeight || (typeof window !== "undefined" ? window.innerHeight : 0) || ctx.canvas.height
-    const x = 16
-    const y = Math.max(16, canvasHeight - legendHeight - 16)
+    const x = marginLeft
+    const y = Math.max(marginBottom, canvasHeight - legendHeight - marginBottom)
 
     // Draw darkened background with rounded corners
     ctx.fillStyle = "rgba(0, 0, 0, 0.65)"
