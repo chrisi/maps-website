@@ -5,7 +5,7 @@ import ToolSection from "@/components/forms/tool-section.vue";
 import ToolCheckbox from "@/components/forms/tool-checkbox.vue";
 import ToolDropdown from "@/components/forms/tool-dropdown.vue";
 import ToolNumberfield from "@/components/forms/tool-numberfield.vue";
-import type {WeatherManager} from "@/scripts/WeatherManager.ts";
+import type {WeatherManager} from "@/scripts/weather/WeatherManager.ts";
 import type {ValueCaptionPair} from "@/components/forms/ValueCaptionPair.ts";
 import {reactive} from "vue";
 import {useSettingsStore} from "@/stores/settings.ts";

@@ -80,3 +80,8 @@ export function withCanvasCallCounters<T>(
     }
   }
 }
+
+export function padZeros(str: string, num: number) {
+  while (str.length < num) str = "0" + str;
+  return str;
+}

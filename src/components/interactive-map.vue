@@ -35,7 +35,7 @@ import {OverlayMode} from "@/model/mode.ts";
 import {ImcsClient} from "@/scripts/ImcsClient.ts";
 import {AgentClient} from "@/scripts/AgentClient.ts";
 import {MissionManager} from "@/scripts/MissionManager.ts";
-import {WeatherManager} from "@/scripts/WeatherManager.ts";
+import {WeatherManager} from "@/scripts/weather/WeatherManager.ts";
 import {DropFileHandler} from "@/scripts/DropFileHandler.ts";
 import type {Theater} from "@/model/theater.ts";
 import type {Station} from "@/model/station.ts";

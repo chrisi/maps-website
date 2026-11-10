@@ -3,7 +3,7 @@ import {onUnmounted, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useGlobalStore} from "@/stores/global.ts";
 import type {Point2D} from "@/model/base.ts";
-import type {WeatherManager} from "@/scripts/WeatherManager.ts";
+import type {WeatherManager} from "@/scripts/weather/WeatherManager.ts";
 
 const {map} = storeToRefs(useGlobalStore())
 const info = ref("")

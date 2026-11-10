@@ -55,4 +55,6 @@ export interface Fmap {
   fog: number[][];              // [y][x] 0 ... 10,000 ft
 
   analytics: FmapAnalytics;
+
+  //clear(): void;
 }

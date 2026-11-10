@@ -1,6 +1,6 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts"
 import type {Canvas} from "@/scripts/overlays/Canvas.ts"
-import type {WeatherManager} from "@/scripts/WeatherManager.ts"
+import type {WeatherManager} from "@/scripts/weather/WeatherManager.ts"
 import type {Fmap} from "@/model/fmap.ts"
 import {watch} from "vue"
 

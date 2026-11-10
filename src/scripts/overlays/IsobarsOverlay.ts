@@ -1,9 +1,9 @@
 import {BaseOverlay} from "@/scripts/overlays/BaseOverlay.ts"
 import type {Canvas} from "@/scripts/overlays/Canvas.ts"
-import type {WeatherManager} from "@/scripts/WeatherManager.ts"
+import type {WeatherManager} from "@/scripts/weather/WeatherManager.ts"
 import type {Fmap} from "@/model/fmap.ts"
 import type {Point2D} from "@/model/base.ts"
-import {Conrec} from "@/scripts/Conrec.ts"
+import {Conrec} from "@/scripts/weather/Conrec.ts"
 import {addSplineToPath, douglasPeucker} from "@/scripts/draw/spline.ts"
 import {watch} from "vue"
 

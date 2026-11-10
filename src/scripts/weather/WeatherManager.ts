@@ -2,7 +2,8 @@ import type {Fmap} from "@/model/fmap.ts";
 import type {Point2D} from "@/model/base.ts";
 import {useGlobalStore} from "@/stores/global.ts";
 import {useSettingsStore} from "@/stores/settings.ts";
-import {createGfsProcessor, type GfsProcessor} from "@/scripts/gfs.ts"
+import {createGfsProcessor, type GfsProcessor} from "@/scripts/weather/GfsProcessor.ts"
+import {padZeros} from "@/scripts/utils.ts";
 
 const data_offset = {
   shower: [0, 0, 0, 0, 0, 0, 0, 0, 0, 93998],
@@ -375,11 +376,11 @@ export class WeatherManager {
     const hasFog = !isNaN(this.fmap.fog[y]![x]!);
 
     // Get METAR Time component
-    const time_str = this.padZeros(this.fmap.time, 6) + "Z";
+    const time_str = padZeros(this.fmap.time, 6) + "Z";
 
     // Build the Wind String
-    const wnd_dir = this.padZeros(Math.round(this.fmap.wind[y]![x]![0]!.direction).toString(), 3);
-    const wnd_spd = this.padZeros(Math.round(this.fmap.wind[y]![x]![0]!.speed).toString(), 2);
+    const wnd_dir = padZeros(Math.round(this.fmap.wind[y]![x]![0]!.direction).toString(), 3);
+    const wnd_spd = padZeros(Math.round(this.fmap.wind[y]![x]![0]!.speed).toString(), 2);
 
     // Build the Visibility components
     let vis_str = "";
@@ -392,12 +393,12 @@ export class WeatherManager {
     if (this.settings.settings.weather.metric) {
       if ((visibility > 9999) || !hasVisibility) visibility = 9999;
       else visibility = Math.round(visibility / 100) * 100;
-      vis_str = this.padZeros(visibility.toString(), 4);
+      vis_str = padZeros(visibility.toString(), 4);
     } else {
       if ((visibility >= 16093.4) || !hasVisibility) vis_str = "10SM";
       else {
         vis_str = (Math.round(visibility / 1609.344)).toString();
-        vis_str = this.padZeros(vis_str, 2) + "SM";
+        vis_str = padZeros(vis_str, 2) + "SM";
       }
     }
 
@@ -449,7 +450,7 @@ export class WeatherManager {
 
     if (ceiling > 0) {
       const base = Math.round(ceiling / 100);
-      const base_str = this.padZeros(base.toString(), 3);
+      const base_str = padZeros(base.toString(), 3);
       if (cloud_cover > 0) cld_str = "FEW" + base_str;
       if (cloud_cover >= 3) cld_str = "SCT" + base_str;
       if (cloud_cover >= 5) cld_str = "BKN" + base_str;
@@ -472,16 +473,16 @@ export class WeatherManager {
 
     // Temperature
     if (temp < 0) temp_str += "M";
-    temp_str += this.padZeros(Math.round(Math.abs(temp)).toString(), 2);
+    temp_str += padZeros(Math.round(Math.abs(temp)).toString(), 2);
 
     // Dewpoint
     if (dew < 0) dew_str += "M";
-    dew_str += this.padZeros(Math.round(Math.abs(dew)).toString(), 2);
+    dew_str += padZeros(Math.round(Math.abs(dew)).toString(), 2);
 
     // Build the Pressure String
     let baro_str = "";
     const baro = this.fmap.pressure[y]![x]!;
-    if (this.settings.settings.weather.metric) baro_str = "Q" + this.padZeros((baro.toFixed(0)).toString(), 4);
+    if (this.settings.settings.weather.metric) baro_str = "Q" + padZeros((baro.toFixed(0)).toString(), 4);
     else baro_str = "A" + (baro * 0.0295301 * 100).toFixed(0);
 
     // Build the METAR String
@@ -495,11 +496,4 @@ export class WeatherManager {
 
     return metar_str;
   }
-
-  //TODO: put this in utility class
-  private padZeros(str: string, num: number) {
-    while (str.length < num) str = "0" + str;
-    return str;
-  }
-
 }
