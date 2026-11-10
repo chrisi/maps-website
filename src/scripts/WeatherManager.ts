@@ -33,7 +33,6 @@ export class WeatherManager {
     shower: [],
     visibility: [],
     fog: [],
-
     analytics: {
       pressure_min: 1060,
       pressure_max: 950,
@@ -61,7 +60,7 @@ export class WeatherManager {
     })
   }
 
-  public processGrib2(buffer: any) {
+  public processGrib2(buffer: ArrayBuffer) {
     this.gfsProc.ProcessGrib2(buffer);
   }
 
@@ -72,8 +71,8 @@ export class WeatherManager {
   }
 
   private downloadFile(src: string, filename: string) {
-    let link = new URL(src);
-    let downloadLink = document.createElement('a');
+    const link = new URL(src);
+    const downloadLink = document.createElement('a');
     downloadLink.setAttribute('download', filename);
     downloadLink.setAttribute('href', link.toString());
     downloadLink.click();
